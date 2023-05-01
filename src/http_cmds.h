@@ -3,27 +3,6 @@
 
 #include "modem.h"
 
-#define A76XX_HTTP_RESPONSE_RETURN(rsp)                      \
-            switch ((rsp)) {                                 \
-                case Response_t::A76XX_RESPONSE_OK : {       \
-                    return A76XX_HTTP_OPERATION_SUCCEEDED;   \
-                }                                            \
-                case Response_t::A76XX_RESPONSE_TIMEOUT : {  \
-                    return A76XX_HTTP_OPERATION_TIMEDOUT;    \
-                }                                            \
-                case Response_t::A76XX_RESPONSE_ERROR :{     \
-                    return A76XX_HTTP_GENERIC_ERROR;         \
-                }                                            \
-                default : {                                  \
-                    return A76XX_HTTP_GENERIC_ERROR;         \
-                }                                            \
-            }
-
-// error codes
-#define A76XX_HTTP_OPERATION_TIMEDOUT                -2
-#define A76XX_HTTP_GENERIC_ERROR                     -1
-
-//
 #define A76XX_HTTP_OPERATION_SUCCEEDED                0
 #define A76XX_HTTP_CONTINUE                         100
 #define A76XX_HTTP_SWITCHING_PROTOCOLS              101
@@ -83,61 +62,61 @@ class A76XX_HTTP_Commands {
     // HTTPINIT
     int8_t init() {
         _modem.sendCMD("AT+HTTPINIT");
-        A76XX_HTTP_RESPONSE_RETURN(_modem.waitResponse(120000))
+        A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
     // HTTPTERM
     int8_t term() {
         _modem.sendCMD("AT+HTTPTERM");
-        A76XX_HTTP_RESPONSE_RETURN(_modem.waitResponse(120000))
+        A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
     // HTTPPARA URL
     int8_t config_http_url(const char* url) {
         _modem.sendCMD("AT+HTTPPARA=\"URL\",", url);
-        A76XX_HTTP_RESPONSE_RETURN(_modem.waitResponse(120000))
+        A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
     // HTTPPARA CONNECTTO
     int8_t config_http_conn_timeout(int conn_timeout) {
         _modem.sendCMD("AT+HTTPPARA=\"CONNECTTO\",", conn_timeout);
-        A76XX_HTTP_RESPONSE_RETURN(_modem.waitResponse(120000))
+        A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
     // HTTPPARA RECVTO
     int8_t config_http_recv_timeout(int recv_timeout) {
         _modem.sendCMD("AT+HTTPPARA=\"RECVTO\",", recv_timeout);
-        A76XX_HTTP_RESPONSE_RETURN(_modem.waitResponse(120000))
+        A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
     // HTTPPARA CONTENT
     int8_t config_http_content_type(const char* content_type) {
         _modem.sendCMD("AT+HTTPPARA=\"CONTENT\",", content_type);
-        A76XX_HTTP_RESPONSE_RETURN(_modem.waitResponse(120000))
+        A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
     // HTTPPARA ACCEPT
     int8_t config_http_accept_type(const char* accept_type) {
         _modem.sendCMD("AT+HTTPPARA=\"ACCEPT\",", accept_type);
-        A76XX_HTTP_RESPONSE_RETURN(_modem.waitResponse(120000))
+        A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
     // HTTPPARA SSLCFG
     int8_t config_http_sslcfg_id(uint8_t sslcfg_id) {
         _modem.sendCMD("AT+HTTPPARA=\"SSLCFG\",", sslcfg_id);
-        A76XX_HTTP_RESPONSE_RETURN(_modem.waitResponse(120000))
+        A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
     // HTTPPARA USERDATA
     int8_t config_http_user_data(const char* user_data) {
         _modem.sendCMD("AT+HTTPPARA=\"USERDATA\",", user_data);
-        A76XX_HTTP_RESPONSE_RETURN(_modem.waitResponse(120000))
+        A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
     // HTTPPARA READMODE
     int8_t config_http_user_data(uint8_t readmode) {
         _modem.sendCMD("AT+HTTPPARA=\"READMODE\",", readmode);
-        A76XX_HTTP_RESPONSE_RETURN(_modem.waitResponse(120000))
+        A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
     // HTTPACTION
@@ -154,10 +133,10 @@ class A76XX_HTTP_Commands {
                 return A76XX_HTTP_OPERATION_SUCCEEDED;
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
-                return A76XX_HTTP_OPERATION_TIMEDOUT;
+                return A76XX_OPERATION_TIMEDOUT;
             }
             default : {
-                return A76XX_HTTP_GENERIC_ERROR;
+                return A76XX_GENERIC_ERROR;
             }
         }
     }
@@ -182,14 +161,14 @@ class A76XX_HTTP_Commands {
                 if (nbytes == data_len) {
                     return A76XX_HTTP_OPERATION_SUCCEEDED;
                 } else {
-                    return A76XX_HTTP_GENERIC_ERROR;
+                    return A76XX_GENERIC_ERROR;
                 }
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
-                return A76XX_HTTP_OPERATION_TIMEDOUT;
+                return A76XX_OPERATION_TIMEDOUT;
             }
             default : {
-                return A76XX_HTTP_GENERIC_ERROR;
+                return A76XX_GENERIC_ERROR;
             }
         }
     }
@@ -203,10 +182,10 @@ class A76XX_HTTP_Commands {
                 return A76XX_HTTP_OPERATION_SUCCEEDED;
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
-                return A76XX_HTTP_OPERATION_TIMEDOUT;
+                return A76XX_OPERATION_TIMEDOUT;
             }
             default : {
-                return A76XX_HTTP_GENERIC_ERROR;
+                return A76XX_GENERIC_ERROR;
             }
         }
     }
@@ -235,14 +214,14 @@ class A76XX_HTTP_Commands {
                 if (nbytes == byte_size) {
                     return A76XX_HTTP_OPERATION_SUCCEEDED;
                 } else {
-                    return A76XX_HTTP_GENERIC_ERROR;
+                    return A76XX_GENERIC_ERROR;
                 }
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
-                return A76XX_HTTP_OPERATION_TIMEDOUT;
+                return A76XX_OPERATION_TIMEDOUT;
             }
             default : {
-                return A76XX_HTTP_GENERIC_ERROR;
+                return A76XX_GENERIC_ERROR;
             }
         }
     }
@@ -263,18 +242,18 @@ class A76XX_HTTP_Commands {
                         return A76XX_HTTP_OPERATION_SUCCEEDED;
                     }
                     case Response_t::A76XX_RESPONSE_TIMEOUT : {
-                        return A76XX_HTTP_OPERATION_TIMEDOUT;
+                        return A76XX_OPERATION_TIMEDOUT;
                     }
                     default : {
-                        return A76XX_HTTP_GENERIC_ERROR;
+                        return A76XX_GENERIC_ERROR;
                     }
                 }
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
-                return A76XX_HTTP_OPERATION_TIMEDOUT;
+                return A76XX_OPERATION_TIMEDOUT;
             }
             default : {
-                return A76XX_HTTP_GENERIC_ERROR;
+                return A76XX_GENERIC_ERROR;
             }
         }
     }

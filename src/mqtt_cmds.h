@@ -3,14 +3,6 @@
 
 #include "modem.h"
 
-// error codes
-#define A76XX_MQTT_ALREADY_STOPPED                                   -4
-#define A76XX_MQTT_ALREADY_STARTED                                   -3
-#define A76XX_MQTT_OPERATION_TIMEDOUT                                -2
-#define A76XX_MQTT_GENERIC_ERROR                                     -1
-
-// section 18.3 of the A76XX Series_AT Command Manual_V1.07
-#define A76XX_MQTT_OPERATION_SUCCEEDED                                0
 #define A76XX_MQTT_FAILED                                             1
 #define A76XX_MQTT_BAD_UTF8_STRING                                    2
 #define A76XX_MQTT_SOCK_CONNECT_FAIL                                  3
@@ -93,10 +85,9 @@ class A76XX_MQTT_Commands {
         Response_t rsp = _modem.waitResponse("+CMQTTACCQ: ", 9000, true, true);
 
         if (rsp == Response_t::A76XX_RESPONSE_OK)
-            return A76XX_MQTT_OPERATION_SUCCEEDED;
 
         if (rsp == Response_t::A76XX_RESPONSE_ERROR)
-            return A76XX_MQTT_GENERIC_ERROR;
+            return A76XX_GENERIC_ERROR;
 
         // this is an error case
         if (rsp == Response_t::A76XX_RESPONSE_MATCH_1ST) {
@@ -105,7 +96,7 @@ class A76XX_MQTT_Commands {
         }
 
         // might be something else
-        return A76XX_MQTT_GENERIC_ERROR;
+        return A76XX_GENERIC_ERROR;
     }
 
     // CMQTTREL
@@ -114,10 +105,9 @@ class A76XX_MQTT_Commands {
         Response_t rsp = _modem.waitResponse("+CMQTTREL: ", 9000, true, true);
 
         if (rsp == Response_t::A76XX_RESPONSE_OK)
-            return A76XX_MQTT_OPERATION_SUCCEEDED;
 
         if (rsp == Response_t::A76XX_RESPONSE_ERROR)
-            return A76XX_MQTT_GENERIC_ERROR;
+            return A76XX_GENERIC_ERROR;
 
         // this is an error case
         if (rsp == Response_t::A76XX_RESPONSE_MATCH_1ST) {
@@ -125,7 +115,7 @@ class A76XX_MQTT_Commands {
             return _modem._serialParseIntClear();
         }
 
-        return A76XX_MQTT_GENERIC_ERROR;
+        return A76XX_GENERIC_ERROR;
     }
 
     // CMQTTSSLCFG
@@ -145,9 +135,8 @@ class A76XX_MQTT_Commands {
                 _modem._serial.write(will_topic);
                 _modem._serial.flush();
                 if (_modem.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
-                    return A76XX_MQTT_OPERATION_SUCCEEDED;
                 } else {
-                    return A76XX_MQTT_GENERIC_ERROR;
+                    return A76XX_GENERIC_ERROR;
                 }
             }
             case Response_t::A76XX_RESPONSE_MATCH_2ND : {
@@ -155,10 +144,10 @@ class A76XX_MQTT_Commands {
                 return _modem._serialParseIntClear();
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
-                return A76XX_MQTT_OPERATION_TIMEDOUT;
+                return A76XX_OPERATION_TIMEDOUT;
             }
             default : {
-                return A76XX_MQTT_GENERIC_ERROR;
+                return A76XX_GENERIC_ERROR;
             }
         }
     }
@@ -174,9 +163,8 @@ class A76XX_MQTT_Commands {
                 _modem._serial.write(will_message);
                 _modem._serial.flush();
                 if (_modem.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
-                    return A76XX_MQTT_OPERATION_SUCCEEDED;
                 } else {
-                    return A76XX_MQTT_GENERIC_ERROR;
+                    return A76XX_GENERIC_ERROR;
                 }
             }
             case Response_t::A76XX_RESPONSE_MATCH_2ND : {
@@ -184,10 +172,10 @@ class A76XX_MQTT_Commands {
                 return _modem._serialParseIntClear();
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
-                return A76XX_MQTT_OPERATION_TIMEDOUT;
+                return A76XX_OPERATION_TIMEDOUT;
             }
             default : {
-                return A76XX_MQTT_GENERIC_ERROR;
+                return A76XX_GENERIC_ERROR;
             }
         }
     }
@@ -208,13 +196,18 @@ class A76XX_MQTT_Commands {
         Response_t rsp = _modem.waitResponse("+CMQTTCONNECT: ", 9000, false, false);
 
         // read int output
-        if (rsp == Response_t::A76XX_RESPONSE_MATCH_1ST) {
-            _modem._serial.find(',');
-            return _modem._serialParseIntClear();
+        switch (rsp) {
+            case Response_t::A76XX_RESPONSE_MATCH_1ST : {
+                _modem._serial.find(',');
+                return _modem._serialParseIntClear();
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
         }
-
-        // might be something else
-        return rsp;
     }
 
     // CMQTTDISC?
@@ -246,10 +239,10 @@ class A76XX_MQTT_Commands {
                 return _modem._serialParseIntClear();
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT: {
-                return A76XX_MQTT_OPERATION_TIMEDOUT;
+                return A76XX_OPERATION_TIMEDOUT;
             }
             default : {
-                return A76XX_MQTT_GENERIC_ERROR;
+                return A76XX_GENERIC_ERROR;
             }
         }
     }
@@ -265,9 +258,8 @@ class A76XX_MQTT_Commands {
                 _modem._serial.write(topic);
                 _modem._serial.flush();
                 if (_modem.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
-                    return A76XX_MQTT_OPERATION_SUCCEEDED;
                 } else {
-                    return A76XX_MQTT_GENERIC_ERROR;
+                    return A76XX_GENERIC_ERROR;
                 }
             }
             case Response_t::A76XX_RESPONSE_MATCH_2ND : {
@@ -275,10 +267,10 @@ class A76XX_MQTT_Commands {
                 return _modem._serialParseIntClear();
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
-                return A76XX_MQTT_OPERATION_TIMEDOUT;
+                return A76XX_OPERATION_TIMEDOUT;
             }
             default : {
-                return A76XX_MQTT_GENERIC_ERROR;
+                return A76XX_GENERIC_ERROR;
             }
         }
     }
@@ -294,9 +286,8 @@ class A76XX_MQTT_Commands {
                 _modem._serial.write(payload, length);
                 _modem._serial.flush();
                 if (_modem.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
-                    return A76XX_MQTT_OPERATION_SUCCEEDED;
                 } else {
-                    return A76XX_MQTT_GENERIC_ERROR;
+                    return A76XX_GENERIC_ERROR;
                 }
             }
             case Response_t::A76XX_RESPONSE_MATCH_2ND : {
@@ -304,10 +295,10 @@ class A76XX_MQTT_Commands {
                 return _modem._serialParseIntClear();
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
-                return A76XX_MQTT_OPERATION_TIMEDOUT;
+                return A76XX_OPERATION_TIMEDOUT;
             }
             default : {
-                return A76XX_MQTT_GENERIC_ERROR;
+                return A76XX_GENERIC_ERROR;
             }
         }
     }
@@ -327,10 +318,10 @@ class A76XX_MQTT_Commands {
                 return _modem._serialParseIntClear();
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
-                return A76XX_MQTT_OPERATION_TIMEDOUT;
+                return A76XX_OPERATION_TIMEDOUT;
             }
             default : {
-                return A76XX_MQTT_GENERIC_ERROR;
+                return A76XX_GENERIC_ERROR;
             }
         }
     }

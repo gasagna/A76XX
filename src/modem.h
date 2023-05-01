@@ -1,21 +1,8 @@
-#ifndef A76XX_H_
-#define A76XX_H_
+#ifndef A76XXMODEM_H_
+#define A76XXMODEM_H_
 
 #include <Arduino.h>
 
-enum Response_t {
-    A76XX_RESPONSE_OK        = 0,
-    A76XX_RESPONSE_MATCH_1ST = 1,
-    A76XX_RESPONSE_MATCH_2ND = 2,
-    A76XX_RESPONSE_MATCH_3RD = 3,
-    A76XX_RESPONSE_ERROR     = 4,
-    A76XX_RESPONSE_TIMEOUT   = 5
-};
-
-#define A76XX_RESPONSE_ASSERT_OK(rsp) { if((rsp) != Response_t::A76XX_RESPONSE_OK) { return false; } }
-
-#define RESPONSE_OK "OK\r\n"
-#define RESPONSE_ERROR "ERROR\r\n"
 
 class A76XX {
 
@@ -39,19 +26,19 @@ class A76XX {
 
         // turn off echoing commands
         sendCMD("ATE0");
-        A76XX_RESPONSE_ASSERT_OK(waitResponse(120000));
+        A76XX_RESPONSE_ASSERT_BOOL(waitResponse(120000));
 
         // disable reporting mobile equipment errors with numeric values
         sendCMD("AT+CMEE=0");
-        A76XX_RESPONSE_ASSERT_OK(waitResponse());
+        A76XX_RESPONSE_ASSERT_BOOL(waitResponse());
 
         // disable unsolicited codes for time zone change
         sendCMD("AT+CTZR=0");
-        A76XX_RESPONSE_ASSERT_OK(waitResponse());
+        A76XX_RESPONSE_ASSERT_BOOL(waitResponse());
 
         // enable automatic time and time zone updates via NITZ
         sendCMD("AT+CTZU=1");
-        A76XX_RESPONSE_ASSERT_OK(waitResponse());
+        A76XX_RESPONSE_ASSERT_BOOL(waitResponse());
 
         return true;
     }
@@ -60,11 +47,11 @@ class A76XX {
     bool connect(const char apn[]) {
         // define PDP context
         sendCMD("AT+CGDCONT=1,\"IP\",\"", apn, "\"");
-        A76XX_RESPONSE_ASSERT_OK(waitResponse(9000));
+        A76XX_RESPONSE_ASSERT_BOOL(waitResponse(9000));
 
         // activate PDP context
         sendCMD("AT+CGACT=1,1");
-        A76XX_RESPONSE_ASSERT_OK(waitResponse(9000));
+        A76XX_RESPONSE_ASSERT_BOOL(waitResponse(9000));
 
         return true;
     }
@@ -72,7 +59,7 @@ class A76XX {
     // disconnect - this does not seem to work
     bool disconnect() {
         sendCMD("AT+CGACT=0,1");
-        A76XX_RESPONSE_ASSERT_OK(waitResponse(9000));
+        A76XX_RESPONSE_ASSERT_BOOL(waitResponse(9000));
         return true;
     }
 
@@ -307,4 +294,4 @@ class A76XX {
 
 };
 
-#endif A76XX_H_
+#endif A76XXMODEM_H_
