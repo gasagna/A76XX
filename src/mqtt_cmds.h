@@ -84,19 +84,24 @@ class A76XX_MQTT_Commands {
         _modem.sendCMD("AT+CMQTTACCQ=", client_index, ",\"", clientID, "\",", server_type);
         Response_t rsp = _modem.waitResponse("+CMQTTACCQ: ", 9000, true, true);
 
-        if (rsp == Response_t::A76XX_RESPONSE_OK)
-
-        if (rsp == Response_t::A76XX_RESPONSE_ERROR)
-            return A76XX_GENERIC_ERROR;
-
-        // this is an error case
-        if (rsp == Response_t::A76XX_RESPONSE_MATCH_1ST) {
-            _modem._serial.find(',');
-            return _modem._serialParseIntClear();
+        switch( rsp ) {
+            case Response_t::A76XX_RESPONSE_MATCH_1ST : {
+                _modem._serial.find(',');
+                return _modem._serialParseIntClear();
+            }
+            case Response_t::A76XX_RESPONSE_OK : {
+                return A76XX_OPERATION_SUCCEEDED;
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            case Response_t::A76XX_RESPONSE_ERROR :{
+                return A76XX_GENERIC_ERROR;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
         }
-
-        // might be something else
-        return A76XX_GENERIC_ERROR;
     }
 
     // CMQTTREL
