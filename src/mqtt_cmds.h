@@ -95,7 +95,7 @@ class A76XX_MQTT_Commands {
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
             }
-            case Response_t::A76XX_RESPONSE_ERROR :{
+            case Response_t::A76XX_RESPONSE_ERROR : {
                 return A76XX_GENERIC_ERROR;
             }
             default : {

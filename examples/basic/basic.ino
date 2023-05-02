@@ -21,7 +21,7 @@ void setup() {
 
     // begin
     Serial.begin(115200);
-    Serial1.begin(115200, SERIAL_8N1, PIN_RX, PIN_TX); 
+    Serial1.begin(115200, SERIAL_8N1, PIN_RX, PIN_TX);
     delay(3000);
 
     //

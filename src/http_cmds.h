@@ -149,7 +149,7 @@ class A76XX_HTTP_Commands {
     int8_t    PUT(int* statuscode, int* length) { return action(4, statuscode, length); }
 
 
-    // HTTPHEAD 
+    // HTTPHEAD
     int8_t read_header(String& header) {
         _modem.sendCMD("AT+HTTPHEAD");
         Response_t rsp = _modem.waitResponse("+HTTPHEAD: ", 120000, false, true);
@@ -195,7 +195,7 @@ class A76XX_HTTP_Commands {
         // get how much data is available
         uint32_t byte_size;
         int8_t retcode = get_content_length(&byte_size);
-        if ( retcode != A76XX_HTTP_OPERATION_SUCCEEDED) 
+        if ( retcode != A76XX_HTTP_OPERATION_SUCCEEDED)
             return retcode;
 
         _modem.sendCMD("AT+HTTPREAD=", 0, ",", byte_size);

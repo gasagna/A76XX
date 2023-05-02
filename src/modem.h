@@ -165,7 +165,7 @@ class A76XX {
         // send again
         sendCMD("AT+CGMM");
         String out = "";
-        
+
         // go at the start of the version number
         _serial.find('\n');
 
@@ -173,7 +173,7 @@ class A76XX {
         while (millis() - tstart < 5000) {
             if (_serial.available() > 0) {
                 char c = static_cast<char>(_serial.read());
-                if (c == '\r') { 
+                if (c == '\r') {
                     break;
                 }
                 out += c;
@@ -194,7 +194,7 @@ class A76XX {
         while (millis() - tstart < 5000) {
             if (_serial.available() > 0) {
                 char c = static_cast<char>(_serial.read());
-                if (c == '\r') { 
+                if (c == '\r') {
                     break;
                 }
                 out += c;
@@ -210,18 +210,18 @@ class A76XX {
     // the response matches with the OK and ERROR strings, but
     // precedence is given to `match`, which might be helpful
     // with some commands
- 
+
     // match zero arguments - only match OK and ERROR
     Response_t waitResponse(int timeout=1000, bool match_OK=true, bool match_ERROR=true) {
-        return waitResponse("_ThIs_Is_AlMoSt_NeVeR_GoNnA_MaTcH_1_", 
-                            "_ThIs_Is_AlMoSt_NeVeR_GoNnA_MaTcH_2_", 
+        return waitResponse("_ThIs_Is_AlMoSt_NeVeR_GoNnA_MaTcH_1_",
+                            "_ThIs_Is_AlMoSt_NeVeR_GoNnA_MaTcH_2_",
                             "_ThIs_Is_AlMoSt_NeVeR_GoNnA_MaTcH_3_",  timeout, match_OK, match_ERROR);
     }
 
     // match one argument plus OK and ERROR
     Response_t waitResponse(const char* match_1, int timeout=1000, bool match_OK=true, bool match_ERROR=true) {
         return waitResponse(match_1,
-                            "_ThIs_Is_AlMoSt_NeVeR_GoNnA_MaTcH_2_", 
+                            "_ThIs_Is_AlMoSt_NeVeR_GoNnA_MaTcH_2_",
                             "_ThIs_Is_AlMoSt_NeVeR_GoNnA_MaTcH_3_",  timeout, match_OK, match_ERROR);
     }
 

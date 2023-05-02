@@ -32,7 +32,7 @@ A76XXMQTTClient mqtt_client(modem, clientID, use_ssl);
 void setup() {
     // start ports
     Serial.begin(115200);
-    Serial1.begin(115200, SERIAL_8N1, PIN_RX, PIN_TX); 
+    Serial1.begin(115200, SERIAL_8N1, PIN_RX, PIN_TX);
     delay(3000);
 
     Serial.print("Waiting for modem ... ");

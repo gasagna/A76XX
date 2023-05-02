@@ -7,7 +7,7 @@
 
 void setup() {
     Serial.begin(115200);
-    SerialAT.begin(115200, SERIAL_8N1, PIN_RX, PIN_TX); 
+    SerialAT.begin(115200, SERIAL_8N1, PIN_RX, PIN_TX);
     delay(3000);
 }
 
