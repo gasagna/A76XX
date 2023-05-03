@@ -3,52 +3,72 @@
 
 #include "modem.h"
 
-#define A76XX_HTTP_OPERATION_SUCCEEDED                0
-#define A76XX_HTTP_CONTINUE                         100
-#define A76XX_HTTP_SWITCHING_PROTOCOLS              101
-#define A76XX_HTTP_OK                               200
-#define A76XX_HTTP_CREATED                          201
-#define A76XX_HTTP_ACCEPTED                         202
-#define A76XX_HTTP_NON_AUTHORITATIVE_INFORMATION    203
-#define A76XX_HTTP_NO_CONTENT                       204
-#define A76XX_HTTP_RESET_CONTENT                    205
-#define A76XX_HTTP_PARTIAL_CONTENT                  206
-#define A76XX_HTTP_MULTIPLE_CHOICES                 300
-#define A76XX_HTTP_MOVED_PERMANENTLY                301
-#define A76XX_HTTP_FOUND                            302
-#define A76XX_HTTP_SEE_OTHER                        303
-#define A76XX_HTTP_NOT_MODIFIED                     304
-#define A76XX_HTTP_USE_PROXY                        305
-#define A76XX_HTTP_TEMPORARY_REDIRECT               307
-#define A76XX_HTTP_BAD_REQUEST                      400
-#define A76XX_HTTP_UNAUTHORIZED                     401
-#define A76XX_HTTP_PAYMENT_REQUIRED                 402
-#define A76XX_HTTP_FORBIDDEN                        403
-#define A76XX_HTTP_NOT_FOUND                        404
-#define A76XX_HTTP_METHOD_NOT_ALLOWED               405
-#define A76XX_HTTP_NOT_ACCEPTABLE                   406
-#define A76XX_HTTP_PROXY_AUTHENTICATION_REQUIRED    407
-#define A76XX_HTTP_REQUEST_TIMEOUT                  408
-#define A76XX_HTTP_CONFLICT                         409
-#define A76XX_HTTP_GONE                             410
-#define A76XX_HTTP_LENGTH_REQUIRED                  411
-#define A76XX_HTTP_PRECONDITION_FAILED              412
-#define A76XX_HTTP_REQUEST_ENTITY_TOO_LARGE         413
-#define A76XX_HTTP_REQUEST-URI_TOO_LARGE            414
-#define A76XX_HTTP_UNSUPPORTED_MEDIA_TYPE           415
-#define A76XX_HTTP_REQUESTED_RANGE_NOT_SATISFIABLE  416
-#define A76XX_HTTP_EXPECTATION_FAILED               417
-#define A76XX_HTTP_INTERNAL_SERVER_ERROR            500
-#define A76XX_HTTP_NOT_IMPLEMENTED                  501
-#define A76XX_HTTP_BAD_GATEWAY                      502
-#define A76XX_HTTP_SERVICE_UNAVAILABLE              503
-#define A76XX_HTTP_GATEWAY_TIMEOUT                  504
-#define A76XX_HTTP_HTTP_VERSION_NOT_SUPPORTED       505
-#define A76XX_HTTP_NOT_HTTP_PDU                     600
-#define A76XX_HTTP_NETWORK_ERROR                    601
-#define A76XX_HTTP_NO_MEMORY                        602
-#define A76XX_HTTP_DNS_ERROR                        603
-#define A76XX_HTTP_STACK_BUSY                       604
+#define A76XX_HTTP_CONTINUE                                100
+#define A76XX_HTTP_SWITCHING_PROTOCOLS                     101
+#define A76XX_HTTP_OK                                      200
+#define A76XX_HTTP_CREATED                                 201
+#define A76XX_HTTP_ACCEPTED                                202
+#define A76XX_HTTP_NON_AUTHORITATIVE_INFORMATION           203
+#define A76XX_HTTP_NO_CONTENT                              204
+#define A76XX_HTTP_RESET_CONTENT                           205
+#define A76XX_HTTP_PARTIAL_CONTENT                         206
+#define A76XX_HTTP_MULTIPLE_CHOICES                        300
+#define A76XX_HTTP_MOVED_PERMANENTLY                       301
+#define A76XX_HTTP_FOUND                                   302
+#define A76XX_HTTP_SEE_OTHER                               303
+#define A76XX_HTTP_NOT_MODIFIED                            304
+#define A76XX_HTTP_USE_PROXY                               305
+#define A76XX_HTTP_TEMPORARY_REDIRECT                      307
+#define A76XX_HTTP_BAD_REQUEST                             400
+#define A76XX_HTTP_UNAUTHORIZED                            401
+#define A76XX_HTTP_PAYMENT_REQUIRED                        402
+#define A76XX_HTTP_FORBIDDEN                               403
+#define A76XX_HTTP_NOT_FOUND                               404
+#define A76XX_HTTP_METHOD_NOT_ALLOWED                      405
+#define A76XX_HTTP_NOT_ACCEPTABLE                          406
+#define A76XX_HTTP_PROXY_AUTHENTICATION_REQUIRED           407
+#define A76XX_HTTP_REQUEST_TIMEOUT                         408
+#define A76XX_HTTP_CONFLICT                                409
+#define A76XX_HTTP_GONE                                    410
+#define A76XX_HTTP_LENGTH_REQUIRED                         411
+#define A76XX_HTTP_PRECONDITION_FAILED                     412
+#define A76XX_HTTP_REQUEST_ENTITY_TOO_LARGE                413
+#define A76XX_HTTP_REQUEST_URI_TOO_LARGE                   414
+#define A76XX_HTTP_UNSUPPORTED_MEDIA_TYPE                  415
+#define A76XX_HTTP_REQUESTED_RANGE_NOT_SATISFIABLE         416
+#define A76XX_HTTP_EXPECTATION_FAILED                      417
+#define A76XX_HTTP_INTERNAL_SERVER_ERROR                   500
+#define A76XX_HTTP_NOT_IMPLEMENTED                         501
+#define A76XX_HTTP_BAD_GATEWAY                             502
+#define A76XX_HTTP_SERVICE_UNAVAILABLE                     503
+#define A76XX_HTTP_GATEWAY_TIMEOUT                         504
+#define A76XX_HTTP_HTTP_VERSION_NOT_SUPPORTED              505
+#define A76XX_HTTP_NOT_HTTP_PDU                            600
+#define A76XX_HTTP_NETWORK_ERROR                           601
+#define A76XX_HTTP_NO_MEMORY                               602
+#define A76XX_HTTP_DNS_ERROR                               603
+#define A76XX_HTTP_STACK_BUSY                              604
+
+// additional error codes returned by the SIMCOM firmware
+#define A76XX_HTTP_ALERT_STATE                             701
+#define A76XX_HTTP_UNKNOWN_ERROR                           702
+#define A76XX_HTTP_BUSY                                    703
+#define A76XX_HTTP_CONNECTION_CLOSED_ERROR                 704
+#define A76XX_HTTP_TIMEOUT                                 705
+#define A76XX_HTTP_RECEIVE_SEND_SOCKET_DATA_FAILED         706
+#define A76XX_HTTP_FILE_NOT_EXISTS_OR_OTHER_MEMORY_ERROR   707
+#define A76XX_HTTP_INVALID_PARAMETER                       708
+#define A76XX_HTTP_NETWORK_ERROR                           709
+#define A76XX_HTTP_START_A_NEW_SSL_SESSION_FAILED          710
+#define A76XX_HTTP_WRONG_STATE                             711
+#define A76XX_HTTP_FAILED_TO_CREATE_SOCKET                 712
+#define A76XX_HTTP_GET_DNS_FAILED                          713
+#define A76XX_HTTP_CONNECT_SOCKET_FAILED                   714
+#define A76XX_HTTP_HANDSHAKE_FAILED                        715
+#define A76XX_HTTP_CLOSE_SOCKET_FAILED                     716
+#define A76XX_HTTP_NO_NETWORK_ERROR                        717
+#define A76XX_HTTP_SEND_DATA_TIMEOUT                       718
+#define A76XX_HTTP_CA_MISSED                               719
 
 class A76XX_HTTP_Commands {
   private:
@@ -72,8 +92,9 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPPARA URL
-    int8_t config_http_url(const char* url) {
-        _modem.sendCMD("AT+HTTPPARA=\"URL\",", url);
+    template <typename ARG>
+    int8_t config_http_url(ARG server, uint16_t server, const char* path) {
+        _modem.sendCMD("AT+HTTPPARA=\"URL\",", server, ":", server, "/", path);
         A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
@@ -96,8 +117,8 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPPARA ACCEPT
-    int8_t config_http_accept_type(const char* accept_type) {
-        _modem.sendCMD("AT+HTTPPARA=\"ACCEPT\",", accept_type);
+    int8_t config_http_accept(const char* accept) {
+        _modem.sendCMD("AT+HTTPPARA=\"ACCEPT\",", accept);
         A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
@@ -120,14 +141,14 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPACTION
-    int8_t action(int method, int* statuscode, int* length) {
+    int8_t action(int method, uint16_t* status_code, uint32_t* length) {
         _modem.sendCMD("AT+HTTPACTION=", method);
         Response_t rsp = _modem.waitResponse("+HTTPACTION: ", 120000, false, true);
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH1 : {
                 _modem._serial.parseInt();
                 _modem._serial.find(',');
-                *statuscode = _modem._serial.parseInt();
+                *status_code = _modem._serial.parseInt();
                 _modem._serial.find(',');
                 *length = _modem._serial.parseInt();
                 return A76XX_HTTP_OPERATION_SUCCEEDED;
@@ -142,11 +163,11 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPACTION - helper methods
-    int8_t    GET(int* statuscode, int* length) { return action(0, statuscode, length); }
-    int8_t   POST(int* statuscode, int* length) { return action(1, statuscode, length); }
-    int8_t   HEAD(int* statuscode, int* length) { return action(2, statuscode, length); }
-    int8_t DELETE(int* statuscode, int* length) { return action(3, statuscode, length); }
-    int8_t    PUT(int* statuscode, int* length) { return action(4, statuscode, length); }
+    int8_t    GET(int* status_code, int* length) { return action(0, status_code, length); }
+    int8_t   POST(int* status_code, int* length) { return action(1, status_code, length); }
+    int8_t   HEAD(int* status_code, int* length) { return action(2, status_code, length); }
+    int8_t DELETE(int* status_code, int* length) { return action(3, status_code, length); }
+    int8_t    PUT(int* status_code, int* length) { return action(4, status_code, length); }
 
 
     // HTTPHEAD
@@ -191,22 +212,21 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPREAD - read entire response
-    int8_t read_response(String& data) {
-        // get how much data is available
-        uint32_t byte_size;
-        int8_t retcode = get_content_length(&byte_size);
-        if ( retcode != A76XX_HTTP_OPERATION_SUCCEEDED)
-            return retcode;
+    int8_t read_response_body(String& body, uint32_t body_length) {
+        // get how much body is available
+        // uint32_t byte_size;
+        // int8_t retcode = get_content_length(&byte_size);
+        // if ( retcode != A76XX_HTTP_OPERATION_SUCCEEDED)
+            // return retcode;
 
-        _modem.sendCMD("AT+HTTPREAD=", 0, ",", byte_size);
+        _modem.sendCMD("AT+HTTPREAD=", 0, ",", body_length);
         Response_t rsp = _modem.waitResponse("+HTTPREAD: ", 120000, false, true);
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 // get <data_len>
                 _modem._serial.parseInt();
 
-                data.reserve(byte_size);
-                size_t nbytes = _modem._serial.readBytes(data, byte_size);
+                size_t nbytes = _modem._serial.readBytes(body, body_length);
 
                 // clear stream
                 _modem.waitResponse("+HTTPREAD: 0")

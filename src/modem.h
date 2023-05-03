@@ -8,6 +8,7 @@ class A76XX {
 
   friend class A76XX_MQTT_Commands;
   friend class A76XX_SSL_Commands;
+  friend class A76XX_HTTP_Commands;
 
   public:
     Stream& _serial;
