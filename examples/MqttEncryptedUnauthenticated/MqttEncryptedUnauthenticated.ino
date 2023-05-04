@@ -1,5 +1,5 @@
 #include <StreamDebugger.h>
-#include <A76XX.h>
+#include "A76XX.h"
 
 // dump all communication with the module to the standard serial port
 #define DEBUG_AT true
