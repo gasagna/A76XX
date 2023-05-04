@@ -1,8 +1,6 @@
 #ifndef A76XX_SSL_CMDS_H_
 #define A76XX_SSL_CMDS_H_
 
-#include "modem.h"
-
 //default certificate names
 #define A76XX_DEFAULT_CACERT_FILENAME      "_A76XX_CACART_DEFAULT_FILENAME_.pem"
 #define A76XX_DEFAULT_CLIENTCERT_FILENAME  "_A76XX_CLIENTCERT_DEFAULT_FILENAME_.pem"
@@ -31,14 +29,12 @@
 
 class A76XX_SSL_Commands {
   private:
-    A76XX&        _modem;
-    int8_t     _last_error;
+    A76XX&          _modem;
 
   public:
     // Initialise from modem
     A76XX_SSL_Commands(A76XX& modem)
-        : _modem(modem)
-        , _last_error(A76XX_OPERATION_SUCCEEDED) {}
+        : _modem(modem) {}
 
     // CSSLCFG sslversion
     int8_t config_ssl_sslversion(uint8_t ssl_ctx_index, uint8_t ssl_version) {

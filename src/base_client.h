@@ -1,14 +1,12 @@
-#ifndef A76XX_Base_CLIENT_H_
-#define A76XX_Base_CLIENT_H_
-
-#include "ssl_cmds.h"
+#ifndef A76XX_BASE_CLIENT_H_
+#define A76XX_BASE_CLIENT_H_
 
 /*
     @brief Base SSL/TLS functionality for other protocol clients and 
     error handling functionality.
 */ 
 class A76XXBaseClient {
-  private:
+  protected:
     // handle to all SSL commands
     A76XX_SSL_Commands     _ssl_cmds;
 
@@ -16,7 +14,7 @@ class A76XXBaseClient {
     uint8_t           _ssl_ctx_index;
 
     // last error returned by any AT command
-    int8_t               _last_error;
+    int8_t          _last_error_code;
 
   public:
     /*
@@ -69,4 +67,4 @@ class A76XXBaseClient {
     bool configSSL(uint8_t ssl_version = 4, uint8_t ignore_local_time = 1, uint16_t negotiate_time = 300);
 };
 
-#endif A76XX_Base_CLIENT_H_
+#endif A76XX_BASE_CLIENT_H_

@@ -1,8 +1,6 @@
 #ifndef A76XX_HTTP_CMDS_H_
 #define A76XX_HTTP_CMDS_H_
 
-#include "modem.h"
-
 #define A76XX_HTTP_CONTINUE                                100
 #define A76XX_HTTP_SWITCHING_PROTOCOLS                     101
 #define A76XX_HTTP_OK                                      200
@@ -92,9 +90,8 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPPARA URL
-    template <typename ARG>
-    int8_t config_http_url(ARG server, uint16_t server, const char* path) {
-        _modem.sendCMD("AT+HTTPPARA=\"URL\",", server, ":", server, "/", path);
+    int8_t config_http_url(const char* server, uint16_t port, const char* path) {
+        _modem.sendCMD("AT+HTTPPARA=\"URL\",", server, ":", port, "/", path);
         A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
@@ -141,17 +138,17 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPACTION
-    int8_t action(int method, uint16_t* status_code, uint32_t* length) {
+    int8_t action(uint8_t method, uint16_t* status_code, uint32_t* length) {
         _modem.sendCMD("AT+HTTPACTION=", method);
         Response_t rsp = _modem.waitResponse("+HTTPACTION: ", 120000, false, true);
         switch (rsp) {
-            case Response_t::A76XX_RESPONSE_MATCH1 : {
+            case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 _modem._serial.parseInt();
                 _modem._serial.find(',');
                 *status_code = _modem._serial.parseInt();
                 _modem._serial.find(',');
                 *length = _modem._serial.parseInt();
-                return A76XX_HTTP_OPERATION_SUCCEEDED;
+                return A76XX_OPERATION_SUCCEEDED;
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
@@ -163,11 +160,11 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPACTION - helper methods
-    int8_t    GET(int* status_code, int* length) { return action(0, status_code, length); }
-    int8_t   POST(int* status_code, int* length) { return action(1, status_code, length); }
-    int8_t   HEAD(int* status_code, int* length) { return action(2, status_code, length); }
-    int8_t DELETE(int* status_code, int* length) { return action(3, status_code, length); }
-    int8_t    PUT(int* status_code, int* length) { return action(4, status_code, length); }
+    int8_t    GET(uint16_t* status_code, uint32_t* length) { return action(0, status_code, length); }
+    int8_t   POST(uint16_t* status_code, uint32_t* length) { return action(1, status_code, length); }
+    int8_t   HEAD(uint16_t* status_code, uint32_t* length) { return action(2, status_code, length); }
+    int8_t DELETE(uint16_t* status_code, uint32_t* length) { return action(3, status_code, length); }
+    int8_t    PUT(uint16_t* status_code, uint32_t* length) { return action(4, status_code, length); }
 
 
     // HTTPHEAD
@@ -175,12 +172,25 @@ class A76XX_HTTP_Commands {
         _modem.sendCMD("AT+HTTPHEAD");
         Response_t rsp = _modem.waitResponse("+HTTPHEAD: ", 120000, false, true);
         switch (rsp) {
-            case Response_t::A76XX_RESPONSE_MATCH1 : {
-                int data_len = _modem._serial.parseInt();
-                header.reserve(data_len);
-                size_t nbytes = _modem._serial.readBytes(header, data_len);
-                if (nbytes == data_len) {
-                    return A76XX_HTTP_OPERATION_SUCCEEDED;
+            case Response_t::A76XX_RESPONSE_MATCH_1ST : {
+                // get length of header
+                int header_length = _modem._serial.parseInt();
+                
+                // reserve space for the string
+                if (header.reserve(header_length) == 0) {
+                    return A76XX_OUT_OF_MEMORY;
+                }
+
+                // advance till we start with the actual content
+                _modem._serial.find("\n");
+
+                // read as many bytes as we said
+                for (uint32_t i = 0; i < header_length; i++) {
+                    header += _modem._serial.read();
+                }
+
+                if (_modem.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
+                    return A76XX_OPERATION_SUCCEEDED;
                 } else {
                     return A76XX_GENERIC_ERROR;
                 }
@@ -200,7 +210,7 @@ class A76XX_HTTP_Commands {
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 *len = _modem._serialParseIntClear();
-                return A76XX_HTTP_OPERATION_SUCCEEDED;
+                return A76XX_OPERATION_SUCCEEDED;
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
@@ -213,26 +223,31 @@ class A76XX_HTTP_Commands {
 
     // HTTPREAD - read entire response
     int8_t read_response_body(String& body, uint32_t body_length) {
-        // get how much body is available
-        // uint32_t byte_size;
-        // int8_t retcode = get_content_length(&byte_size);
-        // if ( retcode != A76XX_HTTP_OPERATION_SUCCEEDED)
-            // return retcode;
-
         _modem.sendCMD("AT+HTTPREAD=", 0, ",", body_length);
         Response_t rsp = _modem.waitResponse("+HTTPREAD: ", 120000, false, true);
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                // get <data_len>
-                _modem._serial.parseInt();
+                // this should match with body_length
+                if (_modem._serial.parseInt() != body_length) {
+                    return A76XX_GENERIC_ERROR;
+                }
 
-                size_t nbytes = _modem._serial.readBytes(body, body_length);
+                // check we can allocate the string
+                if (body.reserve(body_length) == 0) {
+                    return A76XX_OUT_OF_MEMORY;
+                }
+
+                // advance till we start with the actual content
+                _modem._serial.find("\n");
+
+                // read as many bytes as we said
+                for (uint32_t i = 0; i < body_length; i++) {
+                    body += _modem._serial.read();
+                }
 
                 // clear stream
-                _modem.waitResponse("+HTTPREAD: 0")
-
-                if (nbytes == byte_size) {
-                    return A76XX_HTTP_OPERATION_SUCCEEDED;
+                if (_modem.waitResponse("+HTTPREAD: 0") == Response_t::A76XX_RESPONSE_MATCH_1ST) {
+                    return A76XX_OPERATION_SUCCEEDED;
                 } else {
                     return A76XX_GENERIC_ERROR;
                 }
@@ -259,7 +274,7 @@ class A76XX_HTTP_Commands {
                 _modem._serial.write(data, length);
                 switch (_modem.waitResponse()) {
                     case Response_t::A76XX_RESPONSE_OK : {
-                        return A76XX_HTTP_OPERATION_SUCCEEDED;
+                        return A76XX_OPERATION_SUCCEEDED;
                     }
                     case Response_t::A76XX_RESPONSE_TIMEOUT : {
                         return A76XX_OPERATION_TIMEDOUT;

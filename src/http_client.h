@@ -1,21 +1,12 @@
 #ifndef A76XX_HTTP_CLIENT_H_
 #define A76XX_HTTP_CLIENT_H_
 
-#include "IPAddress.h"
-
-#include "modem.h"
-#include "mqtt_cmds.h"
-#include "ssl_cmds.h"
-
-
-#define A76XX_HTTP_OUT_OF_MEMORY    800
-
 class A76XXHTTPClient : public A76XXBaseClient {
   private:
     A76XX_HTTP_Commands   _http_cmds;
     bool                    _use_ssl;
     const char*         _server_name;
-    IPAddress*       _server_address;
+    IPAddress        _server_address;
     uint16_t            _server_port;
     bool           _send_host_header;
     const char*          _user_agent;

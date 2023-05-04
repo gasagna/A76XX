@@ -1,8 +1,8 @@
-#include "mqtt_client.h"
+#include "A76XX.h"
 
 A76XXMQTTClient::A76XXMQTTClient(A76XX& modem,
                                 const char* clientID,
-                                bool use_ssl = false,
+                                bool use_ssl,
                                 uint8_t ssl_ctx_index,
                                 uint8_t client_index,
                                 uint8_t session_id)
@@ -10,11 +10,8 @@ A76XXMQTTClient::A76XXMQTTClient(A76XX& modem,
         , _mqtt_cmds(modem)
         , _clientID(clientID)
         , _use_ssl(use_ssl)
-        , _ssl_ctx_index(ssl_ctx_index)
         , _client_index(client_index)
-        , _session_id(session_id)
-        , _last_error(0) {}
-
+        , _session_id(session_id) {}
 
 bool A76XXMQTTClient::begin() {
     // start
@@ -37,12 +34,12 @@ bool A76XXMQTTClient::begin() {
 
 bool A76XXMQTTClient::connect(const char* server, int port,
                               bool clean_session,
-                              int keepalive = 60,
-                              const char* username = NULL,
-                              const char* password = NULL,
-                              const char* will_topic = NULL,
-                              const char* will_message = NULL,
-                              int will_qos = 0) {
+                              int keepalive,
+                              const char* username,
+                              const char* password,
+                              const char* will_topic,
+                              const char* will_message,
+                              int will_qos) {
     int8_t retcode;
 
     if (will_message != NULL && will_topic != NULL) {
@@ -64,7 +61,7 @@ bool A76XXMQTTClient::disconnect(uint8_t timeout) {
     return true;
 }
 
-bool A76XXMQTTClient::end(uint8_t timeout = 120) {
+bool A76XXMQTTClient::end(uint8_t timeout) {
     int8_t retcode = _mqtt_cmds.release_client(_client_index);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 
@@ -74,12 +71,12 @@ bool A76XXMQTTClient::end(uint8_t timeout = 120) {
     return true;
 }
 
-bool A76XXMQTTClient::publish(const char* topic, 
-                              const uint8_t* payload, 
-                              uint32_t length, 
+bool A76XXMQTTClient::publish(const char* topic,
+                              const uint8_t* payload,
+                              uint32_t length,
                               uint8_t qos,
-                              uint8_t pub_timeout, 
-                              bool retained, 
+                              uint8_t pub_timeout,
+                              bool retained,
                               bool dup) {
     int8_t retcode = _mqtt_cmds.set_topic(_client_index, topic);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
@@ -93,11 +90,11 @@ bool A76XXMQTTClient::publish(const char* topic,
     return true;
 }
 
-bool A76XXMQTTClient::publish(const char* topic, 
-                              const char* payload, 
+bool A76XXMQTTClient::publish(const char* topic,
+                              const char* payload,
                               uint8_t qos,
-                              uint8_t pub_timeout, 
-                              bool retained, 
+                              uint8_t pub_timeout,
+                              bool retained,
                               bool dup) {
     return publish(topic, reinterpret_cast<const uint8_t*>(payload), strlen(payload), qos,
             pub_timeout, retained, dup);

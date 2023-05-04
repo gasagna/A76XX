@@ -1,12 +1,12 @@
-#include "base_client.h"
+#include "A76XX.h"
 
 A76XXBaseClient::A76XXBaseClient(A76XX& modem) 
     : _ssl_cmds(modem)
     , _ssl_ctx_index(0)
-    , _last_error(0) {}
+    , _last_error_code(0) {}
 
 int8_t A76XXBaseClient::getLastError() {
-    return _last_error;
+    return _last_error_code;
 }
 
 bool A76XXBaseClient::setCaCert(const char* cacert) {
@@ -27,9 +27,9 @@ bool A76XXBaseClient::setCerts(const char* cacert, const char* clientcert, const
     return true;
 }
 
-bool A76XXBaseClient::configSSL(uint8_t  sslversion      = 4,
-                                  uint8_t  ignorelocaltime = 1,
-                                  uint16_t negotiatetime   = 300) {
+bool A76XXBaseClient::configSSL(uint8_t  sslversion,
+                                uint8_t  ignorelocaltime,
+                                uint16_t negotiatetime) {
     int8_t retcode = _ssl_cmds.config_ssl_sslversion(_ssl_ctx_index, sslversion);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 

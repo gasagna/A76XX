@@ -1,8 +1,6 @@
 #ifndef A76XX_MQTT_CMDS_H_
 #define A76XX_MQTT_CMDS_H_
 
-#include "modem.h"
-
 #define A76XX_MQTT_FAILED                                             1
 #define A76XX_MQTT_BAD_UTF8_STRING                                    2
 #define A76XX_MQTT_SOCK_CONNECT_FAIL                                  3
@@ -140,6 +138,7 @@ class A76XX_MQTT_Commands {
                 _modem._serial.write(will_topic);
                 _modem._serial.flush();
                 if (_modem.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
+                    return A76XX_OPERATION_SUCCEEDED;
                 } else {
                     return A76XX_GENERIC_ERROR;
                 }

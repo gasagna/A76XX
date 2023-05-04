@@ -1,16 +1,11 @@
 #ifndef A76XX_MQTT_CLIENT_H_
 #define A76XX_MQTT_CLIENT_H_
 
-#include "modem.h"
-#include "mqtt_cmds.h"
-#include "ssl_cmds.h"
-
 class A76XXMQTTClient : public A76XXBaseClient {
   private:
     A76XX_MQTT_Commands   _mqtt_cmds;
     const char*            _clientID;
     bool                    _use_ssl;
-    uint8_t           _ssl_ctx_index;
     uint8_t            _client_index;
     uint8_t              _session_id;
 
@@ -43,16 +38,16 @@ class A76XXMQTTClient : public A76XXBaseClient {
                  uint8_t qos,
                  uint8_t pub_timeout,
                  bool retained = false,
-                 bool dup = false)
+                 bool dup = false);
 
     bool publish(const char* topic,
                  const char* payload,
                  uint8_t qos,
                  uint8_t pub_timeout,
                  bool retained = false,
-                 bool dup = false)
+                 bool dup = false);
 
-    bool isConnected()
+    bool isConnected();
 };
 
 #endif A76XX_MQTT_CLIENT_H_
