@@ -10,12 +10,10 @@
 
 #define A76XX_HTTP_OUT_OF_MEMORY    800
 
-class A76XXHTTPClient {
+class A76XXHTTPClient : public A76XXSecureClient {
   private:
     A76XX_HTTP_Commands   _http_cmds;
-    A76XX_SSL_Commands     _ssl_cmds;
     bool                    _use_ssl;
-    int8_t               _last_error;
     const char*         _server_name;
     IPAddress*       _server_address;
     uint16_t            _server_port;
@@ -24,7 +22,6 @@ class A76XXHTTPClient {
     String                   _header;
     uint32_t       _last_body_length;
     uint16_t       _last_status_code;
-
 
   public:
     /*
@@ -46,13 +43,6 @@ class A76XXHTTPClient {
                     const char* user_agent = NULL);
 
   public:
-    int8_t getLastError();
-
-    bool setCaCert(const char* cacert);
-
-    bool setClientCertAndKey(const char* clientcert, const char* clientkey, const char* password);
-
-    bool setCerts(const char* cacert, const char* clientcert, const char* clientkey, const char* password);
 
     /* 
         @brief Reset the request header to its default state. By default the header

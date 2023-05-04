@@ -1,9 +1,6 @@
 #ifndef A76XXMODEM_H_
 #define A76XXMODEM_H_
 
-#include <Arduino.h>
-
-
 class A76XX {
 
   friend class A76XX_MQTT_Commands;

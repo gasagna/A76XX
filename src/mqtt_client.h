@@ -7,8 +7,8 @@
 
 class A76XXMQTTClient {
   private:
-    A76XX_MQTT_Commands _mqtt_cmds;
-    A76XX_SSL_Commands   _ssl_cmds;
+    A76XX_MQTT_Commands   _mqtt_cmds;
+    A76XX_SSL_Commands     _ssl_cmds;
     const char*            _clientID;
     bool                    _use_ssl;
     uint8_t           _ssl_ctx_index;
@@ -31,41 +31,6 @@ class A76XXMQTTClient {
   public:
     int8_t getLastError() {
         return _last_error;
-    }
-
-    bool setCaCert(const char* cacert) {
-        int8_t retcode = _ssl_cmds.setCaCert(_ssl_ctx_index, cacert);
-        A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-        return true;
-    }
-
-    bool setClientCertAndKey(const char* clientcert, const char* clientkey, const char* password) {
-        int8_t retcode = _ssl_cmds.setClientCertAndKey(_ssl_ctx_index, clientcert, clientkey, password);
-        A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-        return true;
-    }
-
-    bool setCerts(const char* cacert, const char* clientcert, const char* clientkey, const char* password) {
-        int8_t retcode = _ssl_cmds.setCerts(_ssl_ctx_index, cacert, clientcert, clientkey, password);
-        A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-        return true;
-    }
-
-    // refer to the manual for the values of the parameters
-    bool configSSL(uint8_t  sslversion      = 4,
-                   uint8_t  authmode        = 0,
-                   uint8_t  ignorelocaltime = 1,
-                   uint16_t negotiatetime   = 300) {
-        int8_t retcode = _ssl_cmds.config_ssl_sslversion(_ssl_ctx_index, sslversion);
-        A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-        retcode = _ssl_cmds.config_ssl_ignorelocaltime(_ssl_ctx_index, ignorelocaltime);
-        A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-        retcode = _ssl_cmds.config_ssl_negotiatetime(_ssl_ctx_index, negotiatetime);
-        A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-        return true;
     }
 
     // must be called once

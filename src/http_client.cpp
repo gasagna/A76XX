@@ -35,28 +35,6 @@ A76XXHTTPClient::A76XXHTTPClient(A76XX& modem,
         resetHeader();
     }
 
-int8_t A76XXHTTPClient::getLastError() {
-    return _last_error;
-}
-
-bool A76XXHTTPClient::setCaCert(const char* cacert) {
-    int8_t retcode = _ssl_cmds.setCaCert(_ssl_ctx_index, cacert);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-    return true;
-}
-
-bool A76XXHTTPClient::setClientCertAndKey(const char* clientcert, const char* clientkey, const char* password) {
-    int8_t retcode = _ssl_cmds.setClientCertAndKey(_ssl_ctx_index, clientcert, clientkey, password);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-    return true;
-}
-
-bool A76XXHTTPClient::setCerts(const char* cacert, const char* clientcert, const char* clientkey, const char* password) {
-    int8_t retcode = _ssl_cmds.setCerts(_ssl_ctx_index, cacert, clientcert, clientkey, password);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-    return true;
-}
-
 void A76XXHTTPClient::resetHeader() {
     _header = "";
     _header.reserve(256); 
