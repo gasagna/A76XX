@@ -10,7 +10,7 @@
 
 #define A76XX_HTTP_OUT_OF_MEMORY    800
 
-class A76XXHTTPClient : public A76XXSecureClient {
+class A76XXHTTPClient : public A76XXBaseClient {
   private:
     A76XX_HTTP_Commands   _http_cmds;
     bool                    _use_ssl;
@@ -26,7 +26,7 @@ class A76XXHTTPClient : public A76XXSecureClient {
   public:
     /*
     
-    @param server_name The domain name of the 
+    @param server_name The domain name of the HTTP server to connect to.
     
     */
     A76XXHTTPClient(A76XX& modem,

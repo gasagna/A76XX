@@ -23,7 +23,8 @@ A76XXHTTPClient::A76XXHTTPClient(A76XX& modem,
                                  uint16_t server_port,
                                  bool use_ssl,
                                  const char* user_agent);
-    : _http_cmds(modem)
+    : A76XXBaseClient(modem)
+    , _http_cmds(modem)
     , _ssl_cmds(modem)
     , _use_ssl(use_ssl)
     , _last_error(0)
