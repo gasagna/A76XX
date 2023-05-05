@@ -89,6 +89,36 @@ bool A76XXHTTPClient::post(const char* path,
     return true;
 }
 
+bool A76XXHTTPClient::get(const char* path, const char* accept) {
+    int8_t retcode;
+    
+    // set url with either the domain name or the IP address
+    if (_server_name != NULL) {
+        retcode = _http_cmds.config_http_url(_server_name, _server_port, path, _use_ssl);
+    } else {
+        // retcode = _http_cmds.config_http_url(_server_address.toString().c_str(), _server_port, path);
+    }
+    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+
+    // set accept type header if it's not the default
+    if (strcmp(accept, "*/*") != 0) {
+        retcode = _http_cmds.config_http_accept(accept);
+        A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+    }
+
+    // set user header
+    if (_header.length() > 0) {
+        retcode = _http_cmds.config_http_user_data(_header.c_str());
+        A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+    }
+
+    // execute request and get status code and content length
+    retcode = _http_cmds.GET(&_last_status_code, &_last_body_length); 
+    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+
+    return true;
+}
+
 uint16_t A76XXHTTPClient::getResponseStatusCode() {
     return _last_status_code;
 }

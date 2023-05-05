@@ -69,6 +69,9 @@ class A76XXHTTPClient : public A76XXBaseClient {
     */
     bool post(const char* path, const char* content_type, const char* content_body, const char* accept = "*/*");
 
+
+    bool get(const char* path, const char* accept = "*/*");
+
     /*
         @brief Return the status code of the last request. If the request
             was unsuccessful, the result of this function is undetermined.
