@@ -17,8 +17,10 @@ class A76XXHTTPClient : public A76XXBaseClient {
   public:
     /*
 
-    @param server_name The domain name of the HTTP server to connect to.
-
+    @param server_name The domain name of the HTTP server to connect to. For instance, 
+        "https://www.bbc.co.uk" or "www.google.com". When the domain name does not 
+        start with either "http://" or "https://" the flag `use_ssl` determines whether
+        secure or unsecure connections are made. 
     */
     A76XXHTTPClient(A76XX& modem,
                     const char* server_name,
@@ -38,7 +40,8 @@ class A76XXHTTPClient : public A76XXBaseClient {
     /*
         @brief Reset the request header to its default state. By default the header
             "Host:SERVERNAME" is sent, where "SERVERNAME" is the server address passed
-            to the class constructor.
+            to the class constructor. If the `user_agent` parameter is passed to the 
+            constructor, the "User-Agent" header is also included by default.
     */
     void resetHeader();
 
