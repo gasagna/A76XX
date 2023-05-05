@@ -32,6 +32,12 @@ A76XXHTTPClient::A76XXHTTPClient(A76XX& modem,
         resetHeader();
     }
 
+bool A76XXHTTPClient::begin() {
+    int8_t retcode = _http_cmds.init();
+    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+    return true;
+}
+
 void A76XXHTTPClient::resetHeader() {
     _header = "";
     _header.reserve(256); 
