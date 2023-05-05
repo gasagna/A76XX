@@ -92,6 +92,15 @@ void setup() {
         Serial.println(body); Serial.println(); 
     }
 
+    Serial.print("Stopping HTTP service ... ");
+    if (http_client.end() == false) {
+        Serial.print("error... code: ");
+        Serial.println(http_client.getLastError());
+        while (true) {}
+    } else {
+        Serial.println("done");
+    }
+
     Serial.print("Powering off ... ");
     if (modem.powerOff() == false) {
         Serial.println("error");

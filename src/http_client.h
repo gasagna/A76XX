@@ -40,6 +40,12 @@ class A76XXHTTPClient : public A76XXBaseClient {
     bool begin();
 
     /*
+        @brief Stop the HTTP service
+        @return True on success. If false, use getLastError() to get detail on the error.
+    */
+    bool end();
+
+    /*
         @brief Reset the request header to its default state. By default the header
             "Host:SERVERNAME" is sent, where "SERVERNAME" is the server address passed
             to the class constructor. If the `user_agent` parameter is passed to the 
