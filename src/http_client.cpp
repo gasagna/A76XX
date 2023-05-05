@@ -42,8 +42,21 @@ void A76XXHTTPClient::resetHeader() {
     _header = "";
     _header.reserve(256); 
     if (_send_host_header == true) {
-        _header += "Host: ";
-        _header += _server_name;
+        _header += "Host:";
+        // strip http:// or https:// in the Host header value to avoid 400 Bad Request
+        const char* hostname = _server_name;
+        if (strcmp(_server_name, "https://") == 0) {
+            hostname = _server_name + 8;
+        } 
+        if (strcmp(_server_name, "http://") == 0) {
+            hostname = _server_name + 7;
+        } 
+        _header += hostname;
+        _header += "\n";
+    }
+   if (_user_agent != NULL) {
+        _header += "User-Agent:";
+        _header += _user_agent;
         _header += "\n";
     }
 }
