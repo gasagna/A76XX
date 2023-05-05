@@ -85,7 +85,14 @@ class A76XXHTTPClient : public A76XXBaseClient {
     */
     bool post(const char* path, const char* content_type, const char* content_body, const char* accept = "*/*");
 
+    /*
+        @brief Execute a GET request.
 
+        @param path The path to the resource, EXCLUDING the leading "/".
+        @param accept The value of the "Accept" header. By default it is "*\/*".
+        @return True on a successful operation. If false, use getLastError() to get
+            details on the error.
+    */
     bool get(const char* path, const char* accept = "*/*");
 
     /*
