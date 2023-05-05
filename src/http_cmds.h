@@ -186,7 +186,8 @@ class A76XX_HTTP_Commands {
 
                 // read as many bytes as we said
                 for (uint32_t i = 0; i < header_length; i++) {
-                    header += _modem._serial.read();
+                    while (_modem._serial.available() == 0) {}
+                    header += static_cast<char>(_modem._serial.read());
                 }
 
                 if (_modem.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
@@ -242,7 +243,8 @@ class A76XX_HTTP_Commands {
 
                 // read as many bytes as we said
                 for (uint32_t i = 0; i < body_length; i++) {
-                    body += _modem._serial.read();
+                    while (_modem._serial.available() == 0) {}
+                    body += static_cast<char>(_modem._serial.read());
                 }
 
                 // clear stream
