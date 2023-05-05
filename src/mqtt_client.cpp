@@ -1,17 +1,12 @@
 #include "A76XX.h"
 
-A76XXMQTTClient::A76XXMQTTClient(A76XX& modem,
-                                const char* clientID,
-                                bool use_ssl,
-                                uint8_t ssl_ctx_index,
-                                uint8_t client_index,
-                                uint8_t session_id)
-        : A76XXBaseClient(modem)
-        , _mqtt_cmds(modem)
-        , _clientID(clientID)
-        , _use_ssl(use_ssl)
-        , _client_index(client_index)
-        , _session_id(session_id) {}
+A76XXMQTTClient::A76XXMQTTClient(A76XX& modem, const char* clientID, bool use_ssl)
+    : A76XXBaseClient(modem)
+    , _mqtt_cmds(modem)
+    , _clientID(clientID)
+    , _use_ssl(use_ssl)
+    , _client_index(0)
+    , _session_id(0) {}
 
 bool A76XXMQTTClient::begin() {
     // start
@@ -32,7 +27,7 @@ bool A76XXMQTTClient::begin() {
     return true;
 }
 
-bool A76XXMQTTClient::connect(const char* server, int port,
+bool A76XXMQTTClient::connect(const char* server_name, int port,
                               bool clean_session,
                               int keepalive,
                               const char* username,
@@ -49,7 +44,7 @@ bool A76XXMQTTClient::connect(const char* server, int port,
         A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
     }
 
-    retcode = _mqtt_cmds.connect(_client_index, server, port, clean_session, keepalive, username, password);
+    retcode = _mqtt_cmds.connect(_client_index, server_name, port, clean_session, keepalive, username, password);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 
     return true;
@@ -61,7 +56,7 @@ bool A76XXMQTTClient::disconnect(uint8_t timeout) {
     return true;
 }
 
-bool A76XXMQTTClient::end(uint8_t timeout) {
+bool A76XXMQTTClient::end() {
     int8_t retcode = _mqtt_cmds.release_client(_client_index);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 

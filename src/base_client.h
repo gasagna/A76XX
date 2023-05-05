@@ -2,9 +2,9 @@
 #define A76XX_BASE_CLIENT_H_
 
 /*
-    @brief Base SSL/TLS functionality for other protocol clients and 
+    @brief Base SSL/TLS functionality for other protocol clients and
     error handling functionality.
-*/ 
+*/
 class A76XXBaseClient {
   protected:
     // handle to all SSL commands
@@ -18,8 +18,9 @@ class A76XXBaseClient {
 
   public:
     /*
-        @brief Constructor
-        @param modem An instance of the A76XX modem class
+        @brief Constructor.
+
+        @param [IN] modem An instance of the A76XX modem class.
     */
     A76XXBaseClient(A76XX& modem);
 
@@ -29,40 +30,45 @@ class A76XXBaseClient {
     int8_t getLastError();
 
     /*
-        @brief Write root CA certificate to the module and enable server only 
-        authentication. See the command AT+CSSLCFG for additional details.
-        @param cacert A NULL terminated string containing the root CA certificate
+        @brief Write root CA certificate to the module and enable server only
+            authentication. See the command AT+CSSLCFG for additional details.
+
+        @param [IN] cacert A NULL terminated string containing the root CA certificate.
     */
     bool setCaCert(const char* cacert);
 
     /*
-        @brief Write client certificate, key and the password to decrypt the key to 
-        the module and enable client only authentication. See the command AT+CSSLCFG
-        for additional details.
-        @param clientcert A NULL terminated string containing the client certificate 
-        @param clientkey A NULL terminated string containing the client key
-        @param password A NULL terminated string containing password to decrypt the key
+        @brief Write client certificate, key and the password to decrypt the key to
+            the module and enable client only authentication. See the command AT+CSSLCFG
+            for additional details.
+
+        @param [IN] clientcert A NULL terminated string containing the client certificate.
+        @param [IN] clientkey A NULL terminated string containing the client key.
+        @param [IN] password A NULL terminated string containing password to decrypt the key.
     */
     bool setClientCertAndKey(const char* clientcert, const char* clientkey, const char* password);
 
     /*
-        @brief Write root CA certificate, client certificate, key and the password 
-        to decrypt the key to the module and enable client and server authentication. 
-        See the command AT+CSSLCFG for additional details.
-        @param cacert A NULL terminated string containing the root CA certificate
-        @param clientcert A NULL terminated string containing the client certificate 
-        @param clientkey A NULL terminated string containing the client key
-        @param password A NULL terminated string containing password to decrypt the key
+        @brief Write root CA certificate, client certificate, key and the password
+            to decrypt the key to the module and enable client and server authentication.
+            See the command AT+CSSLCFG for additional details.
+
+        @param [IN] cacert A NULL terminated string containing the root CA certificate.
+        @param [IN] clientcert A NULL terminated string containing the client certificate.
+        @param [IN] clientkey A NULL terminated string containing the client key.
+        @param [IN] password A NULL terminated string containing password to decrypt the key.
     */
     bool setCerts(const char* cacert, const char* clientcert, const char* clientkey, const char* password);
 
     /*
-        @brief Configure SSL authentication parameters. See the command AT+CSSLCFG for 
-        additional details.
-        @param ssl_version the version of the SSL/TLS protocol. Default is all version.
-        @param ignore_local_time flag to deal with expired certificates. Default is to 
-        ignore the expiration date
-        @param negotiate_time timeout value in the SSL negotiation stage. Default is 300 s
+        @brief Configure SSL authentication parameters. See the command AT+CSSLCFG for
+            additional details.
+
+        @param [IN] ssl_version the version of the SSL/TLS protocol. Default is all version.
+        @param [IN] ignore_local_time flag to deal with expired certificates. Default is to
+            ignore the expiration date.
+        @param [IN] negotiate_time timeout value in the SSL negotiation stage. Default is
+            300 seconds.
     */
     bool configSSL(uint8_t ssl_version = 4, uint8_t ignore_local_time = 1, uint16_t negotiate_time = 300);
 };
