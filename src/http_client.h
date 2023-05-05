@@ -37,6 +37,11 @@ class A76XXHTTPClient : public A76XXBaseClient {
 
   public:
 
+    /*
+        @brief Start the HTTP service
+        @detail This function must be called before any call to request functions.
+        @return True on success. If false, use getLastError() to get detail on the error.
+    */
     bool begin();
 
     /*
