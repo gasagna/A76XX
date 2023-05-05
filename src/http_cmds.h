@@ -90,8 +90,17 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPPARA URL
-    int8_t config_http_url(const char* server, uint16_t port, const char* path) {
-        _modem.sendCMD("AT+HTTPPARA=\"URL\",", server, ":", port, "/", path);
+    int8_t config_http_url(const char* server, uint16_t port, const char* path, bool use_ssl) {
+        // add the protocol if not present
+        if (strstr(server, "https://") == NULL || strstr(server, "http://") == NULL) {
+            if (use_ssl == true) {
+                _modem.sendCMD("AT+HTTPPARA=\"URL\",", "\"https://", server, ":", port, "/", path, "\"");
+            } else {
+                _modem.sendCMD("AT+HTTPPARA=\"URL\",", "\"http://", server, ":", port, "/", path, "\"");
+            }
+        } else {
+            _modem.sendCMD("AT+HTTPPARA=\"URL\",", "\"", server, ":", port, "/", path, "\"");
+        }
         A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
