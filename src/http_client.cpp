@@ -79,7 +79,7 @@ bool A76XXHTTPClient::post(const char* path,
     
     // set url with either the domain name or the IP address
     if (_server_name != NULL) {
-        retcode = _http_cmds.config_http_url(_server_name, _server_port, path);
+        retcode = _http_cmds.config_http_url(_server_name, _server_port, path, _use_ssl);
     } else {
         // retcode = _http_cmds.config_http_url(_server_address.toString().c_str(), _server_port, path);
     }
