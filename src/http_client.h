@@ -37,6 +37,8 @@ class A76XXHTTPClient : public A76XXBaseClient {
 
   public:
 
+    bool begin();
+
     /*
         @brief Reset the request header to its default state. By default the header
             "Host:SERVERNAME" is sent, where "SERVERNAME" is the server address passed
