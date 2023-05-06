@@ -10,14 +10,14 @@ However, the latest SIMCOM firmware provides native clients for several network 
 ## Supported protocols and features
 The latest AT command manual for the A76XX family is the 1.08 version, released on 2022/10/12. This is not easily found on SIMCOM's website (why??), but a copy can be found by searching the string "A76XX_Series_AT_Command_Manual_V1.08" in Google. 
 
-Based on the AT command manual, the table below shows the protocols that are natively supported by the latest SIMCOM firmware, along with their current support in this library. Native clients that have a secure option (SSL/TLS) are indicated with a trailing [S].
+Based on the AT command manual, the table below shows the protocols that are natively supported by the firmware described in the v1.08 version of the firmware documentation, along with their current support in this library. Native clients that have a secure option (SSL/TLS) are indicated with a trailing [S].
 
 | Protocol/Feature | Currently supported |
 | ---------------- | ------------------  |
 | BlueTooth        | No                  |
 | COAP             | No                  |
 | FTP[S]           | No                  |
-| HTTP[S]          | In progress         |
+| HTTP[S]          | Yes                 |
 | LwM2M            | No                  |
 | MQTT[S]          | Yes                 |
 | SMS              | No                  |
@@ -35,9 +35,9 @@ It's difficult to say exactly what modules are compatibles with this library. SI
 
 The table below shows a list of A76XX modules and the protocols/features that have ben tested with this library. Other modules are likely compatible, but I do not have data. If you test this library with another module not listed here, please do let me know!
 
-| Module      | MQTT[S] tested |
-| ----------- | -------------  |
-| A7608E      | Yes[Yes]       |
+| Module      | MQTT[S] tested | HTTP[S] tested |
+| ----------- | -------------  | -------------  |
+| A7608E      | Yes[Yes]       | Yes[Yes]       |
 
 
 ## Documentation and examples
