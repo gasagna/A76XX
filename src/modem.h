@@ -91,7 +91,7 @@ class A76XX {
         while (millis() - tstart < timeout) {
             if (isRegistered())
                 return true;
-            delay(50);
+            delay(200);
         }
         return false;
     }
