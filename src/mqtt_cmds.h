@@ -262,6 +262,7 @@ class A76XX_MQTT_Commands {
                 _modem._serial.write(topic);
                 _modem._serial.flush();
                 if (_modem.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
+                    return A76XX_OPERATION_SUCCEEDED;
                 } else {
                     return A76XX_GENERIC_ERROR;
                 }
@@ -290,6 +291,7 @@ class A76XX_MQTT_Commands {
                 _modem._serial.write(payload, length);
                 _modem._serial.flush();
                 if (_modem.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
+                    return A76XX_OPERATION_SUCCEEDED;
                 } else {
                     return A76XX_GENERIC_ERROR;
                 }
