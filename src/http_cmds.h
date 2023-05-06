@@ -118,13 +118,13 @@ class A76XX_HTTP_Commands {
 
     // HTTPPARA CONTENT
     int8_t config_http_content_type(const char* content_type) {
-        _modem.sendCMD("AT+HTTPPARA=\"CONTENT\",", content_type);
+        _modem.sendCMD("AT+HTTPPARA=\"CONTENT\",\"", content_type, "\"");
         A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
     // HTTPPARA ACCEPT
     int8_t config_http_accept(const char* accept) {
-        _modem.sendCMD("AT+HTTPPARA=\"ACCEPT\",", accept);
+        _modem.sendCMD("AT+HTTPPARA=\"ACCEPT\",\"", accept, "\"");
         A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
@@ -135,13 +135,13 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPPARA USERDATA
-    int8_t config_http_user_data(const char* user_data) {
-        _modem.sendCMD("AT+HTTPPARA=\"USERDATA\",", user_data);
+    int8_t config_http_user_data(const char* header, const char* value) {
+        _modem.sendCMD("AT+HTTPPARA=\"USERDATA\",\"", header, ":", value, "\"");
         A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
 
     // HTTPPARA READMODE
-    int8_t config_http_user_data(uint8_t readmode) {
+    int8_t config_http_read_mode(uint8_t readmode) {
         _modem.sendCMD("AT+HTTPPARA=\"READMODE\",", readmode);
         A76XX_RESPONSE_PROCESS(_modem.waitResponse(120000))
     }
@@ -273,9 +273,9 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPDATA
-    int8_t input_data(const char* data, uint32_t length ) {
-        // use a safe 5 seconds timeout
-        _modem.sendCMD("AT+HTTPDATA=", length, ",", 5);
+    int8_t input_data(const char* data, uint32_t length) {
+        // use 30 seconds timeout
+        _modem.sendCMD("AT+HTTPDATA=", length, ",", 30);
 
         // timeout after 10 seconds
         Response_t rsp = _modem.waitResponse("DOWNLOAD", 10, false, true);
@@ -283,6 +283,7 @@ class A76XX_HTTP_Commands {
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 _modem._serial.write(data, length);
+                _modem._serial.flush();
                 switch (_modem.waitResponse()) {
                     case Response_t::A76XX_RESPONSE_OK : {
                         return A76XX_OPERATION_SUCCEEDED;

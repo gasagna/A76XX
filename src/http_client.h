@@ -6,11 +6,8 @@ class A76XXHTTPClient : public A76XXBaseClient {
     A76XX_HTTP_Commands   _http_cmds;
     bool                    _use_ssl;
     const char*         _server_name;
-    IPAddress        _server_address;
     uint16_t            _server_port;
-    bool           _send_host_header;
     const char*          _user_agent;
-    String                   _header;
     uint32_t       _last_body_length;
     uint16_t       _last_status_code;
 
@@ -24,13 +21,6 @@ class A76XXHTTPClient : public A76XXBaseClient {
     */
     A76XXHTTPClient(A76XX& modem,
                     const char* server_name,
-                    uint16_t server_port,
-                    bool use_ssl = false,
-                    const char* user_agent = NULL,
-                    bool send_host_header = true);
-
-    A76XXHTTPClient(A76XX& modem,
-                    IPAddress server_address,
                     uint16_t server_port,
                     bool use_ssl = false,
                     const char* user_agent = NULL);
@@ -77,13 +67,14 @@ class A76XXHTTPClient : public A76XXBaseClient {
         @brief Execute a POST request.
 
         @param path The path to the resource, EXCLUDING the leading "/".
-        @param content_type The value of the "Content-Type" header.
         @param content_body The body of the post request.
+        @param content_type The value of the "Content-Type" header. By default it 
+            is "text/plain".
         @param accept The value of the "Accept" header. By default it is "*\/*".
         @return True on a successful operation. If false, use getLastError() to get
             details on the error.
     */
-    bool post(const char* path, const char* content_type, const char* content_body, const char* accept = "*/*");
+    bool post(const char* path, const char* content_body, const char* content_type = "text/plain", const char* accept = "*/*");
 
     /*
         @brief Execute a GET request.
