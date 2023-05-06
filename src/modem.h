@@ -201,6 +201,105 @@ class A76XX {
         _serialClear();
         return out;
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    /// Time commands
+    //////////////////////////////////////////////////////////////////////////////////////
+    // 0 Operation succeeded
+    // 1 Unknown error
+    // 2 Wrong parameter
+    // 3 Wrong date and time calculated 
+    // 4 Network error
+    // 5 Time zone error 
+    // 6 Time out error
+    int syncTime(const char* host = "pool.ntp.org", int8_t timezone = 0) {
+        Response_t rsp;
+
+        sendCMD("AT+CNTP=\"", host, "\",", timezone);
+        rsp = waitResponse();
+        if (rsp != Response_t::A76XX_RESPONSE_OK) {
+            return A76XX_GENERIC_ERROR;
+        }
+
+        sendCMD("AT+CNTP");
+        rsp = waitResponse("+CNTP: ", 10000, false, true);
+        switch (rsp) {
+            case Response_t::A76XX_RESPONSE_MATCH_1ST : {
+                return _serial.parseInt();
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            case Response_t::A76XX_RESPONSE_ERROR : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
+    }
+
+    bool readTime(int* year, int* month, int* day, int* hour, int* minute, int* second, int* timezone) {
+        sendCMD("AT+CCLK?");
+        if (waitResponse("+CCLK: \"") == Response_t::A76XX_RESPONSE_MATCH_1ST) {
+            // example response: +CCLK: "14/01/01,02:14:36+08"
+            *year   = _serial.parseInt() + 2000; _serial.find("/");
+            *month  = _serial.parseInt()       ; _serial.find("/");
+            *day    = _serial.parseInt()       ; _serial.find(",");
+            *hour   = _serial.parseInt()       ; _serial.find(":");
+            *minute = _serial.parseInt()       ; _serial.find(":");
+            *second = _serial.parseInt()       ; _serial.find(":");
+
+            if (_serial.read() == '-') { 
+                *timezone = - static_cast<float>(_serial.parseInt());
+            } else {
+                *timezone = + static_cast<float>(_serial.parseInt());
+            }
+
+            // clear up
+            waitResponse();
+     
+            return true;
+        }
+        return false;
+    }
+
+    /*
+        @brief Get unix time.
+    */
+    uint32_t getUnixTime(bool UTC = true) {
+        int year, month, day, hour, minute, second, timezone;
+        if (readTime(&year, &month, &day, &hour, &minute, &second, &timezone) == false) {
+            return 0;
+        }
+
+        struct tm ts = {0};         // Initalize to all 0's
+        ts.tm_year = year - 1900;   // This is year-1900, so for 2023 => 123
+        ts.tm_mon  = month - 1;     // january is 0, not 1
+        ts.tm_mday = day;
+        ts.tm_hour = hour;
+        ts.tm_min  = minute;
+        ts.tm_sec  = second;
+
+        uint32_t time = mktime(&ts);
+        if (UTC == true) {
+            time -= static_cast<uint32_t>(timezone*15*60);
+        }
+        return time;
+    }
+
+    // "yy/MM/dd,hh:mm:ss±zz"
+    bool getDateTime(String& date_time) {
+        sendCMD("AT+CCLK?");
+        if (waitResponse("+CCLK: \"") == Response_t::A76XX_RESPONSE_MATCH_1ST) {
+            for (int i = 0; i < 20; i++) {
+                while (_serial.available() == 0 ){}
+                date_time += static_cast<char>(_serial.read());
+            }
+            // clean up
+            waitResponse();
+            return true;
+        }
+        return false;
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////
     // consume the data from the serial port until the string
     // `match` is found or before `timeout` ms have elapsed

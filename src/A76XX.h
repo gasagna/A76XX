@@ -2,6 +2,7 @@
 #define A76XX_H_
 
 #include "Arduino.h"
+#include "time.h"
 
 enum Response_t {
     A76XX_RESPONSE_OK        = 0,
