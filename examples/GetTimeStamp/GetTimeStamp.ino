@@ -2,7 +2,7 @@
 #include <A76XX.h>
 
 // dump all communication with the module to the standard serial port
-#define DEBUG_AT true
+#define DEBUG_AT false
 
 // Use the correct `Serial` object to connect to the simcom module
 #if DEBUG_AT
