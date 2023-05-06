@@ -30,63 +30,6 @@ bool A76XXHTTPClient::addHeader(const char* header, const char* value) {
     return true;
 }
 
-bool A76XXHTTPClient::post(const char* path,
-                           const char* content_body,
-                           const char* content_type,
-                           const char* accept) {
-    int8_t retcode;
-    
-    // set url
-    retcode = _http_cmds.config_http_url(_server_name, _server_port, path, _use_ssl);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-    // set user agent
-    if (_user_agent != NULL) {
-        addHeader("User-Agent", _user_agent);
-    }
-
-    // set Accept: header
-    retcode = _http_cmds.config_http_accept(accept);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-    // set Content-Type: header
-    retcode = _http_cmds.config_http_content_type(content_type);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-    // write request body
-    retcode = _http_cmds.input_data(content_body, strlen(content_body));
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-    // execute request and get status code and content length
-    retcode = _http_cmds.POST(&_last_status_code, &_last_body_length); 
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-    return true;
-}
-
-bool A76XXHTTPClient::get(const char* path, const char* accept) {
-    int8_t retcode;
-    
-    // set url
-    retcode = _http_cmds.config_http_url(_server_name, _server_port, path, _use_ssl);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-    // set user agent
-    if (_user_agent != NULL) {
-        addHeader("User-Agent", _user_agent);
-    }
-
-    // set accept type header if it's not the default
-    retcode = _http_cmds.config_http_accept(accept);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-    // execute request and get status code and content length
-    retcode = _http_cmds.GET(&_last_status_code, &_last_body_length); 
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-    return true;
-}
-
 uint16_t A76XXHTTPClient::getResponseStatusCode() {
     return _last_status_code;
 }
@@ -104,5 +47,46 @@ bool A76XXHTTPClient::getResponseHeader(String& header) {
 bool A76XXHTTPClient::getResponseBody(String& body) {
     int8_t retcode = _http_cmds.read_response_body(body, _last_body_length);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+    return true;
+}
+
+bool A76XXHTTPClient::request(uint8_t method,
+                              const char* path,
+                              const char* content_body,
+                              const char* content_type,
+                              const char* accept) {
+    int8_t retcode;
+    
+    // set url
+    retcode = _http_cmds.config_http_url(_server_name, _server_port, path, _use_ssl);
+    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+
+    // set user agent
+    if (_user_agent != NULL) {
+        addHeader("User-Agent", _user_agent);
+    }
+
+    // set Accept: header
+    if (accept != NULL) {
+        retcode = _http_cmds.config_http_accept(accept);
+        A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+    }
+
+    // set Content-Type: header
+    if (content_type != NULL) {
+        retcode = _http_cmds.config_http_content_type(content_type);
+        A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+    }
+
+    // write request body
+    if (content_body != NULL) {
+        retcode = _http_cmds.input_data(content_body, strlen(content_body));
+        A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+    }
+
+    // execute request and get status code and content length
+    retcode = _http_cmds.action(method, &_last_status_code, &_last_body_length); 
+    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+
     return true;
 }

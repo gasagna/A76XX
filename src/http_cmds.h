@@ -147,6 +147,11 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPACTION
+    // 0 =>    GET
+    // 1 =>   POST
+    // 2 =>   HEAD
+    // 3 => DELETE
+    // 4 =>    PUT
     int8_t action(uint8_t method, uint16_t* status_code, uint32_t* length) {
         _modem.sendCMD("AT+HTTPACTION=", method);
         Response_t rsp = _modem.waitResponse("+HTTPACTION: ", 120000, false, true);
@@ -167,14 +172,6 @@ class A76XX_HTTP_Commands {
             }
         }
     }
-
-    // HTTPACTION - helper methods
-    int8_t    GET(uint16_t* status_code, uint32_t* length) { return action(0, status_code, length); }
-    int8_t   POST(uint16_t* status_code, uint32_t* length) { return action(1, status_code, length); }
-    int8_t   HEAD(uint16_t* status_code, uint32_t* length) { return action(2, status_code, length); }
-    int8_t DELETE(uint16_t* status_code, uint32_t* length) { return action(3, status_code, length); }
-    int8_t    PUT(uint16_t* status_code, uint32_t* length) { return action(4, status_code, length); }
-
 
     // HTTPHEAD
     int8_t read_header(String& header) {

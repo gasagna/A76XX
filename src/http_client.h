@@ -14,10 +14,10 @@ class A76XXHTTPClient : public A76XXBaseClient {
   public:
     /*
 
-    @param server_name The domain name of the HTTP server to connect to. For instance, 
-        "https://www.bbc.co.uk" or "www.google.com". When the domain name does not 
+    @param server_name The domain name of the HTTP server to connect to. For instance,
+        "https://www.bbc.co.uk" or "www.google.com". When the domain name does not
         start with either "http://" or "https://" the flag `use_ssl` determines whether
-        secure or unsecure connections are made. 
+        secure or unsecure connections are made.
     */
     A76XXHTTPClient(A76XX& modem,
                     const char* server_name,
@@ -43,7 +43,7 @@ class A76XXHTTPClient : public A76XXBaseClient {
     /*
         @brief Reset the request header to its default state. By default the header
             "Host:SERVERNAME" is sent, where "SERVERNAME" is the server address passed
-            to the class constructor. If the `user_agent` parameter is passed to the 
+            to the class constructor. If the `user_agent` parameter is passed to the
             constructor, the "User-Agent" header is also included by default.
     */
     void resetHeader();
@@ -55,8 +55,8 @@ class A76XXHTTPClient : public A76XXBaseClient {
             the class constructor. The headers "Content-Type" and "Accept" can be set at
             the call site of the HTTP request function.
 
-        @param header The header string, e.g. "Content-Encoding" for "Content-Encoding: gzip".
-        @param value The value string, e.g. "gzip" for "Content-Encoding: gzip".
+        @param [IN] header The header string, e.g. "Content-Encoding" for "Content-Encoding: gzip".
+        @param [IN] value The value string, e.g. "gzip" for "Content-Encoding: gzip".
         @return True if the resulting total header size is not greater than the 256 character
             limit of the SIMCOM firmware API, false otherwise. If false, the original header is not
             modified.
@@ -64,27 +64,34 @@ class A76XXHTTPClient : public A76XXBaseClient {
     bool addHeader(const char* header, const char* value);
 
     /*
-        @brief Execute a POST request.
-
-        @param path The path to the resource, EXCLUDING the leading "/".
-        @param content_body The body of the post request.
-        @param content_type The value of the "Content-Type" header. By default it 
-            is "text/plain".
-        @param accept The value of the "Accept" header. By default it is "*\/*".
-        @return True on a successful operation. If false, use getLastError() to get
-            details on the error.
-    */
-    bool post(const char* path, const char* content_body, const char* content_type = "text/plain", const char* accept = "*/*");
-
-    /*
         @brief Execute a GET request.
 
-        @param path The path to the resource, EXCLUDING the leading "/".
-        @param accept The value of the "Accept" header. By default it is "*\/*".
+        @param [IN] path The path to the resource, EXCLUDING the leading "/".
+        @param [IN] accept The value of the "Accept" header. If NULL, it defaults to "*\/*".
         @return True on a successful operation. If false, use getLastError() to get
             details on the error.
     */
-    bool get(const char* path, const char* accept = "*/*");
+    bool get(const char* path, const char* accept = NULL) {
+        return request(0, path, NULL, NULL, accept);
+    }
+
+    /*
+        @brief Execute a POST request.
+
+        @param [IN] path The path to the resource, EXCLUDING the leading "/".
+        @param [IN] content_body The body of the post request.
+        @param [IN] content_type The value of the "Content-Type" header. If NULL, it
+            defaults to "text/plain".
+        @param [IN] accept The value of the "Accept" header. If NULL, it defaults to "*\/*".
+        @return True on a successful operation. If false, use getLastError() to get
+            details on the error.
+    */
+    bool post(const char* path,
+              const char* content_body,
+              const char* content_type = NULL,
+              const char* accept = NULL) {
+        return request(1, path, content_body, content_type, accept);
+    }
 
     /*
         @brief Return the status code of the last request. If the request
@@ -106,7 +113,7 @@ class A76XXHTTPClient : public A76XXBaseClient {
     /*
         @brief Get response header of the last successful request.
 
-        @param header Read the header into this string.
+        @param [IN] header Read the header into this string.
         @return True if the header is successfully read.
     */
     bool getResponseHeader(String& header);
@@ -114,11 +121,29 @@ class A76XXHTTPClient : public A76XXBaseClient {
     /*
         @brief Get response body of the last successful request.
 
-        @param header Read the body into this string.
+        @param [IN] header Read the body into this string.
         @return True if the body is successfully read, false if the string
             reserve operation failed or the read.
     */
     bool getResponseBody(String& body);
+
+  private:
+    /*
+        @brief Private request function used to unify all other types of requests
+
+        @param [IN] method The type of the request: 0 is "GET", 1 is "POST", 2 is "HEAD",
+            3 is "DELETE",  4 is "PUT".
+        @param [IN] path The path to the resource
+        @param [IN] content_body The body content, can be NULL
+        @param [IN] content_type The value of the "Content-Type" header. If NULL, it
+            defaults to "text/plain".
+        @param [IN] accept The value of the "Accept" header. If NULL, it defaults to "*\/*".
+    */
+    bool request(uint8_t method,
+                 const char* path,
+                 const char* content_body,
+                 const char* content_type,
+                 const char* accept);
 };
 
 #endif A76XX_HTTP_CLIENT_H_
