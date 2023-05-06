@@ -22,6 +22,9 @@ const int   keepalive     = 60;
 const bool  clean_session = true;
 const bool  use_ssl       = false;
 
+// replace with your apn
+const char* apn           = "simbase";
+
 A76XX modem(SerialAT);
 A76XXMQTTClient mqtt_client(modem, clientID, use_ssl);
 
@@ -50,7 +53,7 @@ void setup() {
     Serial.println("done");
 
     Serial.print("Connecting  ... ");
-    if (modem.connect("em") == false){
+    if (modem.connect(apn) == false){
         Serial.println("cannot connect");
         while (true) {}
     } else {

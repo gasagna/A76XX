@@ -11,6 +11,9 @@
     #define SerialAT Serial1
 #endif
 
+// replace with your apn
+const char* apn = "simbase";
+
 A76XX modem(SerialAT);
 
 // configuration for serial port to simcom module (check your board!)
@@ -50,7 +53,7 @@ void setup() {
     Serial.println(modem.revisionIdentification());
 
     Serial.print("Connecting ... ");
-    if (modem.connect("em") == false ){
+    if (modem.connect(apn) == false ){
         Serial.println("cannot connect");
     } else {
         Serial.println("done");

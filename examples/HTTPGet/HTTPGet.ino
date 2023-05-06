@@ -2,7 +2,7 @@
 #include <A76XX.h>
 
 // dump all communication with the module to the standard serial port
-#define DEBUG_AT false
+#define DEBUG_AT true
 
 // Use the correct `Serial` object to connect to the simcom module
 #if DEBUG_AT
@@ -18,6 +18,8 @@ const char* path          = "TinyGSM/logo.txt";
 const bool  use_ssl       = false;
 const char* user_agent    = "Arduino!!";
 
+// replace with your apn
+const char* apn           = "simbase";
 
 A76XX modem(SerialAT);
 A76XXHTTPClient http_client(modem, server_name, server_port, use_ssl, user_agent);
@@ -47,7 +49,7 @@ void setup() {
     Serial.println("done");
 
     Serial.print("Connecting  ... ");
-    if (modem.connect("em") == false){
+    if (modem.connect(apn) == false){
         Serial.println("cannot connect");
         while (true) {}
     } else {

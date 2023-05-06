@@ -42,7 +42,7 @@ class A76XX {
     }
 
     // connect to network via apn
-    bool connect(const char apn[]) {
+    bool connect(const char apn*) {
         // define PDP context
         sendCMD("AT+CGDCONT=1,\"IP\",\"", apn, "\"");
         A76XX_RESPONSE_ASSERT_BOOL(waitResponse(9000));

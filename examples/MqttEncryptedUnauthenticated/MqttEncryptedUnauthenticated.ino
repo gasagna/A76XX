@@ -50,6 +50,9 @@ m/XriWr/Cq4h/JfB7NTsezVslgkBaoU=
 -----END CERTIFICATE-----
 )EOF";
 
+// replace with your apn
+const char* apn           = "simbase";
+
 A76XX modem(SerialAT);
 A76XXMQTTClient mqtt_client(modem, clientID, use_ssl);
 
@@ -78,7 +81,7 @@ void setup() {
     Serial.println("done");
 
     Serial.print("Connecting  ... ");
-    if (modem.connect("em") == false){
+    if (modem.connect(apn) == false){
         Serial.println("cannot connect");
         while (true) {}
     } else {
