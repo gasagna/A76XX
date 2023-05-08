@@ -68,6 +68,7 @@ enum Response_t {
 #include "ssl_cmds.h"
 #include "mqtt_cmds.h"
 #include "http_cmds.h"
+#include "network_cmds.h"
 
 #include "base_client.h"
 #include "mqtt_client.h"
