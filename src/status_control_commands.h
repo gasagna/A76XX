@@ -8,18 +8,18 @@
     Command | Implemented | Method | Function(s)
     --------| ----------- | ------ |-----------------
     CFUN    |     y       | WRITE  | setPhoneFunctionality
-    CSQ     |             |        |
-    AUTOCSQ |             |        |
-    CSQDELTA|             |        |
+    CSQ     |     -       |        |
+    AUTOCSQ |     -       |        |
+    CSQDELTA|     -       |        |
     CPOF    |     y       |  EXEC  | powerOff
     CRESET  |     y       |  EXEC  | reset
-    CACM    |             |        |
-    CAMM    |             |        |
-    CPUC    |             |        |
-    CCLK    |     y       |        | getDateTime
-    CMEE    |     y       |        | setErrorResultCodes
-    CPAS    |             |        |
-    SIMEI   |             |        |
+    CACM    |     -       |        |
+    CAMM    |     -       |        |
+    CPUC    |     -       |        |
+    CCLK    |     y       |  READ  | getDateTime
+    CMEE    |     y       | WRITE  | setErrorResultCodes
+    CPAS    |     -       |        |
+    SIMEI   |     -       |        |
 */
 class A76XX_StatusControl_Commands {
   private:
@@ -62,7 +62,6 @@ class A76XX_StatusControl_Commands {
         A76XX_RESPONSE_PROCESS(9000)
     }
 
-
     /*
         @brief Implementation for CCLK - READ Command.
         @detail Read date and time from module's real time clock
@@ -76,7 +75,7 @@ class A76XX_StatusControl_Commands {
             return A76XX_GENERIC_ERROR; 
         }
 
-        sendCMD("AT+CCLK?");
+        _modem.sendCMD("AT+CCLK?");
         switch (waitResponse("+CCLK: ", 9000, false, true)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 _modem._serial.readBytes(datetime, 20);
@@ -99,7 +98,7 @@ class A76XX_StatusControl_Commands {
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
     int8_t setErrorResultCodes(uint8_t n) {
-        sendCMD("AT+CMEE=", n);
+        _modem.sendCMD("AT+CMEE=", n);
         A76XX_RESPONSE_PROCESS(9000)
     }
 };
