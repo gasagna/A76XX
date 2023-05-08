@@ -16,7 +16,7 @@
     CNMP    |      -      |        |
     CNBP    |      -      |        |
     CPSI    |      -      |        |
-    CNSMOD  |      -      |        |
+    CNSMOD  |      y      | READ   | getNetworkSystemMode
     CTZU    |      y      | WRITE  | setTimeZoneAutoUpdate
     CTZR    |      y      | WRITE  | setTimeZoneURC
 
@@ -32,12 +32,34 @@ class A76XX_Network_Commands {
 
     /*
         @brief Implementation for CREG - Read Command.
-        @detail Get network registration status.
+        @detail Get GSM network registration status.
         @return The <stat> code, from 0 to 11, or an error code.
     */ 
     int8_t getNetworkRegistrationStatus() {
         _modem.sendCMD("AT+CREG?");
         Response_t rsp = waitResponse("+CREG: ", 9000, false, true);
+        switch (rsp) {
+            case Response_t::A76XX_RESPONSE_MATCH_1ST : {
+                _modem._serial.find(',');
+                return _modem.serialParseIntClear();
+            }
+            case Response_t::A76XX_OPERATION_TIMEDOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
+    }
+
+    /*
+        @brief Implementation for CNSMOD - Read Command.
+        @detail Show network system mode.
+        @return The <stat> code, from 0 to 8, or an error code.
+    */ 
+    int8_t getNetworkSystemMode() {
+        _modem.sendCMD("AT+CNSMOD?");
+        Response_t rsp = waitResponse("+CNSMOD: ");
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 _modem._serial.find(',');
