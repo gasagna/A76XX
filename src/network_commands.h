@@ -35,7 +35,7 @@ class A76XX_Network_Commands {
         @detail Get network registration status.
         @return The <stat> code, from 0 to 11, or an error code.
     */ 
-    int8_t getNetworkRegistration() {
+    int8_t getNetworkRegistrationStatus() {
         _modem.sendCMD("AT+CREG?");
         Response_t rsp = waitResponse("+CREG: ", 9000, false, true);
         switch (rsp) {
