@@ -27,7 +27,7 @@ class A76XX_Network_Commands {
 
   public:
     // Initialise from modem
-    A76XX_NETWORK_Commands(A76XX& modem)
+    A76XX_Network_Commands(A76XX& modem)
         : _modem(modem) {}
 
     /*
