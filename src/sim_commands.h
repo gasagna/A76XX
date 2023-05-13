@@ -51,16 +51,17 @@ class SIMCommands {
                 char buff[11];
                 _modem->streamReadBytesUntil('\r', &buff[0], 11);
 
-                if (strcmp(buff, "READY"))      {status = PINStatus_t::READY;}
-                if (strcmp(buff, "SIM PIN"))    {status = PINStatus_t::SIM_PIN;}
-                if (strcmp(buff, "SIM PUK"))    {status = PINStatus_t::SIM_PUK;}
-                if (strcmp(buff, "PH-SIM PIN")) {status = PINStatus_t::PH_SIM_PIN;}
-                if (strcmp(buff, "SIM PIN2"))   {status = PINStatus_t::SIM_PIN2;}
-                if (strcmp(buff, "SIM PUK2"))   {status = PINStatus_t::SIM_PUK2;}
-                if (strcmp(buff, "PH-NET PIN")) {status = PINStatus_t::PH_NET_PIN;}
-
                 // default case
                 status = PINStatus_t::UKNOWKN;
+
+                if (strstr(buff, "READY")      != NULL) {status = PINStatus_t::READY;}
+                if (strstr(buff, "SIM PIN")    != NULL) {status = PINStatus_t::SIM_PIN;}
+                if (strstr(buff, "SIM PUK")    != NULL) {status = PINStatus_t::SIM_PUK;}
+                if (strstr(buff, "PH-SIM PIN") != NULL) {status = PINStatus_t::PH_SIM_PIN;}
+                if (strstr(buff, "SIM PIN2")   != NULL) {status = PINStatus_t::SIM_PIN2;}
+                if (strstr(buff, "SIM PUK2")   != NULL) {status = PINStatus_t::SIM_PUK2;}
+                if (strstr(buff, "PH-NET PIN") != NULL) {status = PINStatus_t::PH_NET_PIN;}
+
                 return A76XX_OPERATION_SUCCEEDED;
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
