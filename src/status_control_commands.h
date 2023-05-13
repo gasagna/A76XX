@@ -1,5 +1,5 @@
-#ifndef A76XX_STATUCCONTROL_CMDS_H_
-#define A76XX_STATUCCONTROL_CMDS_H_
+#ifndef A76XX_STATUSCONTROL_CMDS_H_
+#define A76XX_STATUSCONTROL_CMDS_H_
 
 
 /*
@@ -21,14 +21,10 @@
     CPAS    |     -       |        |
     SIMEI   |     -       |        |
 */
+template <typename MODEM>
 class A76XX_StatusControl_Commands {
-  private:
-    A76XX& _modem;
-
   public:
-    // Initialise from modem
-    A76XX_StatusControl_Commands(A76XX& modem)
-        : _modem(modem) {}
+    MODEM* _modem = NULL;
 
     /*
         @brief Implementation for CFUN - Write Command.
@@ -38,7 +34,7 @@ class A76XX_StatusControl_Commands {
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
     int8_t setPhoneFunctionality(uint8_t fun, bool reset = false) {
-        _modem.sendCMD("AT+CFUN=", fun, ",", reset ? "1" : "");
+        _modem->sendCMD("AT+CFUN=", fun, ",", reset ? "1" : "");
         A76XX_RESPONSE_PROCESS(9000)
     }
 
@@ -48,7 +44,7 @@ class A76XX_StatusControl_Commands {
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
     int8_t powerOff() {
-        _modem.sendCMD("AT+CPOF");
+        _modem->sendCMD("AT+CPOF");
         A76XX_RESPONSE_PROCESS(9000)
     }
 
@@ -58,31 +54,31 @@ class A76XX_StatusControl_Commands {
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
     int8_t reset() {
-        _modem.sendCMD("AT+CRESET");
+        _modem->sendCMD("AT+CRESET");
         A76XX_RESPONSE_PROCESS(9000)
     }
 
     /*
         @brief Implementation for CCLK - READ Command.
         @detail Read date and time from module's real time clock
-        @param [OUT] datetime A char buffer to store the date and time in the format 
+        @param [OUT] dateTime A char buffer to store the date and time in the format 
             "yy/MM/dd,hh:mm:ss±zz". Length must be at least 20 char, or A76XX_GENERIC_ERROR
             is returned. 
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
-    int8_t getDateTime(char* datetime) {
-        if (strlen(datetime) < 20) { 
+    int8_t getDateTime(char* dateTime) {
+        if (strlen(dateTime) < 20) { 
             return A76XX_GENERIC_ERROR; 
         }
 
-        _modem.sendCMD("AT+CCLK?");
-        switch (waitResponse("+CCLK: ", 9000, false, true)) {
+        _modem->sendCMD("AT+CCLK?");
+        switch (_modem->waitResponse("+CCLK: ", 9000, false, true)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                _modem._serial.readBytes(datetime, 20);
-                // clear OK
-                return _modem.serialClear();
+                _modem->streamReadBytes(dateTime, 20);
+                _modem->streamClear(); // clear OK
+                return A76XX_OPERATION_SUCCEEDED;
             }
-            case Response_t::A76XX_OPERATION_TIMEDOUT : {
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
             }
             default : {
@@ -98,8 +94,9 @@ class A76XX_StatusControl_Commands {
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
     int8_t setErrorResultCodes(uint8_t n) {
-        _modem.sendCMD("AT+CMEE=", n);
+        _modem->sendCMD("AT+CMEE=", n);
         A76XX_RESPONSE_PROCESS(9000)
     }
 };
-#ifndef A76XX_STATUCCONTROL_CMDS_H_
+
+#endif A76XX_STATUSCONTROL_CMDS_H_

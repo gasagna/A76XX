@@ -3,13 +3,13 @@
 
 class A76XXHTTPClient : public A76XXBaseClient {
   private:
-    A76XX_HTTP_Commands   _http_cmds;
-    bool                    _use_ssl;
-    const char*         _server_name;
-    uint16_t            _server_port;
-    const char*          _user_agent;
-    uint32_t       _last_body_length;
-    uint16_t       _last_status_code;
+    A76XX_HTTP_Commands<A76XX>   _http_cmds;
+    bool                           _use_ssl;
+    const char*                _server_name;
+    uint16_t                   _server_port;
+    const char*                 _user_agent;
+    uint32_t              _last_body_length;
+    uint16_t              _last_status_code;
 
   public:
     /*
@@ -19,7 +19,7 @@ class A76XXHTTPClient : public A76XXBaseClient {
         start with either "http://" or "https://" the flag `use_ssl` determines whether
         secure or unsecure connections are made.
     */
-    A76XXHTTPClient(A76XX& modem,
+    A76XXHTTPClient(A76XX* modem,
                     const char* server_name,
                     uint16_t server_port,
                     bool use_ssl = false,

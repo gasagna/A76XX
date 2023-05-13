@@ -27,79 +27,76 @@
 #define A76XX_SSL_SEND_DATA_TIMEOUT           18
 #define A76XX_SSL_NOT_SET_CERTIFICATES        19
 
-class A76XX_SSL_Commands {
-  private:
-    A76XX&          _modem;
 
+template <typename MODEM>
+class A76XX_SSL_Commands {
   public:
-    // Initialise from modem
-    A76XX_SSL_Commands(A76XX& modem)
-        : _modem(modem) {}
+    MODEM* _modem = NULL;
 
     // CSSLCFG sslversion
     int8_t config_ssl_sslversion(uint8_t ssl_ctx_index, uint8_t ssl_version) {
-        _modem.sendCMD("AT+CSSLCFG=\"sslversion\",", ssl_ctx_index, ",", ssl_version);
-        A76XX_RESPONSE_PROCESS(_modem.waitResponse());
+        _modem->sendCMD("AT+CSSLCFG=\"sslversion\",", ssl_ctx_index, ",", ssl_version);
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
     }
 
     // CSSLCFG authmode
     int8_t config_ssl_authmode(uint8_t ssl_ctx_index, uint8_t authmode) {
-        _modem.sendCMD("AT+CSSLCFG=\"authmode\",", ssl_ctx_index, ",", authmode);
-        A76XX_RESPONSE_PROCESS(_modem.waitResponse());
+        _modem->sendCMD("AT+CSSLCFG=\"authmode\",", ssl_ctx_index, ",", authmode);
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
     }
 
     // CSSLCFG ignorelocaltime
     int8_t config_ssl_ignorelocaltime(uint8_t ssl_ctx_index, uint8_t ignorelocaltime) {
-        _modem.sendCMD("AT+CSSLCFG=\"ignorelocaltime\",", ssl_ctx_index, ",", ignorelocaltime);
-        A76XX_RESPONSE_PROCESS(_modem.waitResponse());
+        _modem->sendCMD("AT+CSSLCFG=\"ignorelocaltime\",", ssl_ctx_index, ",", ignorelocaltime);
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
     }
 
     // CSSLCFG negotiatetime
     int8_t config_ssl_negotiatetime(uint8_t ssl_ctx_index, uint16_t negotiatetime) {
-        _modem.sendCMD("AT+CSSLCFG=\"negotiatetime\",", ssl_ctx_index, ",", negotiatetime);
-        A76XX_RESPONSE_PROCESS(_modem.waitResponse());
+        _modem->sendCMD("AT+CSSLCFG=\"negotiatetime\",", ssl_ctx_index, ",", negotiatetime);
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
     }
 
     // CSSLCFG cacert
     int8_t config_ssl_cacert(uint8_t ssl_ctx_index, const char* ca_file) {
-        _modem.sendCMD("AT+CSSLCFG=\"cacert\",", ssl_ctx_index, ",", ca_file);
-        A76XX_RESPONSE_PROCESS(_modem.waitResponse());
+        _modem->sendCMD("AT+CSSLCFG=\"cacert\",", ssl_ctx_index, ",", ca_file);
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
     }
 
     // CSSLCFG clientcert
     int8_t config_ssl_clientcert(uint8_t ssl_ctx_index, const char* clientcert_file) {
-        _modem.sendCMD("AT+CSSLCFG=\"clientcert\",", ssl_ctx_index, ",", clientcert_file);
-        A76XX_RESPONSE_PROCESS(_modem.waitResponse());
+        _modem->sendCMD("AT+CSSLCFG=\"clientcert\",", ssl_ctx_index, ",", clientcert_file);
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
     }
 
     // CSSLCFG clientkey
     int8_t config_ssl_clientkey(uint8_t ssl_ctx_index, const char* clientkey_file) {
-        _modem.sendCMD("AT+CSSLCFG=\"clientkey\",", ssl_ctx_index, ",", clientkey_file);
-        A76XX_RESPONSE_PROCESS(_modem.waitResponse());
+        _modem->sendCMD("AT+CSSLCFG=\"clientkey\",", ssl_ctx_index, ",", clientkey_file);
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
     }
 
     // CSSLCFG password
     int8_t config_ssl_password(uint8_t ssl_ctx_index, const char* password_file) {
-        _modem.sendCMD("AT+CSSLCFG=\"password\",", ssl_ctx_index, ",", password_file);
-        A76XX_RESPONSE_PROCESS(_modem.waitResponse());
+        _modem->sendCMD("AT+CSSLCFG=\"password\",", ssl_ctx_index, ",", password_file);
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
     }
 
     // CSSLCFG enableSNI
     int8_t config_ssl_context(uint8_t ssl_ctx_index, uint8_t enableSNI_flag) {
-        _modem.sendCMD("AT+CSSLCFG=\"enableSNI\",", ssl_ctx_index, ",", enableSNI_flag);
-        A76XX_RESPONSE_PROCESS(_modem.waitResponse());
+        _modem->sendCMD("AT+CSSLCFG=\"enableSNI\",", ssl_ctx_index, ",", enableSNI_flag);
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
     }
 
     // CCERTDOWN
     int8_t cert_download(const char* cert, const char* certname) {
-        _modem.sendCMD("AT+CCERTDOWN=\"", certname, "\",", strlen(cert));
-        Response_t rsp = _modem.waitResponse(">", 120000);
+        _modem->sendCMD("AT+CCERTDOWN=\"", certname, "\",", strlen(cert));
+        Response_t rsp = _modem->waitResponse(">", 120000);
 
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                _modem._serial.write(cert);
-                _modem._serial.flush();
-                if (_modem.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
+                _modem->streamWrite(cert);
+                _modem->streamFlush();
+                if (_modem->waitResponse() == Response_t::A76XX_RESPONSE_OK) {
                     return A76XX_OPERATION_SUCCEEDED;
                 } else {
                     return A76XX_GENERIC_ERROR;
@@ -117,11 +114,11 @@ class A76XX_SSL_Commands {
     // CCERTLIST
     // check a file named `certname` already exists in the list of certificates
     bool cert_exists(const char* certname) {
-        _modem.sendCMD("AT+CCERTLIST");
-        Response_t rsp = _modem.waitResponse(certname, 120000);
+        _modem->sendCMD("AT+CCERTLIST");
+        Response_t rsp = _modem->waitResponse(certname, 120000);
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                _modem._serialClear();
+                _modem->streamClear();
                 return true;
             }
             default : {
@@ -132,14 +129,14 @@ class A76XX_SSL_Commands {
 
     // CCERTDELE
     int8_t cert_delete(const char* certname) {
-        _modem.sendCMD("AT+CCERTDELE=\"", certname, "\"");
-        A76XX_RESPONSE_PROCESS(_modem.waitResponse());
+        _modem->sendCMD("AT+CCERTDELE=\"", certname, "\"");
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
     }
 
     // CCHSSLCFG
     int8_t set_ssl_context(uint8_t session_id, uint8_t ssl_ctx_index) {
-        _modem.sendCMD("AT+CCHSSLCFG=", session_id, ",", ssl_ctx_index);
-        A76XX_RESPONSE_PROCESS(_modem.waitResponse());
+        _modem->sendCMD("AT+CCHSSLCFG=", session_id, ",", ssl_ctx_index);
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
     }
 
 

@@ -1,18 +1,17 @@
 #ifndef A76XX_SERIAL_H_
 #define A76XX_SERIAL_H_
 
-enum Response_t {
-    A76XX_RESPONSE_OK        = 0,
-    A76XX_RESPONSE_MATCH_1ST = 1,
-    A76XX_RESPONSE_MATCH_2ND = 2,
-    A76XX_RESPONSE_ERROR     = 3,
-    A76XX_RESPONSE_TIMEOUT   = 4
-};
+class SerialDevice {
+  private:
+    // We could derive this class from Stream, but the HardwareSerial objects 
+    // to communicate with the modem are already instantiated in the arduino core 
+    // of the board and we can't create a new one
+    Stream& stream;
 
-#define RESPONSE_OK "OK\r\n"
-#define RESPONSE_ERROR "ERROR\r\n"
+  public:
+    SerialDevice(Stream& _stream)
+        : stream(_stream) {}
 
-class SerialAT : public Stream {
     /*
         @brief Wait for modem to respond.
 
@@ -42,8 +41,8 @@ class SerialAT : public Stream {
         auto tstart = millis();
 
         while (millis() - tstart < timeout) {
-            if (available() > 0) {
-                data += static_cast<char>(read());
+            if (stream.available() > 0) {
+                data += static_cast<char>(stream.read());
                 if (data.endsWith(match_1) == true)
                     return Response_t::A76XX_RESPONSE_MATCH_1ST;
                 if (data.endsWith(match_2) == true)
@@ -110,13 +109,8 @@ class SerialAT : public Stream {
         @param [IN] finish Whether to send a terminating "\r\n" to the module.
     */
     template <typename... ARGS>
-    void sendCMD(ARGS... args, bool finish = true) {
-        if (finish) {
-            _print(args..., "\r\n");
-        } else {
-            _print(args...);
-        }
-        flush();
+    void sendCMD(ARGS... args) {
+        printCMD(args..., "\r\n");
     }
 
     /*
@@ -126,8 +120,8 @@ class SerialAT : public Stream {
         @param [IN] timeout Time out in milliseconds. Default is 50 milliseconds.
         @return The integer.
     */
-    auto parseIntClear(uint32_t timeout = 500) {
-        auto retcode = parseInt();
+    long parseIntClear(uint32_t timeout = 500) {
+        long retcode = stream.parseInt();
         clear(timeout);
         return retcode;
     }
@@ -141,20 +135,39 @@ class SerialAT : public Stream {
         waitResponse(timeout);
     }
 
-  protected:
+    // forward calls to underlying stream object
+    int available() { return stream.available(); }
+
+    long parseInt() { return stream.parseInt(); }
+    
+    void flush() { stream.flush(); }
+
+    uint16_t read() { return stream.read(); }
+
+    template <typename ARG>
+    bool find(ARG arg) { return stream.find(arg); }
+
+    template <typename... ARGS>
+    uint16_t write(ARGS... args) { return stream.write(args...); }
+
+    template <typename... ARGS>
+    uint16_t readBytesUntil(ARGS... args) { return stream.readBytesUntil(args...); }
+
+    template <typename... ARGS>
+    uint16_t readBytes(ARGS... args) { return stream.readBytes(args...); }
+
     // print any number of commands to the module serial interface
     template <typename HEAD, typename... TAIL>
-    void _print(HEAD head, TAIL... tail) {
-        print(head);
-        _print(tail...);
+    void printCMD(HEAD head, TAIL... tail) {
+        stream.print(head); stream.flush();
+        printCMD(tail...);
     }
 
     // single argument case
     template <typename ARG>
-    void _print(ARG arg) {
-        print(arg);
+    void printCMD(ARG arg) {
+        stream.print(arg); stream.flush();
     }
-
-}
+};
 
 #endif A76XX_SERIAL_H_

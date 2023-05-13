@@ -12,6 +12,9 @@ enum Response_t {
     A76XX_RESPONSE_TIMEOUT   = 4
 };
 
+#define RESPONSE_OK "OK\r\n"
+#define RESPONSE_ERROR "ERROR\r\n"
+
 // error codes
 #define A76XX_OPERATION_SUCCEEDED             0
 #define A76XX_OPERATION_TIMEDOUT             -1
@@ -19,9 +22,6 @@ enum Response_t {
 #define A76XX_OUT_OF_MEMORY                  -3
 #define A76XX_MQTT_ALREADY_STOPPED           -4
 #define A76XX_MQTT_ALREADY_STARTED           -5
-
-#define RESPONSE_OK "OK\r\n"
-#define RESPONSE_ERROR "ERROR\r\n"
 
 
 // if retcode is an error, return it
@@ -62,12 +62,18 @@ enum Response_t {
         }                                             \
     }
 
-#include "modem.h"
+#include "internet_service_commands.h"
+#include "serial_interface_commands.h"
+#include "status_control_commands.h"
+#include "packet_domain_commands.h"
+#include "network_commands.h"
+#include "v25ter_commands.h"
+#include "http_commands.h"
+#include "mqtt_commands.h"
+#include "ssl_commands.h"
+#include "sim_commands.h"
 
-#include "ssl_cmds.h"
-#include "mqtt_cmds.h"
-#include "http_cmds.h"
-#include "network_cmds.h"
+#include "modem.h"
 
 #include "base_client.h"
 #include "mqtt_client.h"

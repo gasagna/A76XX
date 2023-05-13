@@ -3,9 +3,9 @@
 
 class A76XXMQTTClient : public A76XXBaseClient {
   private:
-    A76XX_MQTT_Commands   _mqtt_cmds;
-    const char*            _clientID;
-    bool                    _use_ssl;
+    A76XX_MQTT_Commands<A76XX>   _mqtt_cmds;
+    const char*                   _clientID;
+    bool                           _use_ssl;
 
     // these two are set to zero by default until a use
     // case for allowing these to change comes up
@@ -24,7 +24,7 @@ class A76XXMQTTClient : public A76XXBaseClient {
         @param [IN] clientID The client ID used for connecting to the broker.
         @param [IN] use_ssl Whether SSL/TLS encryption should be used.
     */
-    A76XXMQTTClient(A76XX& modem, const char* clientID, bool use_ssl = false);
+    A76XXMQTTClient(A76XX* modem, const char* clientID, bool use_ssl = false);
 
     /*
         @brief Start the MQTT service.

@@ -1,12 +1,13 @@
 #include "A76XX.h"
 
-A76XXMQTTClient::A76XXMQTTClient(A76XX& modem, const char* clientID, bool use_ssl)
+A76XXMQTTClient::A76XXMQTTClient(A76XX* modem, const char* clientID, bool use_ssl)
     : A76XXBaseClient(modem)
-    , _mqtt_cmds(modem)
     , _clientID(clientID)
     , _use_ssl(use_ssl)
     , _client_index(0)
-    , _session_id(0) {}
+    , _session_id(0) {
+        _mqtt_cmds._modem = modem;
+    }
 
 bool A76XXMQTTClient::begin() {
     // start

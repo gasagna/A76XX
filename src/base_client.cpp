@@ -1,9 +1,10 @@
 #include "A76XX.h"
 
-A76XXBaseClient::A76XXBaseClient(A76XX& modem) 
-    : _ssl_cmds(modem)
-    , _ssl_ctx_index(0)
-    , _last_error_code(0) {}
+A76XXBaseClient::A76XXBaseClient(A76XX* modem) 
+    : _ssl_ctx_index(0)
+    , _last_error_code(0) {
+        _ssl_cmds._modem = modem;
+    }
 
 int8_t A76XXBaseClient::getLastError() {
     return _last_error_code;

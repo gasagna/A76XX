@@ -8,21 +8,21 @@
 class A76XXBaseClient {
   protected:
     // handle to all SSL commands
-    A76XX_SSL_Commands     _ssl_cmds;
+    A76XX_SSL_Commands<A76XX>          _ssl_cmds;
 
     // context id of the SSL session
-    uint8_t           _ssl_ctx_index;
+    uint8_t                       _ssl_ctx_index;
 
     // last error returned by any AT command
-    int8_t          _last_error_code;
+    int8_t                      _last_error_code;
 
   public:
     /*
         @brief Constructor.
 
-        @param [IN] modem An instance of the A76XX modem class.
+        @param [IN] FIXME:
     */
-    A76XXBaseClient(A76XX& modem);
+    A76XXBaseClient(A76XX* modem);
 
     /*
         @brief Get last error raise by any AT command.

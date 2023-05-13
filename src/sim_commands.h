@@ -1,6 +1,16 @@
 #ifndef A76XX_SIM_CMDS_H_
 #define A76XX_SIM_CMDS_H_
 
+enum PINStatus_t {
+    READY,
+    SIM_PIN,
+    SIM_PUK,
+    PH_SIM_PIN,
+    SIM_PIN2,
+    SIM_PUK2,
+    PH_NET_PIN,
+    UKNOWKN
+};
 
 /*
     @brief Commands in section 6 of the AT command manual version 1.09
@@ -23,26 +33,10 @@
     BINDSIM         |             |        |
     DUALSIMURC      |             |        |
 */
-
-enum PINStatus_t {
-    READY,
-    SIM_PIN,
-    SIM_PUK,
-    PH_SIM_PIN,
-    SIM_PIN2,
-    SIM_PUK2,
-    PH_NET_PIN,
-    UKNOWKN
-}
-
+template <typename MODEM>
 class A76XX_SIM_Commands {
-  private:
-    A76XX& _modem;
-
   public:
-    // Initialise from modem
-    A76XX_SIM_Commands(A76XX& modem)
-        : _modem(modem) {}
+    MODEM* _modem = NULL;
 
     /*
         @brief Implementation for CPIN - Read Command.
@@ -51,11 +45,11 @@ class A76XX_SIM_Commands {
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR 
     */
     int8_t getPINStatus(PINStatus_t& status) {
-        _modem.sendCMD("AT+CPIN?");
-        switch(_modem.waitResponse("+CPIN: ", 9000)) {
+        _modem->sendCMD("AT+CPIN?");
+        switch(_modem->waitResponse("+CPIN: ", 9000)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 char buff[11];
-                _modem._serial.readBytesUntil("\r", &buff, 11);
+                _modem->streamReadBytesUntil('\r', &buff[0], 11);
 
                 if (strcmp(buff, "READY"))      {status = PINStatus_t::READY;}
                 if (strcmp(buff, "SIM PIN"))    {status = PINStatus_t::SIM_PIN;}
@@ -69,7 +63,7 @@ class A76XX_SIM_Commands {
                 status = PINStatus_t::UKNOWKN;
                 return A76XX_OPERATION_SUCCEEDED;
             }
-            case Response_t::A76XX_OPERATION_TIMEDOUT : {
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
             }
             default : {

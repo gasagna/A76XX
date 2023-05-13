@@ -25,14 +25,10 @@
     CGAUTH  |      y      | WRITE  | setPDPAuthentication
     CPING   |      -      |        |
 */
+template <typename MODEM>
 class A76XX_PacketDomain_Commands {
-  private:
-    A76XX& _modem;
-
   public:
-    // Initialise from modem
-    A76XX_PacketDomain_Commands(A76XX& modem)
-        : _modem(modem) {}
+    MODEM* _modem = NULL;
 
     /*
         @brief Implementation for CGREG - Read Command.
@@ -40,14 +36,14 @@ class A76XX_PacketDomain_Commands {
         @return The <stat> code, from 0 to 11, or an error code.
     */
     int8_t getNetworkRegistrationStatus() {
-        _modem.sendCMD("AT+CGREG?");
-        Response_t rsp = waitResponse("+CGREG: ", 9000, false, true);
+        _modem->sendCMD("AT+CGREG?");
+        Response_t rsp = _modem->waitResponse("+CGREG: ", 9000, false, true);
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                _modem._serial.find(',');
-                return _modem.serialParseIntClear();
+                _modem->streamFind(',');
+                return _modem->streamParseIntClear();
             }
-            case Response_t::A76XX_OPERATION_TIMEDOUT : {
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
             }
             default : {
@@ -64,8 +60,26 @@ class A76XX_PacketDomain_Commands {
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
     int8_t setPDPContextActiveStatus(uint8_t cid, bool activate) {
-        _modem.sendCMD("AT+CGACT=", activate ? "1" : "0", ",", cid);
-        A76XX_RESPONSE_ASSERT_BOOL(waitResponse(9000))
+        _modem->sendCMD("AT+CGACT=", activate ? "1" : "0", ",", cid);
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse(9000))
+    }
+
+    int8_t getPDPContextActiveStatus(uint8_t cid, int8_t status) {
+        _modem->sendCMD("AT+CGACT?");
+        char buff[10] = "+CGACT: X"; buff[8] = cid;
+        switch (_modem->waitResponse(buff, 9000)) {
+            case Response_t::A76XX_RESPONSE_MATCH_1ST : {
+                _modem->streamFind(',');
+                status = _modem->streamParseIntClear();
+                return A76XX_OPERATION_SUCCEEDED;
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
     }
 
     /*
@@ -76,8 +90,8 @@ class A76XX_PacketDomain_Commands {
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
     int8_t setPDPContextParameters(uint8_t cid, const char* apn) {
-        _modem.sendCMD("AT+CGDCONT=", cid,",\"IP\",\"", apn, "\"");
-        A76XX_RESPONSE_PROCESS(waitResponse(9000))
+        _modem->sendCMD("AT+CGDCONT=", cid,",\"IP\",\"", apn, "\"");
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse(9000))
     }
 
     /*
@@ -93,12 +107,12 @@ class A76XX_PacketDomain_Commands {
                                 uint8_t auth_type = 0,
                                 const char* password = NULL,
                                 const char* username = NULL) {
-        _modem.beginCMD("AT+CGAUTH=", cid);
-        if (auth_type != 0)    { _modem.addCMD(",", auth_type);}
-        if (password  != NULL) { _modem.addCMD(",", password);}
-        if (username  != NULL) { _modem.addCMD(",", username);}
-        _modem.endCMD();
-        A76XX_RESPONSE_ASSERT_BOOL(waitResponse(9000))
+        _modem->printCMD("AT+CGAUTH=", cid);
+        if (auth_type != 0)    { _modem->printCMD(",", auth_type);}
+        if (password  != NULL) { _modem->printCMD(",", password);}
+        if (username  != NULL) { _modem->printCMD(",", username);}
+        _modem->printCMD("\r\n");
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse(9000))
     }
 
 };

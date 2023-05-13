@@ -37,55 +37,45 @@
 #define A76XX_MQTT_OPEN_SESSION_FAILED                               34
 #define A76XX_MQTT_DISCONNECT_FROM_SERVER_FAILED                     35
 
+template <typename MODEM>
 class A76XX_MQTT_Commands {
-  private:
-    A76XX& _modem;
-
   public:
-    // Initialise from modem
-    A76XX_MQTT_Commands(A76XX& modem)
-        : _modem(modem) {}
+    MODEM* _modem = NULL;
 
     // CMQTTSTART
     int8_t start() {
         // start MQTT service by activating PDP context
-        _modem.sendCMD("AT+CMQTTSTART");
-        Response_t rsp = _modem.waitResponse("+CMQTTSTART: ", 12000, false, true);
+        _modem->sendCMD("AT+CMQTTSTART");
+        Response_t rsp = _modem->waitResponse("+CMQTTSTART: ", 12000, false, true);
 
         if (rsp == Response_t::A76XX_RESPONSE_ERROR)
             return A76XX_MQTT_ALREADY_STARTED;
 
         // read return code (could be 0) and clear stream
-        int retcode = _modem._serial.parseInt(); _modem._serialClear();
-
-        // return on error
-        return retcode;
+        return _modem->streamParseIntClear();
     }
 
     // CMQTTSTOP
     int8_t stop() {
-        _modem.sendCMD("AT+CMQTTSTOP");
-        Response_t rsp = _modem.waitResponse("+CMQTTSTOP: ", 12000, false, true);
+        _modem->sendCMD("AT+CMQTTSTOP");
+        Response_t rsp = _modem->waitResponse("+CMQTTSTOP: ", 12000, false, true);
 
         if (rsp == Response_t::A76XX_RESPONSE_ERROR)
             return A76XX_MQTT_ALREADY_STOPPED;
 
         // read return code (could be 0) and clear stream
-        int retcode = _modem._serial.parseInt(); _modem._serialClear();
-
-        // return on error
-        return retcode;
+        return _modem->streamParseIntClear();
     }
 
     // CMQTTACCQ
     int8_t acquire_client(uint8_t client_index, const char clientID[], uint8_t server_type) {
-        _modem.sendCMD("AT+CMQTTACCQ=", client_index, ",\"", clientID, "\",", server_type);
-        Response_t rsp = _modem.waitResponse("+CMQTTACCQ: ", 9000, true, true);
+        _modem->sendCMD("AT+CMQTTACCQ=", client_index, ",\"", clientID, "\",", server_type);
+        Response_t rsp = _modem->waitResponse("+CMQTTACCQ: ", 9000, true, true);
 
         switch( rsp ) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                _modem._serial.find(',');
-                return _modem._serialParseIntClear();
+                _modem->streamFind(',');
+                return _modem->streamParseIntClear();
             }
             case Response_t::A76XX_RESPONSE_OK : {
                 return A76XX_OPERATION_SUCCEEDED;
@@ -104,8 +94,8 @@ class A76XX_MQTT_Commands {
 
     // CMQTTREL
     int8_t release_client(uint8_t client_index) {
-        _modem.sendCMD("AT+CMQTTREL=", client_index);
-        Response_t rsp = _modem.waitResponse("+CMQTTREL: ", 9000, true, true);
+        _modem->sendCMD("AT+CMQTTREL=", client_index);
+        Response_t rsp = _modem->waitResponse("+CMQTTREL: ", 9000, true, true);
 
         if (rsp == Response_t::A76XX_RESPONSE_OK)
 
@@ -114,8 +104,8 @@ class A76XX_MQTT_Commands {
 
         // this is an error case
         if (rsp == Response_t::A76XX_RESPONSE_MATCH_1ST) {
-            _modem._serial.find(',');
-            return _modem._serialParseIntClear();
+            _modem->streamFind(',');
+            return _modem->streamParseIntClear();
         }
 
         return A76XX_GENERIC_ERROR;
@@ -123,29 +113,29 @@ class A76XX_MQTT_Commands {
 
     // CMQTTSSLCFG
     int8_t set_SSL_context(uint8_t session_id, uint8_t ssl_ctx_index) {
-        _modem.sendCMD("AT+CMQTTSSLCFG=", session_id, ",", ssl_ctx_index);
-        return _modem.waitResponse();
+        _modem->sendCMD("AT+CMQTTSSLCFG=", session_id, ",", ssl_ctx_index);
+        return _modem->waitResponse();
     }
 
     // CMQTTWILLTOPIC
     int8_t set_will_topic(uint8_t client_index, const char* will_topic) {
-        _modem.sendCMD("AT+CMQTTWILLTOPIC=", client_index, ",", strlen(will_topic));
+        _modem->sendCMD("AT+CMQTTWILLTOPIC=", client_index, ",", strlen(will_topic));
 
-        Response_t rsp = _modem.waitResponse(">", "+CMQTTWILLTOPIC: ", 9000);
+        Response_t rsp = _modem->waitResponse(">", "+CMQTTWILLTOPIC: ", 9000);
 
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                _modem._serial.write(will_topic);
-                _modem._serial.flush();
-                if (_modem.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
+                _modem->streamWrite(will_topic);
+                _modem->streamFlush();
+                if (_modem->waitResponse() == Response_t::A76XX_RESPONSE_OK) {
                     return A76XX_OPERATION_SUCCEEDED;
                 } else {
                     return A76XX_GENERIC_ERROR;
                 }
             }
             case Response_t::A76XX_RESPONSE_MATCH_2ND : {
-                _modem._serial.find(',');
-                return _modem._serialParseIntClear();
+                _modem->streamFind(',');
+                return _modem->streamParseIntClear();
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
@@ -158,22 +148,22 @@ class A76XX_MQTT_Commands {
 
     // CMQTTWILLMSG
     int8_t set_will_message(uint8_t client_index, const char* will_message, uint8_t will_qos) {
-        _modem.sendCMD("AT+CMQTTWILLMSG=", client_index, ",", strlen(will_message), ",", will_qos);
+        _modem->sendCMD("AT+CMQTTWILLMSG=", client_index, ",", strlen(will_message), ",", will_qos);
 
-        Response_t rsp = _modem.waitResponse(">", "+CMQTTWILLMSG: ", 9000);
+        Response_t rsp = _modem->waitResponse(">", "+CMQTTWILLMSG: ", 9000);
 
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                _modem._serial.write(will_message);
-                _modem._serial.flush();
-                if (_modem.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
+                _modem->streamWrite(will_message);
+                _modem->streamFlush();
+                if (_modem->waitResponse() == Response_t::A76XX_RESPONSE_OK) {
                 } else {
                     return A76XX_GENERIC_ERROR;
                 }
             }
             case Response_t::A76XX_RESPONSE_MATCH_2ND : {
-                _modem._serial.find(',');
-                return _modem._serialParseIntClear();
+                _modem->streamFind(',');
+                return _modem->streamParseIntClear();
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
@@ -190,20 +180,20 @@ class A76XX_MQTT_Commands {
                    const char* username = NULL, const char* password = NULL) {
 
         if (username && password) {
-            _modem.sendCMD("AT+CMQTTCONNECT=", client_index, ",\"tcp://", server, ":", port, "\",", keepalive, ",", clean_session, ",\"", username, "\",\"", password, "\"");
+            _modem->sendCMD("AT+CMQTTCONNECT=", client_index, ",\"tcp://", server, ":", port, "\",", keepalive, ",", clean_session, ",\"", username, "\",\"", password, "\"");
         } else {
-            _modem.sendCMD("AT+CMQTTCONNECT=", client_index, ",\"tcp://", server, ":", port, "\",", keepalive, ",", clean_session);
+            _modem->sendCMD("AT+CMQTTCONNECT=", client_index, ",\"tcp://", server, ":", port, "\",", keepalive, ",", clean_session);
         }
 
         // it might happen that the command only returns ERROR (case 5)
         // in this case we timeout
-        Response_t rsp = _modem.waitResponse("+CMQTTCONNECT: ", 9000, false, false);
+        Response_t rsp = _modem->waitResponse("+CMQTTCONNECT: ", 9000, false, false);
 
         // read int output
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                _modem._serial.find(',');
-                return _modem._serialParseIntClear();
+                _modem->streamFind(',');
+                return _modem->streamParseIntClear();
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
@@ -216,15 +206,15 @@ class A76XX_MQTT_Commands {
 
     // CMQTTDISC?
     bool is_connected(uint8_t client_index) {
-        _modem.sendCMD("AT+CMQTTDISC?");
+        _modem->sendCMD("AT+CMQTTDISC?");
 
         char match_str[15] = "+CMQTTDISC: x,";
         match_str[12] = client_index == 0 ? '0' : '1';
 
-        Response_t rsp = _modem.waitResponse(match_str, 9000, false, true);
+        Response_t rsp = _modem->waitResponse(match_str, 9000, false, true);
 
         if (rsp == Response_t::A76XX_RESPONSE_MATCH_1ST) {
-            int retcode = _modem._serialParseIntClear();
+            int retcode = _modem->streamParseIntClear();
             return retcode == 0 ? true : false;
         } else {
             return false;
@@ -233,14 +223,14 @@ class A76XX_MQTT_Commands {
 
     // CMQTTDISC
     int8_t disconnect(uint8_t client_index, uint8_t timeout) {
-        _modem.sendCMD("AT+CMQTTDISC=", client_index, ",", timeout);
-        Response_t rsp = _modem.waitResponse("+CMQTTDISC: ", timeout, false, true);
+        _modem->sendCMD("AT+CMQTTDISC=", client_index, ",", timeout);
+        Response_t rsp = _modem->waitResponse("+CMQTTDISC: ", timeout, false, true);
 
         // read int output
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST: {
-                _modem._serial.find(',');
-                return _modem._serialParseIntClear();
+                _modem->streamFind(',');
+                return _modem->streamParseIntClear();
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT: {
                 return A76XX_OPERATION_TIMEDOUT;
@@ -253,23 +243,23 @@ class A76XX_MQTT_Commands {
 
     // CMQTTTOPIC
     int8_t set_topic(uint8_t client_index, const char* topic) {
-        _modem.sendCMD("AT+CMQTTTOPIC=", client_index, ",", strlen(topic));
+        _modem->sendCMD("AT+CMQTTTOPIC=", client_index, ",", strlen(topic));
 
-        Response_t rsp = _modem.waitResponse(">", "+CMQTTTOPIC: ", 9000);
+        Response_t rsp = _modem->waitResponse(">", "+CMQTTTOPIC: ", 9000);
 
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                _modem._serial.write(topic);
-                _modem._serial.flush();
-                if (_modem.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
+                _modem->streamWrite(topic);
+                _modem->streamFlush();
+                if (_modem->waitResponse() == Response_t::A76XX_RESPONSE_OK) {
                     return A76XX_OPERATION_SUCCEEDED;
                 } else {
                     return A76XX_GENERIC_ERROR;
                 }
             }
             case Response_t::A76XX_RESPONSE_MATCH_2ND : {
-                _modem._serial.find(',');
-                return _modem._serialParseIntClear();
+                _modem->streamFind(',');
+                return _modem->streamParseIntClear();
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
@@ -282,23 +272,23 @@ class A76XX_MQTT_Commands {
 
     // CMQTTPAYLOAD
     int8_t set_payload(uint8_t client_index, const uint8_t* payload, uint length) {
-        _modem.sendCMD("AT+CMQTTPAYLOAD=0,", length);
+        _modem->sendCMD("AT+CMQTTPAYLOAD=0,", length);
 
-        Response_t rsp = _modem.waitResponse(">", "+CMQTTTPAYLOAD: ", 9000);
+        Response_t rsp = _modem->waitResponse(">", "+CMQTTTPAYLOAD: ", 9000);
 
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                _modem._serial.write(payload, length);
-                _modem._serial.flush();
-                if (_modem.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
+                _modem->streamWrite(payload, length);
+                _modem->streamFlush();
+                if (_modem->waitResponse() == Response_t::A76XX_RESPONSE_OK) {
                     return A76XX_OPERATION_SUCCEEDED;
                 } else {
                     return A76XX_GENERIC_ERROR;
                 }
             }
             case Response_t::A76XX_RESPONSE_MATCH_2ND : {
-                _modem._serial.find(',');
-                return _modem._serialParseIntClear();
+                _modem->streamFind(',');
+                return _modem->streamParseIntClear();
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
@@ -313,15 +303,15 @@ class A76XX_MQTT_Commands {
     int8_t publish(uint8_t client_index, uint8_t qos, uint8_t pub_timeout, bool retained = false, bool dup = false) {
         uint8_t _retained = retained ? 1 : 0;
         uint8_t _dup      = dup      ? 1 : 0;
-        _modem.sendCMD("AT+CMQTTPUB=", client_index, ",", qos, ",", pub_timeout, ",", _retained, ",", _dup);
+        _modem->sendCMD("AT+CMQTTPUB=", client_index, ",", qos, ",", pub_timeout, ",", _retained, ",", _dup);
 
         // we already have read OK
-        Response_t rsp = _modem.waitResponse("+CMQTTPUB: ", 9000, false, true);
+        Response_t rsp = _modem->waitResponse("+CMQTTPUB: ", 9000, false, true);
 
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                _modem._serial.find(',');
-                return _modem._serialParseIntClear();
+                _modem->streamFind(',');
+                return _modem->streamParseIntClear();
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
