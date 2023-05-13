@@ -1,7 +1,8 @@
 #include "A76XX.h"
 
 A76XX::A76XX(Stream& stream)
-    : _stream(stream) {
+    : _stream(stream)
+    , _last_error_code(0) {
         internetService._modem = this;
         network._modem = this;
         packetDomain._modem = this;
