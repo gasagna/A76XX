@@ -1,7 +1,7 @@
 #ifndef A76XX_MQTT_CLIENT_H_
 #define A76XX_MQTT_CLIENT_H_
 
-class A76XXMQTTClient : public A76XXBaseClient {
+class A76XXMQTTClient : public A76XXSecureClient {
   private:
     A76XX_MQTT_Commands<A76XX>   _mqtt_cmds;
     const char*                   _clientID;

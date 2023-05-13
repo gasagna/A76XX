@@ -1,7 +1,7 @@
 #ifndef A76XX_HTTP_CLIENT_H_
 #define A76XX_HTTP_CLIENT_H_
 
-class A76XXHTTPClient : public A76XXBaseClient {
+class A76XXHTTPClient : public A76XXSecureClient {
   private:
     A76XX_HTTP_Commands<A76XX>   _http_cmds;
     bool                           _use_ssl;
