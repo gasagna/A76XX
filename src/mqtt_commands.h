@@ -1,42 +1,29 @@
 #ifndef A76XX_MQTT_CMDS_H_
 #define A76XX_MQTT_CMDS_H_
 
-#define A76XX_MQTT_FAILED                                             1
-#define A76XX_MQTT_BAD_UTF8_STRING                                    2
-#define A76XX_MQTT_SOCK_CONNECT_FAIL                                  3
-#define A76XX_MQTT_SOCK_CREATE_FAIL                                   4
-#define A76XX_MQTT_SOCK_CLOSE_FAIL                                    5
-#define A76XX_MQTT_MESSAGE_RECEIVE_FAIL                               6
-#define A76XX_MQTT_NETWORK_OPEN_FAIL                                  7
-#define A76XX_MQTT_NETWORK_CLOSE_FAIL                                 8
-#define A76XX_MQTT_NETWORK_NOT_OPENED                                 9
-#define A76XX_MQTT_CLIENT_INDEX_ERROR                                10
-#define A76XX_MQTT_NO_CONNECTION                                     11
-#define A76XX_MQTT_INVALID_PARAMETER                                 12
-#define A76XX_MQTT_NOT_SUPPORTED_OPERATION                           13
-#define A76XX_MQTT_CLIENT_IS_BUSY                                    14
-#define A76XX_MQTT_REQUIRE_CONNECTION_FAIL                           15
-#define A76XX_MQTT_SOCK_SENDING_FAIL                                 16
-#define A76XX_MQTT_TIMEOUT                                           17
-#define A76XX_MQTT_TOPIC_IS_EMPTY                                    18
-#define A76XX_MQTT_CLIENT_IS_USED                                    19
-#define A76XX_MQTT_CLIENT_NOT_ACQUIRED                               20
-#define A76XX_MQTT_CLIENT_NOT_RELEASED                               21
-#define A76XX_MQTT_LENGTH_OUT_OF_RANGE                               22
-#define A76XX_MQTT_NETWORK_IS_OPENED                                 23
-#define A76XX_MQTT_PACKET_FAIL                                       24
-#define A76XX_MQTT_DNS_ERROR                                         25
-#define A76XX_MQTT_SOCKET_IS_CLOSED_BY_SERVER                        26
-#define A76XX_MQTT_CONNECTION_REFUSED_UNACCEPTED_PROTOCOL_VERSION    27
-#define A76XX_MQTT_CONNECTION_REFUSED_IDENTIFIER_REJECTED            28
-#define A76XX_MQTT_CONNECTION_REFUSED_SERVER_UNAVAILABLE             29
-#define A76XX_MQTT_CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD      30
-#define A76XX_MQTT_CONNECTION_REFUSED_NOT_AUTHORIZED                 31
-#define A76XX_MQTT_HANDSHAKE_FAIL                                    32
-#define A76XX_MQTT_NOT_SET_CERTIFICATE                               33
-#define A76XX_MQTT_OPEN_SESSION_FAILED                               34
-#define A76XX_MQTT_DISCONNECT_FROM_SERVER_FAILED                     35
+/*
+    @brief Commands in section 18 of the AT command manual version 1.09
 
+    Command        | Implemented | Method | Function(s)
+    -------------- | ----------- | ------ |-----------------
+    CMQTTSTART     |             |        | start
+    CMQTTSTOP      |             |        | stop
+    CMQTTACCQ      |             |        | acquireClient
+    CMQTTREL       |             |        | releaseClient
+    CMQTTSSLCFG    |             |        | setSSLContext
+    CMQTTWILLTOPIC |             |        | setWillTopic
+    CMQTTWILLMSG   |             |        | setWillMessage
+    CMQTTCONNECT   |             |        | connect
+    CMQTTDISC      |             |        | disconnect, isConnected
+    CMQTTTOPIC     |             |        | setTopic
+    CMQTTPAYLOAD   |             |        | setPayload
+    CMQTTPUB       |             |        | publish
+    CMQTTSUBTOPIC  |             |        |
+    CMQTTSUB       |             |        |
+    CMQTTUNSUBTOPIC|             |        |
+    CMQTTUNSUB     |             |        |
+    CMQTTCFG       |             |        |
+*/
 template <typename MODEM>
 class A76XX_MQTT_Commands {
   public:
@@ -68,7 +55,7 @@ class A76XX_MQTT_Commands {
     }
 
     // CMQTTACCQ
-    int8_t acquire_client(uint8_t client_index, const char clientID[], uint8_t server_type) {
+    int8_t acquireClient(uint8_t client_index, const char clientID[], uint8_t server_type) {
         _modem->sendCMD("AT+CMQTTACCQ=", client_index, ",\"", clientID, "\",", server_type);
         Response_t rsp = _modem->waitResponse("+CMQTTACCQ: ", 9000, true, true);
 
@@ -93,7 +80,7 @@ class A76XX_MQTT_Commands {
     }
 
     // CMQTTREL
-    int8_t release_client(uint8_t client_index) {
+    int8_t releaseClient(uint8_t client_index) {
         _modem->sendCMD("AT+CMQTTREL=", client_index);
         Response_t rsp = _modem->waitResponse("+CMQTTREL: ", 9000, true, true);
 
@@ -112,13 +99,13 @@ class A76XX_MQTT_Commands {
     }
 
     // CMQTTSSLCFG
-    int8_t set_SSL_context(uint8_t session_id, uint8_t ssl_ctx_index) {
+    int8_t setSSLContext(uint8_t session_id, uint8_t ssl_ctx_index) {
         _modem->sendCMD("AT+CMQTTSSLCFG=", session_id, ",", ssl_ctx_index);
         return _modem->waitResponse();
     }
 
     // CMQTTWILLTOPIC
-    int8_t set_will_topic(uint8_t client_index, const char* will_topic) {
+    int8_t setWillTopic(uint8_t client_index, const char* will_topic) {
         _modem->sendCMD("AT+CMQTTWILLTOPIC=", client_index, ",", strlen(will_topic));
 
         Response_t rsp = _modem->waitResponse(">", "+CMQTTWILLTOPIC: ", 9000);
@@ -147,7 +134,7 @@ class A76XX_MQTT_Commands {
     }
 
     // CMQTTWILLMSG
-    int8_t set_will_message(uint8_t client_index, const char* will_message, uint8_t will_qos) {
+    int8_t setWillMessage(uint8_t client_index, const char* will_message, uint8_t will_qos) {
         _modem->sendCMD("AT+CMQTTWILLMSG=", client_index, ",", strlen(will_message), ",", will_qos);
 
         Response_t rsp = _modem->waitResponse(">", "+CMQTTWILLMSG: ", 9000);
@@ -205,7 +192,7 @@ class A76XX_MQTT_Commands {
     }
 
     // CMQTTDISC?
-    bool is_connected(uint8_t client_index) {
+    bool isConnected(uint8_t client_index) {
         _modem->sendCMD("AT+CMQTTDISC?");
 
         char match_str[15] = "+CMQTTDISC: x,";
@@ -242,7 +229,7 @@ class A76XX_MQTT_Commands {
     }
 
     // CMQTTTOPIC
-    int8_t set_topic(uint8_t client_index, const char* topic) {
+    int8_t setTopic(uint8_t client_index, const char* topic) {
         _modem->sendCMD("AT+CMQTTTOPIC=", client_index, ",", strlen(topic));
 
         Response_t rsp = _modem->waitResponse(">", "+CMQTTTOPIC: ", 9000);
@@ -271,7 +258,7 @@ class A76XX_MQTT_Commands {
     }
 
     // CMQTTPAYLOAD
-    int8_t set_payload(uint8_t client_index, const uint8_t* payload, uint length) {
+    int8_t setPayload(uint8_t client_index, const uint8_t* payload, uint length) {
         _modem->sendCMD("AT+CMQTTPAYLOAD=0,", length);
 
         Response_t rsp = _modem->waitResponse(">", "+CMQTTTPAYLOAD: ", 9000);
@@ -321,7 +308,6 @@ class A76XX_MQTT_Commands {
             }
         }
     }
-
 };
 
 #endif A76XX_MQTT_CMDS_H_

@@ -1,73 +1,21 @@
 #ifndef A76XX_HTTP_CMDS_H_
 #define A76XX_HTTP_CMDS_H_
 
-#define A76XX_HTTP_CONTINUE                                100
-#define A76XX_HTTP_SWITCHING_PROTOCOLS                     101
-#define A76XX_HTTP_OK                                      200
-#define A76XX_HTTP_CREATED                                 201
-#define A76XX_HTTP_ACCEPTED                                202
-#define A76XX_HTTP_NON_AUTHORITATIVE_INFORMATION           203
-#define A76XX_HTTP_NO_CONTENT                              204
-#define A76XX_HTTP_RESET_CONTENT                           205
-#define A76XX_HTTP_PARTIAL_CONTENT                         206
-#define A76XX_HTTP_MULTIPLE_CHOICES                        300
-#define A76XX_HTTP_MOVED_PERMANENTLY                       301
-#define A76XX_HTTP_FOUND                                   302
-#define A76XX_HTTP_SEE_OTHER                               303
-#define A76XX_HTTP_NOT_MODIFIED                            304
-#define A76XX_HTTP_USE_PROXY                               305
-#define A76XX_HTTP_TEMPORARY_REDIRECT                      307
-#define A76XX_HTTP_BAD_REQUEST                             400
-#define A76XX_HTTP_UNAUTHORIZED                            401
-#define A76XX_HTTP_PAYMENT_REQUIRED                        402
-#define A76XX_HTTP_FORBIDDEN                               403
-#define A76XX_HTTP_NOT_FOUND                               404
-#define A76XX_HTTP_METHOD_NOT_ALLOWED                      405
-#define A76XX_HTTP_NOT_ACCEPTABLE                          406
-#define A76XX_HTTP_PROXY_AUTHENTICATION_REQUIRED           407
-#define A76XX_HTTP_REQUEST_TIMEOUT                         408
-#define A76XX_HTTP_CONFLICT                                409
-#define A76XX_HTTP_GONE                                    410
-#define A76XX_HTTP_LENGTH_REQUIRED                         411
-#define A76XX_HTTP_PRECONDITION_FAILED                     412
-#define A76XX_HTTP_REQUEST_ENTITY_TOO_LARGE                413
-#define A76XX_HTTP_REQUEST_URI_TOO_LARGE                   414
-#define A76XX_HTTP_UNSUPPORTED_MEDIA_TYPE                  415
-#define A76XX_HTTP_REQUESTED_RANGE_NOT_SATISFIABLE         416
-#define A76XX_HTTP_EXPECTATION_FAILED                      417
-#define A76XX_HTTP_INTERNAL_SERVER_ERROR                   500
-#define A76XX_HTTP_NOT_IMPLEMENTED                         501
-#define A76XX_HTTP_BAD_GATEWAY                             502
-#define A76XX_HTTP_SERVICE_UNAVAILABLE                     503
-#define A76XX_HTTP_GATEWAY_TIMEOUT                         504
-#define A76XX_HTTP_HTTP_VERSION_NOT_SUPPORTED              505
-#define A76XX_HTTP_NOT_HTTP_PDU                            600
-#define A76XX_HTTP_NETWORK_ERROR                           601
-#define A76XX_HTTP_NO_MEMORY                               602
-#define A76XX_HTTP_DNS_ERROR                               603
-#define A76XX_HTTP_STACK_BUSY                              604
+/*
+    @brief Commands in section 16 of the AT command manual version 1.09
 
-// additional error codes returned by the SIMCOM firmware
-#define A76XX_HTTP_ALERT_STATE                             701
-#define A76XX_HTTP_UNKNOWN_ERROR                           702
-#define A76XX_HTTP_BUSY                                    703
-#define A76XX_HTTP_CONNECTION_CLOSED_ERROR                 704
-#define A76XX_HTTP_TIMEOUT                                 705
-#define A76XX_HTTP_RECEIVE_SEND_SOCKET_DATA_FAILED         706
-#define A76XX_HTTP_FILE_NOT_EXISTS_OR_OTHER_MEMORY_ERROR   707
-#define A76XX_HTTP_INVALID_PARAMETER                       708
-#define A76XX_HTTP_NETWORK_ERROR                           709
-#define A76XX_HTTP_START_A_NEW_SSL_SESSION_FAILED          710
-#define A76XX_HTTP_WRONG_STATE                             711
-#define A76XX_HTTP_FAILED_TO_CREATE_SOCKET                 712
-#define A76XX_HTTP_GET_DNS_FAILED                          713
-#define A76XX_HTTP_CONNECT_SOCKET_FAILED                   714
-#define A76XX_HTTP_HANDSHAKE_FAILED                        715
-#define A76XX_HTTP_CLOSE_SOCKET_FAILED                     716
-#define A76XX_HTTP_NO_NETWORK_ERROR                        717
-#define A76XX_HTTP_SEND_DATA_TIMEOUT                       718
-#define A76XX_HTTP_CA_MISSED                               719
-
+    Command     | Implemented | Method | Function(s)
+    ----------- | ----------- | ------ |-----------------
+    HTTPINIT    |      y      | EXEC   | init
+    HTTPTERM    |      y      | EXEC   | term
+    HTTPPARA    |      y      | WRITE  | config_http_*
+    HTTPACTION  |      y      | WRITE  | action
+    HTTPHEAD    |      y      | EXEC   | read_header
+    HTTPREAD    |      y      | R/W    | get_content_length, read_response_body
+    HTTPDATA    |      y      | WRITE  | input_data
+    HTTPPOSTFILE|             |        |
+    HTTPREADFILE|             |        |
+*/
 template <typename MODEM>
 class A76XX_HTTP_Commands {
   public:
@@ -299,4 +247,4 @@ class A76XX_HTTP_Commands {
     }
 };
 
-#endif A76XX_MQTT_CMDS_H_
+#endif A76XX_HTTP_CMDS_H_
