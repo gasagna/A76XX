@@ -12,8 +12,6 @@ class A76XXBaseClient {
   public:
     /*
         @brief Constructor.
-
-        @param [IN] FIXME:
     */
     A76XXBaseClient();
 
