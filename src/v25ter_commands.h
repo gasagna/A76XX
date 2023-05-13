@@ -62,7 +62,10 @@ class V25TERCommands {
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR 
     */
     int8_t modelIdentification(String& model) {
+        // clear stream before sending command, then get rid of the first line
+        _modem->streamClear();
         _modem->sendCMD("AT+CGMM");
+        _modem->streamFind("\r\n");
         uint32_t tstart = millis();
         while (millis() - tstart < 5000) {
             if (_modem->streamAvailable() > 0) {
@@ -85,21 +88,30 @@ class V25TERCommands {
     */
     int8_t revisionIdentification(String& revision) {
         _modem->sendCMD("AT+CGMR");
-        uint32_t tstart = millis();
-        while (millis() - tstart < 5000) {
-            if (_modem->streamAvailable() > 0) {
-                char c = static_cast<char>(_modem->streamRead());
-                if (c == '\r') {
-                    _modem->streamClear();
-                    return A76XX_OPERATION_SUCCEEDED;
+        switch (_modem->waitResponse("+CGMR: ", 9000, false, false)) {
+            case Response_t::A76XX_RESPONSE_MATCH_1ST : {
+                uint32_t tstart = millis();
+                while (millis() - tstart < 5000) {
+                    if (_modem->streamAvailable() > 0) {
+                        char c = static_cast<char>(_modem->streamRead());
+                        if (c == '\r') {
+                            _modem->streamClear();
+                            return A76XX_OPERATION_SUCCEEDED;
+                        }
+                        revision += c;
+                    }
                 }
-                revision += c;
+                _modem->streamClear();
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
             }
         }
-        return A76XX_OPERATION_TIMEDOUT;
     }
-
-
 };
 
 #endif A76XX_V25TER_CMDS_H_
