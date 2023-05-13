@@ -8,11 +8,11 @@
     ----------- | ----------- | ------ |-----------------
     HTTPINIT    |      y      | EXEC   | init
     HTTPTERM    |      y      | EXEC   | term
-    HTTPPARA    |      y      | WRITE  | config_http_*
+    HTTPPARA    |      y      | WRITE  | configHttp*
     HTTPACTION  |      y      | WRITE  | action
-    HTTPHEAD    |      y      | EXEC   | read_header
-    HTTPREAD    |      y      | R/W    | get_content_length, read_response_body
-    HTTPDATA    |      y      | WRITE  | input_data
+    HTTPHEAD    |      y      | EXEC   | readHeader
+    HTTPREAD    |      y      | R/W    | getContentLength, readResponseBody
+    HTTPDATA    |      y      | WRITE  | inputData
     HTTPPOSTFILE|             |        |
     HTTPREADFILE|             |        |
 */
@@ -34,7 +34,7 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPPARA URL
-    int8_t config_http_url(const char* server, uint16_t port, const char* path, bool use_ssl) {
+    int8_t configHttpURL(const char* server, uint16_t port, const char* path, bool use_ssl) {
         // add the protocol if not present
         if (strstr(server, "https://") == NULL || strstr(server, "http://") == NULL) {
             if (use_ssl == true) {
@@ -49,43 +49,43 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPPARA CONNECTTO
-    int8_t config_http_conn_timeout(int conn_timeout) {
+    int8_t configHttpConnTimeout(int conn_timeout) {
         _modem->sendCMD("AT+HTTPPARA=\"CONNECTTO\",", conn_timeout);
         A76XX_RESPONSE_PROCESS(_modem->waitResponse(120000))
     }
 
     // HTTPPARA RECVTO
-    int8_t config_http_recv_timeout(int recv_timeout) {
+    int8_t configHttpRecvTimeout(int recv_timeout) {
         _modem->sendCMD("AT+HTTPPARA=\"RECVTO\",", recv_timeout);
         A76XX_RESPONSE_PROCESS(_modem->waitResponse(120000))
     }
 
     // HTTPPARA CONTENT
-    int8_t config_http_content_type(const char* content_type) {
+    int8_t configHttpContentType(const char* content_type) {
         _modem->sendCMD("AT+HTTPPARA=\"CONTENT\",\"", content_type, "\"");
         A76XX_RESPONSE_PROCESS(_modem->waitResponse(120000))
     }
 
     // HTTPPARA ACCEPT
-    int8_t config_http_accept(const char* accept) {
+    int8_t configHttpAccept(const char* accept) {
         _modem->sendCMD("AT+HTTPPARA=\"ACCEPT\",\"", accept, "\"");
         A76XX_RESPONSE_PROCESS(_modem->waitResponse(120000))
     }
 
     // HTTPPARA SSLCFG
-    int8_t config_http_sslcfg_id(uint8_t sslcfg_id) {
+    int8_t configHttpSSLCfgId(uint8_t sslcfg_id) {
         _modem->sendCMD("AT+HTTPPARA=\"SSLCFG\",", sslcfg_id);
         A76XX_RESPONSE_PROCESS(_modem->waitResponse(120000))
     }
 
     // HTTPPARA USERDATA
-    int8_t config_http_user_data(const char* header, const char* value) {
+    int8_t configHttpUserData(const char* header, const char* value) {
         _modem->sendCMD("AT+HTTPPARA=\"USERDATA\",\"", header, ":", value, "\"");
         A76XX_RESPONSE_PROCESS(_modem->waitResponse(120000))
     }
 
     // HTTPPARA READMODE
-    int8_t config_http_read_mode(uint8_t readmode) {
+    int8_t configHttpReadMode(uint8_t readmode) {
         _modem->sendCMD("AT+HTTPPARA=\"READMODE\",", readmode);
         A76XX_RESPONSE_PROCESS(_modem->waitResponse(120000))
     }
@@ -118,7 +118,7 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPHEAD
-    int8_t read_header(String& header) {
+    int8_t readHeader(String& header) {
         _modem->sendCMD("AT+HTTPHEAD");
         Response_t rsp = _modem->waitResponse("+HTTPHEAD: ", 120000, false, true);
         switch (rsp) {
@@ -155,7 +155,7 @@ class A76XX_HTTP_Commands {
         }
     }
 
-    int8_t get_content_length(uint32_t* len) {
+    int8_t getContentLength(uint32_t* len) {
         _modem->sendCMD("AT+HTTPREAD?");
         Response_t rsp = _modem->waitResponse("+HTTPREAD: LEN,", 120000, false, true);
         switch (rsp) {
@@ -173,7 +173,7 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPREAD - read entire response
-    int8_t read_response_body(String& body, uint32_t body_length) {
+    int8_t readResponseBody(String& body, uint32_t body_length) {
         _modem->sendCMD("AT+HTTPREAD=", 0, ",", body_length);
         Response_t rsp = _modem->waitResponse("+HTTPREAD: ", 120000, false, true);
         switch (rsp) {
@@ -214,7 +214,7 @@ class A76XX_HTTP_Commands {
     }
 
     // HTTPDATA
-    int8_t input_data(const char* data, uint32_t length) {
+    int8_t inputData(const char* data, uint32_t length) {
         // use 30 seconds timeout
         _modem->sendCMD("AT+HTTPDATA=", length, ",", 30);
 

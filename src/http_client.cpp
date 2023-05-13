@@ -26,7 +26,7 @@ bool A76XXHTTPClient::end() {
 }
 
 bool A76XXHTTPClient::addHeader(const char* header, const char* value) {
-    int8_t retcode = _http_cmds.config_http_user_data(header, value);
+    int8_t retcode = _http_cmds.configHttpUserData(header, value);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
     return true;
 }
@@ -40,13 +40,13 @@ uint32_t A76XXHTTPClient::getResponseBodyLength() {
 }
 
 bool A76XXHTTPClient::getResponseHeader(String& header) {
-    int8_t retcode = _http_cmds.read_header(header);
+    int8_t retcode = _http_cmds.readHeader(header);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
     return true;
 }
 
 bool A76XXHTTPClient::getResponseBody(String& body) {
-    int8_t retcode = _http_cmds.read_response_body(body, _last_body_length);
+    int8_t retcode = _http_cmds.readResponseBody(body, _last_body_length);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
     return true;
 }
@@ -59,7 +59,7 @@ bool A76XXHTTPClient::request(uint8_t method,
     int8_t retcode;
     
     // set url
-    retcode = _http_cmds.config_http_url(_server_name, _server_port, path, _use_ssl);
+    retcode = _http_cmds.configHttpURL(_server_name, _server_port, path, _use_ssl);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 
     // set user agent
@@ -69,19 +69,19 @@ bool A76XXHTTPClient::request(uint8_t method,
 
     // set Accept: header
     if (accept != NULL) {
-        retcode = _http_cmds.config_http_accept(accept);
+        retcode = _http_cmds.configHttpAccept(accept);
         A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
     }
 
     // set Content-Type: header
     if (content_type != NULL) {
-        retcode = _http_cmds.config_http_content_type(content_type);
+        retcode = _http_cmds.configHttpContentType(content_type);
         A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
     }
 
     // write request body
     if (content_body != NULL) {
-        retcode = _http_cmds.input_data(content_body, strlen(content_body));
+        retcode = _http_cmds.inputData(content_body, strlen(content_body));
         A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
     }
 

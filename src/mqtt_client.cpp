@@ -16,12 +16,12 @@ bool A76XXMQTTClient::begin() {
 
     // acquire client
     uint8_t server_type = _use_ssl ? 1 : 0;
-    retcode = _mqtt_cmds.acquire_client(_client_index, _clientID, server_type);
+    retcode = _mqtt_cmds.acquireClient(_client_index, _clientID, server_type);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 
     // set ssl context for mqtt
     if (_use_ssl) {
-        retcode = _mqtt_cmds.set_SSL_context(_session_id, _ssl_ctx_index);
+        retcode = _mqtt_cmds.setSSLContext(_session_id, _ssl_ctx_index);
         A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
     }
 
@@ -39,9 +39,9 @@ bool A76XXMQTTClient::connect(const char* server_name, int port,
     int8_t retcode;
 
     if (will_message != NULL && will_topic != NULL) {
-        retcode = _mqtt_cmds.set_will_topic(_client_index, will_topic);
+        retcode = _mqtt_cmds.setWillTopic(_client_index, will_topic);
         A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-        retcode = _mqtt_cmds.set_will_message(_client_index, will_message, will_qos);
+        retcode = _mqtt_cmds.setWillMessage(_client_index, will_message, will_qos);
         A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
     }
 
@@ -58,7 +58,7 @@ bool A76XXMQTTClient::disconnect(uint8_t timeout) {
 }
 
 bool A76XXMQTTClient::end() {
-    int8_t retcode = _mqtt_cmds.release_client(_client_index);
+    int8_t retcode = _mqtt_cmds.releaseClient(_client_index);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 
     retcode = _mqtt_cmds.stop();
@@ -74,10 +74,10 @@ bool A76XXMQTTClient::publish(const char* topic,
                               uint8_t pub_timeout,
                               bool retained,
                               bool dup) {
-    int8_t retcode = _mqtt_cmds.set_topic(_client_index, topic);
+    int8_t retcode = _mqtt_cmds.setTopic(_client_index, topic);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 
-    retcode = _mqtt_cmds.set_payload(_client_index, payload, length);
+    retcode = _mqtt_cmds.setPayload(_client_index, payload, length);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 
     retcode = _mqtt_cmds.publish(_client_index, qos, pub_timeout, retained, dup);
@@ -97,5 +97,5 @@ bool A76XXMQTTClient::publish(const char* topic,
 }
 
 bool A76XXMQTTClient::isConnected() {
-    return _mqtt_cmds.is_connected(_client_index);
+    return _mqtt_cmds.isConnected(_client_index);
 }
