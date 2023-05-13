@@ -64,13 +64,18 @@ class PacketDomainCommands {
         A76XX_RESPONSE_PROCESS(_modem->waitResponse(9000))
     }
 
-    int8_t getPDPContextActiveStatus(uint8_t cid, int8_t status) {
+    int8_t getPDPContextActiveStatus(uint8_t cid, int8_t& status) {
         _modem->sendCMD("AT+CGACT?");
-        char buff[10] = "+CGACT: X"; buff[8] = cid;
+        char buff[] = "+CGACT: XX";
+        sprintf(buff, "+CGACT: %d\0", cid);
         switch (_modem->waitResponse(buff, 9000)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 _modem->streamFind(',');
                 status = _modem->streamParseIntClear();
+                return A76XX_OPERATION_SUCCEEDED;
+            }
+            case Response_t::A76XX_RESPONSE_OK : {
+                status = 0;
                 return A76XX_OPERATION_SUCCEEDED;
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
