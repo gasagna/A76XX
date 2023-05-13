@@ -159,48 +159,6 @@ class A76XX_SSL_Commands {
         return retcode;
     }
 
-    // save certificate `cacert` to the module.
-    int8_t setCaCert(uint8_t ssl_ctx_index, const char* cacert) {
-        int8_t retcode = cert_overwrite(cacert, A76XX_DEFAULT_CACERT_FILENAME);
-        A76XX_RETCODE_ASSERT_RETURN(retcode);
-
-        retcode = config_ssl_cacert(ssl_ctx_index, A76XX_DEFAULT_CACERT_FILENAME);
-        A76XX_RETCODE_ASSERT_RETURN(retcode);
-
-        // only server authentication
-        retcode = config_ssl_authmode(ssl_ctx_index, 1);
-        A76XX_RETCODE_ASSERT_RETURN(retcode);
-
-        return retcode;
-    }
-
-    // set client certificate, key and key file password
-    int8_t setClientCertAndKey(uint8_t ssl_ctx_index, const char* clientcert, const char* clientkey, const char* password) {
-        int8_t retcode = cert_overwrite(clientcert, A76XX_DEFAULT_CLIENTCERT_FILENAME);
-        A76XX_RETCODE_ASSERT_RETURN(retcode);
-
-        retcode = config_ssl_clientcert(ssl_ctx_index, A76XX_DEFAULT_CLIENTCERT_FILENAME);
-        A76XX_RETCODE_ASSERT_RETURN(retcode);
-
-        retcode = cert_overwrite(clientkey, A76XX_DEFAULT_CLIENTKEY_FILENAME);
-        A76XX_RETCODE_ASSERT_RETURN(retcode);
-
-        retcode = config_ssl_clientkey(ssl_ctx_index, A76XX_DEFAULT_CLIENTKEY_FILENAME);
-        A76XX_RETCODE_ASSERT_RETURN(retcode);
-
-        retcode = cert_overwrite(password, A76XX_DEFAULT_PASSWORD_FILENAME);
-        A76XX_RETCODE_ASSERT_RETURN(retcode);
-
-        retcode = config_ssl_password(ssl_ctx_index, A76XX_DEFAULT_PASSWORD_FILENAME);
-        A76XX_RETCODE_ASSERT_RETURN(retcode);
-
-        // only client authentication
-        retcode = config_ssl_authmode(ssl_ctx_index, 3);
-        A76XX_RETCODE_ASSERT_RETURN(retcode);
-
-        return retcode;
-    }
-
     // set ca and client certificate, key and key file password
     int8_t setCerts(uint8_t ssl_ctx_index, const char* cacert, const char* clientcert, const char* clientkey, const char* password) {
         int8_t retcode = setCaCert(ssl_ctx_index, cacert);
