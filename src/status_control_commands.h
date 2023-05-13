@@ -34,8 +34,8 @@ class StatusControlCommands {
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
     int8_t setPhoneFunctionality(uint8_t fun, bool reset = false) {
-        _modem->sendCMD("AT+CFUN=", fun, ",", reset ? "1" : "");
         A76XX_RESPONSE_PROCESS(9000)
+        _modem->sendCMD("AT+CFUN=", fun, reset ? ",1" : "");
     }
 
     /*
