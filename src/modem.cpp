@@ -33,7 +33,7 @@ bool A76XX::init() {
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
 
     // enable automatic time and time zone updates via NITZ
-    network.setTimeZoneAutoUpdate(true);
+    retcode = network.setTimeZoneAutoUpdate(true);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
 
     return true;
