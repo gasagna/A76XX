@@ -117,9 +117,22 @@ bool A76XX::radioON()  {
 }
 
 bool A76XX::restart() {
-    if (reset() == false)
+    if (reset() == false) {
         return false;
-    return init();
+    }
+
+    // test the serial interface until it stops responding within 1 second
+    // but give up if the module has not properly reset within 30 seconds
+    uint32_t tstart = millis();
+    while (millis() - tstart < 30000) {
+        sendCMD("AT");
+        if (waitResponse(1000) == Response_t::A76XX_RESPONSE_TIMEOUT) {
+            return init();
+        }
+        delay(100);
+    }
+
+    return false;
 }
 
 bool A76XX::sleep() {
