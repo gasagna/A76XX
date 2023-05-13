@@ -91,15 +91,23 @@ int8_t A76XX::getNetworkSystemMode() {
     return _last_error_code == A76XX_OPERATION_SUCCEEDED ? mode : -1;
 }
 
-bool A76XX::reset() {
-    int8_t retcode = statusControl.reset();
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+bool A76XX::reset(uint32_t timeout) {
+    if (statusControl.reset() != A76XX_OPERATION_SUCCEEDED) {
+        return false;
+    }
+    if (waitATUnresponsive(timeout) == false) {
+        return false;
+    }
     return true;
 }
 
-bool A76XX::powerOff() {
-    int8_t retcode = statusControl.powerOff();
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+bool A76XX::powerOff(uint32_t timeout) {
+    if (statusControl.powerOff() != A76XX_OPERATION_SUCCEEDED) {
+        return false;
+    }
+    if (waitATUnresponsive(timeout) == false) {
+        return false;
+    }
     return true;
 }
 
@@ -117,22 +125,20 @@ bool A76XX::radioON()  {
     return setPhoneFunctionality(1, false);
 }
 
-bool A76XX::restart() {
-    if (reset() == false) {
-        return false;
-    }
+bool A76XX::restart(uint32_t timeout) {
+    if (reset(timeout) == false) {  return false; }
+    return init();
+}
 
-    // test the serial interface until it stops responding within 1 second
-    // but give up if the module has not properly reset within 30 seconds
+bool A76XX::waitATUnresponsive(uint32_t timeout) {
     uint32_t tstart = millis();
-    while (millis() - tstart < 30000) {
+    while (millis() - tstart < timeout) {
         sendCMD("AT");
         if (waitResponse(1000) == Response_t::A76XX_RESPONSE_TIMEOUT) {
-            return init();
+            return true;
         }
         delay(100);
     }
-
     return false;
 }
 

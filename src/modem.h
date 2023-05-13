@@ -67,10 +67,10 @@ class A76XX {
     //////////////////////////////////////////////////////////////////////////////////////
 
     // CRESET
-    bool reset();
+    bool reset(uint32_t timeout = 30000);
 
     // CPOF
-    bool powerOff();
+    bool powerOff(uint32_t timeout = 0);
 
     // CFUN - radio off/on
     bool setPhoneFunctionality(uint8_t fun, bool reset = false);
@@ -80,7 +80,11 @@ class A76XX {
     bool radioON();
 
     // restart
-    bool restart();
+    bool restart(uint32_t timeout = 30000);
+
+    // test the serial interface until it stops responding within 1 second
+    // but give up if the module has not properly reset within 30 seconds
+    bool waitATUnresponsive(uint32_t timeout = 30000);
 
     // enable UART sleep
     bool sleep();
