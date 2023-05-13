@@ -76,6 +76,7 @@ enum Response_t {
 #include "modem.h"
 
 #include "base_client.h"
+#include "secure_client.h"
 #include "mqtt_client.h"
 #include "http_client.h"
 
