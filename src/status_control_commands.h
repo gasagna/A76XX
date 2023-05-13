@@ -34,8 +34,8 @@ class StatusControlCommands {
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
     int8_t setPhoneFunctionality(uint8_t fun, bool reset = false) {
-        A76XX_RESPONSE_PROCESS(9000)
         _modem->sendCMD("AT+CFUN=", fun, reset ? ",1" : "");
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse(9000))
     }
 
     /*
@@ -45,7 +45,7 @@ class StatusControlCommands {
     */
     int8_t powerOff() {
         _modem->sendCMD("AT+CPOF");
-        A76XX_RESPONSE_PROCESS(9000)
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse(9000))
     }
 
     /*
@@ -55,7 +55,7 @@ class StatusControlCommands {
     */
     int8_t reset() {
         _modem->sendCMD("AT+CRESET");
-        A76XX_RESPONSE_PROCESS(9000)
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse(9000))
     }
 
     /*
@@ -95,7 +95,7 @@ class StatusControlCommands {
     */
     int8_t setErrorResultCodes(uint8_t n) {
         _modem->sendCMD("AT+CMEE=", n);
-        A76XX_RESPONSE_PROCESS(9000)
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse(9000))
     }
 };
 
