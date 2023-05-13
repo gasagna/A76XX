@@ -5,7 +5,7 @@ A76XXHTTPClient::A76XXHTTPClient(A76XX* modem,
                                  uint16_t server_port,
                                  bool use_ssl,
                                  const char* user_agent)
-    : A76XXBaseClient(modem)
+    : A76XXSecureClient(modem)
     , _use_ssl(use_ssl)
     , _server_name(server_name)
     , _server_port(server_port)

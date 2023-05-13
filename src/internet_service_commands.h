@@ -12,7 +12,7 @@
     AT+CNTP       |     y       |            |
 */
 template <typename MODEM>
-class A76XX_InternetService_Commands {
+class InternetServiceCommands {
   public:
     MODEM* _modem = NULL;
 

@@ -22,7 +22,7 @@
 
 */
 template <typename MODEM>
-class A76XX_Network_Commands {
+class NetworkCommands {
   public:
     MODEM* _modem = NULL;
 

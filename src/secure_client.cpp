@@ -59,7 +59,7 @@ bool A76XXSecureClient::setCerts(const char* cacert, const char* clientcert, con
 bool A76XXSecureClient::configSSL(uint8_t  sslversion,
                                 uint8_t  ignorelocaltime,
                                 uint16_t negotiatetime) {
-    int8_t retcode = _ssl_cmds.configSSLSslversion(_ssl_ctx_index, sslversion);
+    int8_t retcode = _ssl_cmds.configSSLSSLversion(_ssl_ctx_index, sslversion);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 
     retcode = _ssl_cmds.configSSLIgnorelocaltime(_ssl_ctx_index, ignorelocaltime);

@@ -34,7 +34,7 @@ enum PINStatus_t {
     DUALSIMURC      |             |        |
 */
 template <typename MODEM>
-class A76XX_SIM_Commands {
+class SIMCommands {
   public:
     MODEM* _modem = NULL;
 

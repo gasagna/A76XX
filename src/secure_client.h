@@ -7,10 +7,10 @@
 class A76XXSecureClient : public A76XXBaseClient {
   protected:
     // handle to all SSL commands
-    A76XX_SSL_Commands<A76XX>          _ssl_cmds;
+    SSLCommands<A76XX>  _ssl_cmds;
 
     // context id of the SSL session
-    uint8_t                       _ssl_ctx_index;
+    uint8_t        _ssl_ctx_index;
 
   public:
     /*

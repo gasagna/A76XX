@@ -30,7 +30,7 @@
     AT+GCAP  |             |        |
 */
 template <typename MODEM>
-class A76XX_V25TER_Commands {
+class V25TERCommands {
   public:
     MODEM* _modem = NULL;
 

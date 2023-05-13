@@ -26,7 +26,7 @@
     CPING   |      -      |        |
 */
 template <typename MODEM>
-class A76XX_PacketDomain_Commands {
+class PacketDomainCommands {
   public:
     MODEM* _modem = NULL;
 

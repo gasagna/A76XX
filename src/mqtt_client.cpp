@@ -1,7 +1,7 @@
 #include "A76XX.h"
 
 A76XXMQTTClient::A76XXMQTTClient(A76XX* modem, const char* clientID, bool use_ssl)
-    : A76XXBaseClient(modem)
+    : A76XXSecureClient(modem)
     , _clientID(clientID)
     , _use_ssl(use_ssl)
     , _client_index(0)

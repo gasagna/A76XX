@@ -3,14 +3,14 @@
 
 class A76XX {
   public:
-    A76XX_InternetService_Commands<A76XX>       internetService;
-    A76XX_Network_Commands<A76XX>                       network;
-    A76XX_PacketDomain_Commands<A76XX>             packetDomain;
-    A76XX_SerialInterface_Commands<A76XX>       serialInterface;
-    A76XX_SIM_Commands<A76XX>                               sim;
-    A76XX_StatusControl_Commands<A76XX>           statusControl;
-    A76XX_V25TER_Commands<A76XX>                         v25ter;
-    int8_t                                     _last_error_code;
+    InternetServiceCommands<A76XX>       internetService;
+    NetworkCommands<A76XX>                       network;
+    PacketDomainCommands<A76XX>             packetDomain;
+    SerialInterfaceCommands<A76XX>       serialInterface;
+    SIMCommands<A76XX>                               sim;
+    StatusControlCommands<A76XX>           statusControl;
+    V25TERCommands<A76XX>                         v25ter;
+    int8_t                              _last_error_code;
 
   private:
     Stream&                                             _stream;

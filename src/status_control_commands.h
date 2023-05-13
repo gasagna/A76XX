@@ -22,7 +22,7 @@
     SIMEI   |     -       |        |
 */
 template <typename MODEM>
-class A76XX_StatusControl_Commands {
+class StatusControlCommands {
   public:
     MODEM* _modem = NULL;
 

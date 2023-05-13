@@ -25,7 +25,7 @@
     CMQTTCFG       |             |        |
 */
 template <typename MODEM>
-class A76XX_MQTT_Commands {
+class MQTTCommands {
   public:
     MODEM* _modem = NULL;
 

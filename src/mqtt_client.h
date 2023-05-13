@@ -3,7 +3,7 @@
 
 class A76XXMQTTClient : public A76XXSecureClient {
   private:
-    A76XX_MQTT_Commands<A76XX>   _mqtt_cmds;
+    MQTTCommands<A76XX>          _mqtt_cmds;
     const char*                   _clientID;
     bool                           _use_ssl;
 

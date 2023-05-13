@@ -21,7 +21,7 @@
 
 */
 template <typename MODEM>
-class A76XX_SerialInterface_Commands {
+class SerialInterfaceCommands {
   public:
     MODEM* _modem = NULL;
  

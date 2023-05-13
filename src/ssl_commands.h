@@ -30,7 +30,7 @@
     CCERTMOVE |             |        |
 */
 template <typename MODEM>
-class A76XX_SSL_Commands {
+class SSLCommands {
   public:
     MODEM* _modem = NULL;
 
@@ -149,12 +149,12 @@ class A76XX_SSL_Commands {
     int8_t certOverwrite(const char* cert, const char* certname) {
         int8_t retcode;
 
-        if (cert_exists(certname)) {
-            retcode = cert_delete(certname);
+        if (certExists(certname)) {
+            retcode = certDelete(certname);
             A76XX_RETCODE_ASSERT_RETURN(retcode);
         }
 
-        retcode = cert_download(cert, certname);
+        retcode = certDownload(cert, certname);
         A76XX_RETCODE_ASSERT_RETURN(retcode);
 
         return retcode;

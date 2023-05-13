@@ -17,7 +17,7 @@
     HTTPREADFILE|             |        |
 */
 template <typename MODEM>
-class A76XX_HTTP_Commands {
+class HTTPCommands {
   public:
     MODEM* _modem = NULL;
 

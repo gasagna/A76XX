@@ -3,7 +3,7 @@
 
 class A76XXHTTPClient : public A76XXSecureClient {
   private:
-    A76XX_HTTP_Commands<A76XX>   _http_cmds;
+    HTTPCommands<A76XX>          _http_cmds;
     bool                           _use_ssl;
     const char*                _server_name;
     uint16_t                   _server_port;
