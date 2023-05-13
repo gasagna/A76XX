@@ -15,7 +15,7 @@ class A76XXBaseClient {
 
         @param [IN] FIXME:
     */
-    A76XXBaseClient(A76XX* modem);
+    A76XXBaseClient();
 
     /*
         @brief Get last error raise by any AT command.
