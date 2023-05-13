@@ -6,18 +6,18 @@
 
     Command        | Implemented | Method | Function(s)
     -------------- | ----------- | ------ |-----------------
-    CMQTTSTART     |             |        | start
-    CMQTTSTOP      |             |        | stop
-    CMQTTACCQ      |             |        | acquireClient
-    CMQTTREL       |             |        | releaseClient
-    CMQTTSSLCFG    |             |        | setSSLContext
-    CMQTTWILLTOPIC |             |        | setWillTopic
-    CMQTTWILLMSG   |             |        | setWillMessage
-    CMQTTCONNECT   |             |        | connect
-    CMQTTDISC      |             |        | disconnect, isConnected
-    CMQTTTOPIC     |             |        | setTopic
-    CMQTTPAYLOAD   |             |        | setPayload
-    CMQTTPUB       |             |        | publish
+    CMQTTSTART     |      y      |        | start
+    CMQTTSTOP      |      y      |        | stop
+    CMQTTACCQ      |      y      |        | acquireClient
+    CMQTTREL       |      y      |        | releaseClient
+    CMQTTSSLCFG    |      y      |        | setSSLContext
+    CMQTTWILLTOPIC |      y      |        | setWillTopic
+    CMQTTWILLMSG   |      y      |        | setWillMessage
+    CMQTTCONNECT   |      y      |        | connect
+    CMQTTDISC      |      y      |        | disconnect, isConnected
+    CMQTTTOPIC     |      y      |        | setTopic
+    CMQTTPAYLOAD   |      y      |        | setPayload
+    CMQTTPUB       |      y      |        | publish
     CMQTTSUBTOPIC  |             |        |
     CMQTTSUB       |             |        |
     CMQTTUNSUBTOPIC|             |        |
