@@ -51,15 +51,13 @@ bool A76XXBaseClient::setClientCertAndKey(const char* clientcert, const char* cl
 }
 
 bool A76XXBaseClient::setCerts(const char* cacert, const char* clientcert, const char* clientkey, const char* password) {
-    int8_t retcode = _ssl_cmds.setCaCert(_ssl_ctx_index, cacert);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-    retcode = _ssl_cmds.setClientCertAndKey(_ssl_ctx_index, clientcert, clientkey, password);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
+    if (setCaCert(cacert) == false || setClientCertAndKey(clientcert, clientkey, password) == false) {
+        return false;
+    }
     // repeat server and client authentication
-    retcode = _ssl_cmds.config_ssl_authmode(_ssl_ctx_index, 2);
+    int8_t retcode = _ssl_cmds.config_ssl_authmode(_ssl_ctx_index, 2);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+
     return true;
 }
 

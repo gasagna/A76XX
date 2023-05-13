@@ -158,21 +158,6 @@ class A76XX_SSL_Commands {
 
         return retcode;
     }
-
-    // set ca and client certificate, key and key file password
-    int8_t setCerts(uint8_t ssl_ctx_index, const char* cacert, const char* clientcert, const char* clientkey, const char* password) {
-        int8_t retcode = setCaCert(ssl_ctx_index, cacert);
-        A76XX_RETCODE_ASSERT_RETURN(retcode);
-
-        retcode = setClientCertAndKey(ssl_ctx_index, clientcert, clientkey, password);
-        A76XX_RETCODE_ASSERT_RETURN(retcode);
-
-        // repeat server and client authentication
-        retcode = config_ssl_authmode(ssl_ctx_index, 2);
-        A76XX_RETCODE_ASSERT_RETURN(retcode);
-
-        return retcode;
-    }
 };
 
 #endif A76XX_SSL_CMDS_H_
