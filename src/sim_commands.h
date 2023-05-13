@@ -46,7 +46,7 @@ class SIMCommands {
     */
     int8_t getPINStatus(PINStatus_t& status) {
         _modem->sendCMD("AT+CPIN?");
-        switch(_modem->waitResponse("+CPIN: ", 9000)) {
+        switch(_modem->waitResponse("+CPIN: ", 9000, false, true)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 char buff[11];
                 _modem->streamReadBytesUntil('\r', &buff[0], 11);
@@ -61,6 +61,9 @@ class SIMCommands {
                 if (strstr(buff, "SIM PIN2")   != NULL) {status = PINStatus_t::SIM_PIN2;}
                 if (strstr(buff, "SIM PUK2")   != NULL) {status = PINStatus_t::SIM_PUK2;}
                 if (strstr(buff, "PH-NET PIN") != NULL) {status = PINStatus_t::PH_NET_PIN;}
+
+                // clear up
+                _modem->streamClear();
 
                 return A76XX_OPERATION_SUCCEEDED;
             }
