@@ -29,9 +29,16 @@ class A76XX {
             become available and initialise the modem. 
             
         @detail Currently, only sims with no PIN code are supported.
-        @return True is initialisation was successful.
+
+        @param [IN] timeout Give up if the module cannot be initialised within
+            this time in millisecond. Default is 30000 ms.
+
+        @return True is the device was successfully initialised within the 
+            specified time. Returns false is the module does not become 
+            responsive within `timeout`, if the SIM requires a PIN code or
+            if any other commands run during the initialisation are unsuccessful.
     */
-    bool init();
+    bool init(uint32_t timeout = 30000);
 
     /*
         @brief Connect to GPRS network.

@@ -31,8 +31,8 @@ void setup() {
     // wait a little so we can see the output
     delay(3000);
 
-    Serial.print("Initialising modem ... ");
-    if (modem.init() == false) {
+    Serial.print("Initialising modem within 20 seconds ... ");
+    if (modem.init(20000) == false) {
         Serial.println("error");
         while (true) {}
     }

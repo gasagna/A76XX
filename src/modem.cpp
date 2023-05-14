@@ -12,13 +12,19 @@ A76XX::A76XX(Stream& stream)
         v25ter._modem = this;
     }
 
-bool A76XX::init() {
+bool A76XX::init(uint32_t timeout) {
     int8_t retcode;
 
     // wait until modem is ready
+    if (waitATResponsive(timeout) == false) {
+        return false;
+    }
+
+    // check we do not require a PIN code
     PINStatus_t status = PINStatus_t::UKNOWKN;
-    while (status != PINStatus_t::READY) {
-        sim.getPINStatus(status);
+    _last_error_code = sim.getPINStatus(status);
+    if (status != PINStatus_t::READY) {
+        return false;
     }
 
     // turn off echoing commands
