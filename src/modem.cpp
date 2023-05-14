@@ -58,12 +58,6 @@ bool A76XX::GPRSConnect(const char* apn) {
     return true;
 }
 
-bool A76XX::GPRSDisconnect() {
-    int8_t retcode = packetDomain.setPDPContextActiveStatus(1, false);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
-    return true;
-}
-
 bool A76XX::isGPRSConnected() {
     int8_t status;
     _last_error_code = packetDomain.getPDPContextActiveStatus(1, status);

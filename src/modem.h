@@ -49,13 +49,6 @@ class A76XX {
     bool GPRSConnect(const char* apn);
 
     /*
-        @brief Disconnect from GPRS network.
-        
-        @return True if disconnection was successful.
-    */
-    bool GPRSDisconnect();
-
-    /*
         @brief Check status of connection to GPRS network.
         
         @return True if connection is active.
