@@ -40,7 +40,7 @@ bool A76XX::init() {
     return true;
 }
 
-bool A76XX::connect(const char* apn, const char* username, const char* password) {
+bool A76XX::GPRSConnect(const char* apn) {
     int8_t retcode;
 
     retcode = packetDomain.setPDPContextParameters(1, apn);
@@ -52,13 +52,13 @@ bool A76XX::connect(const char* apn, const char* username, const char* password)
     return true;
 }
 
-bool A76XX::disconnect() {
+bool A76XX::GPRSDisconnect() {
     int8_t retcode = packetDomain.setPDPContextActiveStatus(1, false);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
     return true;
 }
 
-bool A76XX::isConnected() {
+bool A76XX::isGPRSConnected() {
     int8_t status;
     _last_error_code = packetDomain.getPDPContextActiveStatus(1, status);
     return (_last_error_code == A76XX_OPERATION_SUCCEEDED && status == 1) ? true : false;
@@ -111,6 +111,9 @@ bool A76XX::reset(uint32_t timeout) {
     if (waitATUnresponsive(timeout) == false) {
         return false;
     }
+    if (waitATResponsive(timeout) == false) {
+        return false;
+    }
     return true;
 }
 
@@ -149,6 +152,18 @@ bool A76XX::waitATUnresponsive(uint32_t timeout) {
     while (millis() - tstart < timeout) {
         sendCMD("AT");
         if (waitResponse(1000) == Response_t::A76XX_RESPONSE_TIMEOUT) {
+            return true;
+        }
+        delay(100);
+    }
+    return false;
+}
+
+bool A76XX::waitATResponsive(uint32_t timeout) {
+    uint32_t tstart = millis();
+    while (millis() - tstart < timeout) {
+        sendCMD("AT");
+        if (waitResponse(1000) == Response_t::A76XX_RESPONSE_OK) {
             return true;
         }
         delay(100);
@@ -286,20 +301,4 @@ int32_t A76XX::streamParseIntClear(uint32_t timeout) {
 
 void A76XX::streamClear(uint32_t timeout) {
     waitResponse(timeout);
-}
-
-int A76XX::streamAvailable() { 
-    return _stream.available(); 
-}
-
-long A76XX::streamParseInt() { 
-    return _stream.parseInt(); 
-}
-
-void A76XX::streamFlush() { 
-    _stream.flush(); 
-}
-
-uint16_t A76XX::streamRead() { 
-    return _stream.read(); 
 }
