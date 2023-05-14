@@ -38,15 +38,19 @@ void setup() {
     }
     Serial.println("done");
 
-    Serial.print("Waiting for modem to register on network ... ");
-    if (!modem.waitForRegistration()) {
+    Serial.print("Waiting 30 seconds for modem to register on GPRS network ... ");
+    if (modem.waitForRegistration(1, 30000) == false) {
         Serial.println("registration timed out");
         while (true) {}
     }
     Serial.println("done");
 
-    Serial.print("Registration status: ");
-    Serial.println(modem.getRegistrationStatus());
+    Serial.print("Registration status - GSM: ");
+    Serial.println(modem.getRegistrationStatus(0));
+    Serial.print("Registration status - GPRS: ");
+    Serial.println(modem.getRegistrationStatus(1));
+    Serial.print("Registration status - LTE: ");
+    Serial.println(modem.getRegistrationStatus(2));
 
     Serial.print("Model identification: ");
     Serial.println(modem.modelIdentification());

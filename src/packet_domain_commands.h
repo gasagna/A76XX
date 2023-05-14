@@ -7,23 +7,23 @@
 
     Command | Implemented | Method | Function(s)
     ------- | ----------- | ------ |-----------------
-    CGREG   |      y      | READ   | getNetworkRegistrationStatus
-    CEREG   |      -      |        |
-    CGATT   |      -      |        |
+    CGREG   |      y      | READ   | getGPRSNetworkRegistrationStatus
+    CEREG   |      y      | READ   | getLTENetworkRegistrationStatus
+    CGATT   |             |        |
     CGACT   |      y      | WRITE  | setPDPContextActiveStatus
     CGDCONT |      y      | WRITE  | setPDPContextParameters
-    CGDSCONT|      -      |        |
-    CGTFT   |      -      |        |
-    CGQREQ  |      -      |        |
-    CGEQREQ |      -      |        |
-    CGQMIN  |      -      |        |
-    CGEQMIN |      -      |        |
-    CGDATA  |      -      |        |
-    CGPADDR |      -      |        |
-    CGCLASS |      -      |        |
-    CGEREP  |      -      |        |
+    CGDSCONT|             |        |
+    CGTFT   |             |        |
+    CGQREQ  |             |        |
+    CGEQREQ |             |        |
+    CGQMIN  |             |        |
+    CGEQMIN |             |        |
+    CGDATA  |             |        |
+    CGPADDR |             |        |
+    CGCLASS |             |        |
+    CGEREP  |             |        |
     CGAUTH  |      y      | WRITE  | setPDPAuthentication
-    CPING   |      -      |        |
+    CPING   |             |        |
 */
 template <typename MODEM>
 class PacketDomainCommands {
@@ -32,16 +32,36 @@ class PacketDomainCommands {
 
     /*
         @brief Implementation for CGREG - Read Command.
-        @detail Get GPRS network registration status
-        @return The <stat> code, from 0 to 11, or an error code.
+        @detail Get GPRS network registration status.
+        @param [OUT] status the registration code (i.e. <stat> in the manual)
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
-    int8_t getNetworkRegistrationStatus() {
-        _modem->sendCMD("AT+CGREG?");
-        Response_t rsp = _modem->waitResponse("+CGREG: ", 9000, false, true);
+    int8_t getGPRSNetworkRegistrationStatus(int8_t& status) {
+        return getXXXNetworkRegistrationStatus('G', status);
+    }
+
+    /*
+        @brief Implementation for CEREG - Read Command.
+        @detail Get LTE network registration status.
+        @param [OUT] status the registration code (i.e. <stat> in the manual)
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
+    int8_t getLTENetworkRegistrationStatus(int8_t& status) {
+        return getXXXNetworkRegistrationStatus('E', status);
+    }
+
+    /*
+        @brief Helper function
+    */
+    int8_t getXXXNetworkRegistrationStatus(char select, int8_t& status) {
+        _modem->sendCMD("AT+C", select, "REG?");
+        char buff[] = "+CxREG: "; buff[2] = select;
+        Response_t rsp = _modem->waitResponse(buff, 9000, false, true);
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 _modem->streamFind(',');
-                return _modem->streamParseIntClear();
+                status = _modem->streamParseIntClear();
+                return A76XX_OPERATION_SUCCEEDED;
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;

@@ -29,7 +29,8 @@ class NetworkCommands {
     /*
         @brief Implementation for CREG - Read Command.
         @detail Get GSM network registration status.
-        @return The <stat> code, from 0 to 11, or an error code.
+        @param [OUT] status the registration code (i.e. <stat> in the manual)
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */ 
     int8_t getNetworkRegistrationStatus(int8_t& status) {
         _modem->sendCMD("AT+CREG?");

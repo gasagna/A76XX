@@ -64,21 +64,34 @@ bool A76XX::isConnected() {
     return (_last_error_code == A76XX_OPERATION_SUCCEEDED && status == 1) ? true : false;
 }
 
-int8_t A76XX::getRegistrationStatus() {
+int8_t A76XX::getRegistrationStatus(uint8_t net) {
     int8_t status;
-    _last_error_code = network.getNetworkRegistrationStatus(status);
+    switch (net) {
+        case 0 : { // circuit switched network - CREG
+            _last_error_code = network.getNetworkRegistrationStatus(status);
+            break;
+        }
+        case 1 : { // packet network - GPRS - CGREG
+            _last_error_code = packetDomain.getGPRSNetworkRegistrationStatus(status);
+            break;
+        }
+        case 2 : { // packet network - LTE - CEREG
+            _last_error_code = packetDomain.getLTENetworkRegistrationStatus(status);
+            break;
+        }
+    }
     return _last_error_code == A76XX_OPERATION_SUCCEEDED ? status : -1;
 }
 
-bool A76XX::isRegistered() {
-    int8_t stat = getRegistrationStatus();
-    return (stat == 1 | stat == 5);
+bool A76XX::isRegistered(uint8_t net) {
+    int8_t stat = getRegistrationStatus(net);
+    return (stat == 1 || stat == 5);
 }
 
-bool A76XX::waitForRegistration(uint32_t timeout) {
+bool A76XX::waitForRegistration(uint8_t net, uint32_t timeout) {
     uint32_t tstart = millis();
     while (millis() - tstart < timeout) {
-        if (isRegistered() == true)
+        if (isRegistered(net) == true)
             return true;
         delay(200);
     }

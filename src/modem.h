@@ -51,12 +51,16 @@ class A76XX {
 
     /// @brief CREG - Get registration status
     /// @return -1 on error
-    int8_t getRegistrationStatus();
+    // see https://stackoverflow.com/questions/71194343/creg-cgreg-cereg-at-commands
+    // 0 for circuit switched network
+    // 1 for packet network, GPRS - default
+    // 2 for the LTE packet network
+    int8_t getRegistrationStatus(uint8_t net = 1);
 
-    // check we are registered on network or roaming
-    bool isRegistered();
+    // check we are registered on net or roaming
+    bool isRegistered(uint8_t net = 1);
 
-    bool waitForRegistration(uint32_t timeout = 60000);
+    bool waitForRegistration(uint8_t net = 1, uint32_t timeout = 60000);
 
     /// @brief CNSMOD - Show network system mode
     /// @return -1 on error
