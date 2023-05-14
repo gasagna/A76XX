@@ -10,7 +10,7 @@
     CGREG   |      y      | READ   | getGPRSNetworkRegistrationStatus
     CEREG   |      y      | READ   | getLTENetworkRegistrationStatus
     CGATT   |             |        |
-    CGACT   |      y      | WRITE  | setPDPContextActiveStatus
+    CGACT   |      y      | W/R    | ***PDPContextActiveStatus
     CGDCONT |      y      | WRITE  | setPDPContextParameters
     CGDSCONT|             |        |
     CGTFT   |             |        |
@@ -84,6 +84,13 @@ class PacketDomainCommands {
         A76XX_RESPONSE_PROCESS(_modem->waitResponse(9000))
     }
 
+    /*
+        @brief Implementation for CGACT - Read Command.
+        @detail Get PDP context activation status.
+        @param [IN] cid Context identifier.
+        @param [OUT] status activation flag
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
     int8_t getPDPContextActiveStatus(uint8_t cid, int8_t& status) {
         _modem->sendCMD("AT+CGACT?");
         char buff[] = "+CGACT: XX";
@@ -95,7 +102,7 @@ class PacketDomainCommands {
                 return A76XX_OPERATION_SUCCEEDED;
             }
             case Response_t::A76XX_RESPONSE_OK : {
-                status = 0;
+                status = 0; // default is disconnected
                 return A76XX_OPERATION_SUCCEEDED;
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
