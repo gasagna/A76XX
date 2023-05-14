@@ -62,22 +62,22 @@ enum Response_t {
         }                                             \
     }
 
-#include "internet_service_commands.h"
-#include "serial_interface_commands.h"
-#include "status_control_commands.h"
-#include "packet_domain_commands.h"
-#include "network_commands.h"
-#include "v25ter_commands.h"
-#include "http_commands.h"
-#include "mqtt_commands.h"
-#include "ssl_commands.h"
-#include "sim_commands.h"
+#include "commands/internet_service.h"
+#include "commands/serial_interface.h"
+#include "commands/status_control.h"
+#include "commands/packet_domain.h"
+#include "commands/network.h"
+#include "commands/v25ter.h"
+#include "commands/http.h"
+#include "commands/mqtt.h"
+#include "commands/ssl.h"
+#include "commands/sim.h"
 
 #include "modem.h"
 
-#include "base_client.h"
-#include "secure_client.h"
-#include "mqtt_client.h"
-#include "http_client.h"
+#include "clients/base.h"
+#include "clients/secure.h"
+#include "clients/mqtt.h"
+#include "clients/http.h"
 
 #endif A76XX_H_
