@@ -105,7 +105,8 @@ bool A76XX::powerOff(uint32_t timeout) {
     if (statusControl.powerOff() != A76XX_OPERATION_SUCCEEDED) {
         return false;
     }
-    if (waitATUnresponsive(timeout) == false) {
+    // only return error if we wanted to wait 
+    if (timeout > 0 && waitATUnresponsive(timeout) == false) {
         return false;
     }
     return true;
