@@ -59,14 +59,14 @@ void setup() {
     Serial.println(modem.revisionIdentification());
 
     Serial.print("Connecting ... ");
-    if (modem.connect(apn) == false ){
+    if (modem.GPRSConnect(apn) == false ){
         Serial.println("error");
         while (true) {}
     }
     Serial.println("done");
 
     Serial.print("Checking connection ... ");
-    if (modem.isConnected() == false) {
+    if (modem.isGPRSConnected() == false) {
         Serial.println("modem not connected");
         while (true) {}
     }

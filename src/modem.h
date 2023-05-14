@@ -39,7 +39,7 @@ class A76XX {
         @param [IN] apn The Access Point Name.
         @return True is connection was successful.
     */
-    bool GRPSConnect(const char* apn);
+    bool GPRSConnect(const char* apn);
 
     /*
         @brief Disconnect from GPRS network.
@@ -53,7 +53,7 @@ class A76XX {
         
         @return True if connection is active.
     */
-    bool isGRPSConnected();
+    bool isGPRSConnected();
 
     /*
         @brief Get registration status.
