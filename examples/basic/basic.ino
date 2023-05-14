@@ -22,20 +22,22 @@ A76XX modem(SerialAT);
 
 void setup() {
 
-    // begin
+    // begin serial port
     Serial.begin(115200);
+
+    // must begin UART communicating with the SIMCOM module
     Serial1.begin(115200, SERIAL_8N1, PIN_RX, PIN_TX);
+
+    // wait a little so we can see the output
     delay(3000);
 
-    //
     Serial.print("Initialising modem ... ");
     if (modem.init() == false) {
         Serial.println("error");
-    } else {
-        Serial.println("done");
+        while (true) {}
     }
+    Serial.println("done");
 
-    //
     Serial.print("Waiting for modem to register on network ... ");
     if (!modem.waitForRegistration()) {
         Serial.println("registration timed out");
@@ -54,56 +56,55 @@ void setup() {
 
     Serial.print("Connecting ... ");
     if (modem.connect(apn) == false ){
-        Serial.println("cannot connect");
-    } else {
-        Serial.println("done");
+        Serial.println("error");
+        while (true) {}
     }
+    Serial.println("done");
 
     Serial.print("Checking connection ... ");
-    if (modem.isConnected()) {
-        Serial.println("modem connected");
-    } else {
+    if (modem.isConnected() == false) {
         Serial.println("modem not connected");
+        while (true) {}
     }
+    Serial.println("modem connected");
 
     Serial.print("Network system mode: ");
     Serial.println(modem.getNetworkSystemMode());
 
-    // turn off radio
-    Serial.print("Turning radio off ... ");
+    Serial.print("Turning radio OFF ... ");
     if (modem.radioOFF() == false) {
         Serial.println("error");
-    } else {
-        Serial.println("done");
+        while (true) {}
     }
+    Serial.println("done");
 
     Serial.print("Going to sleep ... ");
     if (modem.sleep() == false) {
         Serial.println("error");
-    } else {
-        Serial.println("done");
+        while (true) {}
     }
+    Serial.println("done");
 
     Serial.print("Waking up ... ");
     if (modem.wakeUp() == false) {
         Serial.println("error");
-    } else {
-        Serial.println("done");
+        while (true) {}
     }
+    Serial.println("done");
 
-    Serial.print("Setting radio on ... ");
+    Serial.print("Setting radio ON ... ");
     if (modem.radioON() == false) {
         Serial.println("error");
-    } else {
-        Serial.println("done");
+        while (true) {}
     }
+    Serial.println("done");
 
     Serial.print("Restarting ... ");
     if (modem.restart() == false) {
         Serial.println("error");
-    } else {
-        Serial.println("done");
+        while (true) {}
     }
+    Serial.println("done");
 
     Serial.print("Waiting for modem to register on network ... ");
     if (!modem.waitForRegistration()) {
@@ -115,23 +116,23 @@ void setup() {
     Serial.print("Registration status: ");
     Serial.println(modem.getRegistrationStatus());
 
-    // turn off radio
     Serial.print("Turning radio off ... ");
     if (modem.radioOFF() == false) {
         Serial.println("error");
-    } else {
-        Serial.println("done");
+        while (true) {}
     }
+    Serial.println("done");
 
     Serial.print("Powering off ... ");
     if (modem.powerOff() == false) {
         Serial.println("error");
-    } else {
-        Serial.println("done");
+        while (true) {}
     }
+    Serial.println("done");
 }
 
 void loop() {
+    // loop forever... modem becomes unresponsive after a bit
     Serial.print(".");
     modem.sendCMD("AT");
     modem.waitResponse();
