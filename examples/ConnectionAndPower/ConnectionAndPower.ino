@@ -127,8 +127,8 @@ void setup() {
     }
     Serial.println("done");
 
-    Serial.print("Powering off ... ");
-    if (modem.powerOff() == false) {
+    Serial.print("Powering off within 10 seconds ... ");
+    if (modem.powerOff(10000) == false) {
         Serial.println("error");
         while (true) {}
     }
@@ -136,9 +136,6 @@ void setup() {
 }
 
 void loop() {
-    // loop forever... modem becomes unresponsive after a bit
     Serial.print(".");
-    modem.sendCMD("AT");
-    modem.waitResponse();
     delay(1000);
 }
