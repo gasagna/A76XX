@@ -22,94 +22,93 @@ const char* user_agent    = "Arduino!!";
 const char* apn           = "simbase";
 
 A76XX modem(SerialAT);
-A76XXHTTPClient http_client(modem, server_name, server_port, use_ssl, user_agent);
+A76XXHTTPClient http_client(&modem, server_name, server_port, use_ssl, user_agent);
 
 // configuration for serial port to simcom module (check your board!)
 #define PIN_TX   26
 #define PIN_RX   27
 
 void setup() {
-    // start ports
+    // begin serial port
     Serial.begin(115200);
+
+    // must begin UART communicating with the SIMCOM module
     Serial1.begin(115200, SERIAL_8N1, PIN_RX, PIN_TX);
+
+    // wait a little so we can see the output
     delay(3000);
 
     Serial.print("Waiting for modem ... ");
     if (modem.init() == false) {
         Serial.println("error");
-    } else {
-        Serial.println("OK");
+        while (true) {}
     }
+    Serial.println("OK");
 
     Serial.print("Waiting for modem to register on network ... ");
-    if (!modem.waitForRegistration()) {
+    if (modem.waitForRegistration() == false) {
         Serial.println("registration timed out");
         while (true) {}
     }
     Serial.println("done");
 
     Serial.print("Connecting  ... ");
-    if (modem.connect(apn) == false){
+    if (modem.GPRSConnect(apn) == false){
         Serial.println("cannot connect");
         while (true) {}
-    } else {
-        Serial.println("connected");
     }
+    Serial.println("connected");
 
     Serial.print("Starting client  ... ");
     if (http_client.begin() == false) {
         Serial.print("error... code: ");
         Serial.println(http_client.getLastError());
         while (true) {}
-    } else {
-        Serial.println("done");
     }
+    Serial.println("done");
 
     Serial.print("Get resource  ... ");
     if (http_client.get(path) == false) {
         Serial.print("error... code: ");
         Serial.println(http_client.getLastError());
         while (true) {}
-    } else {
-        Serial.println("Done");
-        
-        String header;
-        if (http_client.getResponseHeader(header) == false) {
-            Serial.print("Failed to read header. Code: ");
-            Serial.println(http_client.getLastError());
-        }
-
-        String body;
-        if (http_client.getResponseBody(body) == false) {
-            Serial.print("Failed to read body. Code: ");
-            Serial.println(http_client.getLastError());
-        }
-
-        Serial.print("Received: "); Serial.println(http_client.getResponseStatusCode());
-        
-        Serial.println("\nHeader\n----------"); 
-        Serial.println(header); Serial.println(); 
-
-        Serial.println("\nBody\n----------"); 
-        Serial.println(body); Serial.println(); 
+    } 
+    Serial.println("Done");
+    
+    String header;
+    if (http_client.getResponseHeader(header) == false) {
+        Serial.print("Failed to read header. Code: ");
+        Serial.println(http_client.getLastError());
     }
+
+    String body;
+    if (http_client.getResponseBody(body) == false) {
+        Serial.print("Failed to read body. Code: ");
+        Serial.println(http_client.getLastError());
+    }
+
+    Serial.print("Received: "); Serial.println(http_client.getResponseStatusCode());
+    
+    Serial.println("\nHeader\n----------"); 
+    Serial.println(header); Serial.println(); 
+
+    Serial.println("\nBody\n----------"); 
+    Serial.println(body); Serial.println(); 
 
     Serial.print("Stopping HTTP service ... ");
     if (http_client.end() == false) {
         Serial.print("error... code: ");
         Serial.println(http_client.getLastError());
         while (true) {}
-    } else {
-        Serial.println("done");
     }
+    Serial.println("done");
 
     Serial.print("Powering off ... ");
     if (modem.powerOff() == false) {
         Serial.println("error");
         while (true) {}
-    } else {
-        Serial.println("done");
     }
+    Serial.println("done");
 }
 
 
