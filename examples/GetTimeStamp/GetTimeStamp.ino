@@ -21,17 +21,33 @@ A76XX modem(SerialAT);
 #define PIN_RX   27
 
 void setup() {
-    // start ports
+    
+    // begin serial port
     Serial.begin(115200);
+
+    // must begin UART communicating with the SIMCOM module
     Serial1.begin(115200, SERIAL_8N1, PIN_RX, PIN_TX);
+
+    // wait a little so we can see the output
     delay(3000);
 
-    Serial.print("Waiting for modem ... ");
+    Serial.print("Initialising modem ... ");
     if (modem.init() == false) {
-        Serial.println("ERROR");
+        Serial.println("error");
         while (true) {}
+    }
+    Serial.println("OK");
+
+    // update system time with the default ntp server before connecting to the 
+    // network will produce an error which is retrieved using getLastError.
+    // Let's provide the timezone too, i.e. for London (GMT+0). This is passed
+    // in units of 15 minutes. We do not have a mechanism to understand Daylight
+    // Saving Time (DST), so use the time zone information when there is no DST.
+    Serial.print("Syncing time with NTP server ... ");
+    if (modem.syncTime(0) == false) {
+        Serial.print("error, code: "); Serial.println(modem.getLastError());
     } else {
-        Serial.println("OK");
+        Serial.println("all good, but this should not be printed!");
     }
 
     Serial.print("Waiting for modem to register on network ... ");
@@ -41,26 +57,26 @@ void setup() {
     }
     Serial.println("done");
 
-    // update system time with ntp server
-    int retcode = modem.syncTime();
-    Serial.print("NTP update return code: "); Serial.println(retcode);
+    // this should now work
+    Serial.print("Syncing time with NTP server ... ");
+    if (modem.syncTime(0) == false) {
+        Serial.print("NTP sync error, code: "); Serial.println(modem.getLastError());
+        while (true) {}
+    }
+    Serial.println("all good!");
 
     // get date and time as a string in the format "yy/MM/dd,hh:mm:ss±zz"
-    String date_time;
-    modem.getDateTime(date_time);
-    Serial.println(date_time);
+    Serial.print("Time: "); Serial.println(modem.getDateTime());
 
     // get unix time stamp, with respect to UTC
-    uint32_t timestamp = modem.getUnixTime(true);
-    Serial.println(timestamp);
+    Serial.print("Timestamp UTC: "); Serial.println(modem.getUnixTime(true));
 
     Serial.print("Powering off ... ");
     if (modem.powerOff() == false) {
         Serial.println("error");
         while (true) {}
-    } else {
-        Serial.println("done");
     }
+    Serial.println("done");
 }
 
 
