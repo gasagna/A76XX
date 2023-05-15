@@ -210,11 +210,13 @@ class A76XX {
         @detail This function requires an active GPRS connection.
 
         @param [IN] timezone The timezone of the device expressed in quarters of hour.
+        @param [IN] timeout Timeout in milliseconds for the sync with the NTP server. 
+            Default is 10000 ms.
         @param [IN] host The address of the NTP server. Default is "pool.ntp.org".
 
         @return True on successful synchronization.
     */
-    bool syncTime(int8_t timezone = 0, const char* host = "pool.ntp.org");
+    bool syncTime(int8_t timezone = 0, uint32_t timeout = 10000, const char* host = "pool.ntp.org");
 
     /*
         @brief Get date and time.

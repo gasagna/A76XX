@@ -194,11 +194,11 @@ String A76XX::revisionIdentification() {
     return out;
 }
 
-bool A76XX::syncTime(int8_t timezone, const char* host) {
+bool A76XX::syncTime(int8_t timezone, uint32_t timeout, const char* host) {
     int8_t retcode = internetService.setNTPParams(host, timezone);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 
-    retcode = internetService.updateSystemTime();
+    retcode = internetService.updateSystemTime(timeout);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
     return true;
 }

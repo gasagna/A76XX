@@ -29,12 +29,13 @@ class InternetServiceCommands {
     /*
         @brief Implementation for CNTP - EXEC Command.
         @detail Set NTP server and timezone.
+        @param [IN] timeout Timeout in milliseconds for the sync with the NTP server.
         @return Any of the results codes: 0 for Operation succeeded, 1 for Unknown error, 
             2 for Wrong parameter, 3 for Wrong date and time calculated, 4 for Network 
             error, 5 for Time zone error, 6 for Time out error, plus 
             A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
-    int8_t updateSystemTime() {
+    int8_t updateSystemTime(uint32_t timeout) {
         _modem->sendCMD("AT+CNTP");
         switch (_modem->waitResponse("+CNTP: ", timeout, false, true)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
