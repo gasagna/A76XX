@@ -36,7 +36,7 @@ class InternetServiceCommands {
     */
     int8_t updateSystemTime() {
         _modem->sendCMD("AT+CNTP");
-        switch (_modem->waitResponse("+CNTP: ", false, true)) {
+        switch (_modem->waitResponse("+CNTP: ", timeout, false, true)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 return _modem->streamParseIntClear();
             }
