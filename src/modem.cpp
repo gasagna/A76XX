@@ -194,7 +194,7 @@ String A76XX::revisionIdentification() {
     return out;
 }
 
-bool A76XX::syncTime(const char* host, int8_t timezone) {
+bool A76XX::syncTime(int8_t timezone, const char* host) {
     int8_t retcode = internetService.setNTPParams(host, timezone);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 

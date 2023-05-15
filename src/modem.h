@@ -209,12 +209,12 @@ class A76XX {
         
         @detail This function requires an active GPRS connection.
 
-        @param [IN] host The address of the NTP server. Default is "pool.ntp.org".
         @param [IN] timezone The timezone of the device expressed in quarters of hour.
+        @param [IN] host The address of the NTP server. Default is "pool.ntp.org".
 
         @return True on successful synchronization.
     */
-    bool syncTime(const char* host = "pool.ntp.org", int8_t timezone = 0);
+    bool syncTime(int8_t timezone = 0, const char* host = "pool.ntp.org");
 
     /*
         @brief Get date and time.
