@@ -72,7 +72,7 @@ class StatusControlCommands {
         }
 
         _modem->sendCMD("AT+CCLK?");
-        switch (_modem->waitResponse("+CCLK: ", 9000, false, true)) {
+        switch (_modem->waitResponse("+CCLK: \"", 9000, false, true)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 _modem->streamReadBytes(dateTime, 20);
                 _modem->streamClear(); // clear OK
