@@ -25,6 +25,11 @@ class A76XX {
     A76XX(Stream& stream);
 
     /*
+        @brief Get the return code of the last operation.
+    */
+    int8_t getLastError();
+
+    /*
         @brief Wait for the serial communication with the SIMCOM module to
             become available and initialise the modem. 
             

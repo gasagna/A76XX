@@ -12,6 +12,10 @@ A76XX::A76XX(Stream& stream)
         v25ter._modem = this;
     }
 
+int8_t A76XX::getLastError() {
+    return _last_error_code;
+}
+
 bool A76XX::init(uint32_t timeout) {
     int8_t retcode;
 
