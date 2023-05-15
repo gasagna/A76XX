@@ -3,21 +3,27 @@
 
 class A76XXHTTPClient : public A76XXSecureClient {
   private:
-    HTTPCommands<A76XX>          _http_cmds;
-    bool                           _use_ssl;
-    const char*                _server_name;
-    uint16_t                   _server_port;
-    const char*                 _user_agent;
-    uint32_t              _last_body_length;
-    uint16_t              _last_status_code;
+    HTTPCommands<A76XX>       _http_cmds;
+    bool                        _use_ssl;
+    const char*             _server_name;
+    uint16_t                _server_port;
+    const char*              _user_agent;
+    uint32_t           _last_body_length;
+    uint16_t           _last_status_code;
 
   public:
     /*
+        @brief Construct an HTTP client.
 
-    @param server_name The domain name of the HTTP server to connect to. For instance,
-        "https://www.bbc.co.uk" or "www.google.com". When the domain name does not
-        start with either "http://" or "https://" the flag `use_ssl` determines whether
-        secure or unsecure connections are made.
+        @param [IN] server_name The domain name of the HTTP server to connect to. For instance,
+            "https://www.bbc.co.uk" or "www.google.com". When the domain name does not
+            start with either "http://" or "https://" the flag `use_ssl` determines whether
+            secure or unsecure connections are made.
+        @param [IN] server_port The port to connect to.
+        @param [IN] use_ssl Whether to enable SSL/TLS encrypted connections. If using
+            encryption, appropriate certificates must be set to the module. Default is
+            false, i.e. use unsecure connections.
+        @param [IN] user_agent If provided, it is the value of the "User-Agent" header.
     */
     A76XXHTTPClient(A76XX* modem,
                     const char* server_name,
@@ -29,6 +35,7 @@ class A76XXHTTPClient : public A76XXSecureClient {
 
     /*
         @brief Start the HTTP service
+
         @detail This function must be called before any call to request functions.
         @return True on success. If false, use getLastError() to get detail on the error.
     */
@@ -36,6 +43,7 @@ class A76XXHTTPClient : public A76XXSecureClient {
 
     /*
         @brief Stop the HTTP service
+
         @return True on success. If false, use getLastError() to get detail on the error.
     */
     bool end();
