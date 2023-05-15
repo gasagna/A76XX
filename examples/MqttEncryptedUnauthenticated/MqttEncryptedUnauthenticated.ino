@@ -2,7 +2,7 @@
 #include "A76XX.h"
 
 // dump all communication with the module to the standard serial port
-#define DEBUG_AT true
+#define DEBUG_AT false
 
 // Use the correct `Serial` object to connect to the simcom module
 #if DEBUG_AT
@@ -54,79 +54,78 @@ m/XriWr/Cq4h/JfB7NTsezVslgkBaoU=
 const char* apn           = "simbase";
 
 A76XX modem(SerialAT);
-A76XXMQTTClient mqtt_client(modem, clientID, use_ssl);
+A76XXMQTTClient mqtt_client(&modem, clientID, use_ssl);
 
 // configuration for serial port to simcom module (check your board!)
 #define PIN_TX   26
 #define PIN_RX   27
 
 void setup() {
-    // start ports
+    // begin serial port
     Serial.begin(115200);
+
+    // must begin UART communicating with the SIMCOM module
     Serial1.begin(115200, SERIAL_8N1, PIN_RX, PIN_TX);
+
+    // wait a little so we can see the output
     delay(3000);
 
     Serial.print("Waiting for modem ... ");
     if (modem.init() == false) {
         Serial.println("error");
-    } else {
-        Serial.println("OK");
+        while (true) {}
     }
+    Serial.println("OK");
 
     Serial.print("Waiting for modem to register on network ... ");
-    if (!modem.waitForRegistration()) {
+    if (modem.waitForRegistration() == false) {
         Serial.println("registration timed out");
         while (true) {}
     }
     Serial.println("done");
 
     Serial.print("Connecting  ... ");
-    if (modem.connect(apn) == false){
+    if (modem.GPRSConnect(apn) == false){
         Serial.println("cannot connect");
         while (true) {}
-    } else {
-        Serial.println("connected");
     }
+    Serial.println("connected");
 
-    Serial.print("Downloading certificate .. ");
+    Serial.print("Downloading certificate to the module ... ");
     if (mqtt_client.setCaCert(mosquittoCert) == false) {
         Serial.println("error");
         while (true) {}
-    } else {
-        Serial.println("done");
     }
+    Serial.println("done");
 
     Serial.print("Starting client  ... ");
     if (mqtt_client.begin() == false) {
         Serial.println("error");
         while (true) {}
-    } else {
-        Serial.println("done");
     }
+    Serial.println("done");
 
-    Serial.print("Connecting to mosquitto test server  ... ");
-    if (mqtt_client.connect(server, port, clean_session, keepalive, NULL, NULL, will_topic, will_message, will_qos) == false) {
+    Serial.print("Connecting to mosquitto test server ... ");
+    if (mqtt_client.connect(server, port, clean_session, keepalive, 
+            NULL, NULL, will_topic, will_message, will_qos) == false) {
         Serial.println("error");
         while (true) {}
-    } else {
-        Serial.println("done");
     }
+    Serial.println("done");
 
-    Serial.print("Publishing a message  ... ");
+    Serial.print("Publishing a message ... ");
     if (mqtt_client.publish("test_topic", "test_message", 0, 60) == false) {
         Serial.println("error");
         while (true) {}
-    } else {
-        Serial.println("done");
     }
+    Serial.println("done");
 
     Serial.print("Powering off ... ");
     if (modem.powerOff() == false) {
         Serial.println("error");
         while (true) {}
-    } else {
-        Serial.println("done");
     }
+    Serial.println("done");
 }
 
 void loop() {}
