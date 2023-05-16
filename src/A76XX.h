@@ -62,6 +62,8 @@ enum Response_t {
         }                                             \
     }
 
+#include "utils/base64.h"
+
 #include "commands/internet_service.h"
 #include "commands/serial_interface.h"
 #include "commands/status_control.h"

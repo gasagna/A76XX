@@ -71,6 +71,9 @@ void setup() {
     // add a custom header before the request
     http_client.addHeader("TestHeaderName", "TestHeaderValue");
 
+    // add basic authentication credentials to the header
+    http_client.addBasicAuthentication("username", "password");
+
     Serial.print("Executing post request  ... ");
     if (http_client.post(path, "test_message_message") == false) {
         Serial.print("error... code: ");

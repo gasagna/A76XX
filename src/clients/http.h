@@ -72,6 +72,16 @@ class A76XXHTTPClient : public A76XXSecureClient {
     bool addHeader(const char* header, const char* value);
 
     /*
+        @brief Add basic credentials for authenticating the client.
+
+        @details You should not use this authentication method for unsecure connections. See
+            https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication for details.
+        @param [IN] username The username for the authentication. Maximum length is 32 characters.
+        @param [IN] password The password for the authentication. Maximum length is 32 characters.
+    */
+    bool addBasicAuthentication(const char* username, const char* password);
+
+    /*
         @brief Execute a GET request.
 
         @param [IN] path The path to the resource, EXCLUDING the leading "/".
