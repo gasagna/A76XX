@@ -9,7 +9,7 @@ enum PINStatus_t {
     SIM_PIN2,
     SIM_PUK2,
     PH_NET_PIN,
-    UKNOWKN
+    UKNOWN
 };
 
 /*
@@ -18,7 +18,7 @@ enum PINStatus_t {
     Command         | Implemented | Method | Function(s)
     --------------- | ----------- | ------ |-----------------------
     CICCID          |             |        |
-    CPIN            |      y      | READ   |
+    CPIN            |      y      | R/W    | getPINStatus, enterPIN
     CLCK            |             |        |
     CPWD            |             |        |
     CIMI            |             |        |
@@ -40,19 +40,19 @@ class SIMCommands {
 
     /*
         @brief Implementation for CPIN - Read Command.
+
         @detail Get PIN status.
-        @param [OUT] status The PIN status.
+        @param [OUT] status The PIN status. In case of errors, status is set to 
+            PINStatus_t::UNKNOWN.
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR 
     */
     int8_t getPINStatus(PINStatus_t& status) {
+        status = PINStatus_t::UKNOWN;
         _modem->sendCMD("AT+CPIN?");
         switch(_modem->waitResponse("+CPIN: ", 9000, false, true)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 char buff[11];
                 _modem->streamReadBytesUntil('\r', &buff[0], 11);
-
-                // default case
-                status = PINStatus_t::UKNOWKN;
 
                 if (strstr(buff, "READY")      != NULL) {status = PINStatus_t::READY;}
                 if (strstr(buff, "SIM PIN")    != NULL) {status = PINStatus_t::SIM_PIN;}
@@ -74,6 +74,18 @@ class SIMCommands {
                 return A76XX_GENERIC_ERROR;
             }
         }
+    }
+
+    /*
+        @brief Implementation for CPIN - Write Command.
+
+        @detail Enter PIN to unlock the mobile equipment.
+        @param [IN] pincode The PIN.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR 
+    */
+    int8_t enterPIN(const char* pincode) {
+        _modem->sendCMD("AT+CPIN=", pincode);
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse())
     }
 };
 

@@ -16,7 +16,7 @@ int8_t A76XX::getLastError() {
     return _last_error_code;
 }
 
-bool A76XX::init(uint32_t timeout) {
+bool A76XX::init(const char* pincode, uint32_t timeout) {
     int8_t retcode;
 
     // wait until modem is ready
@@ -24,11 +24,29 @@ bool A76XX::init(uint32_t timeout) {
         return false;
     }
 
-    // check we do not require a PIN code
-    PINStatus_t status = PINStatus_t::UKNOWKN;
-    _last_error_code = sim.getPINStatus(status);
-    if (status != PINStatus_t::READY) {
-        return false;
+    PINStatus_t status;
+    retcode = sim.getPINStatus(status);
+    // catch errors with the command
+    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
+
+    switch (status) {
+        case PINStatus_t::READY : {
+            break;
+        }
+        // some error occurred in reading the response
+        case PINStatus_t::UKNOWN : {
+            _last_error_code = A76XX_SIM_PIN_MODEM_ERROR;
+            return false;
+        }
+        // all other cases where PIN is required
+        default : {
+            if (pincode == NULL) {
+                _last_error_code = A76XX_SIM_PIN_REQUIRED;
+                return false;
+            }
+            retcode = sim.enterPIN(pincode);
+            A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
+        }
     }
 
     // turn off echoing commands

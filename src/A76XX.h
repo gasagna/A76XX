@@ -22,6 +22,8 @@ enum Response_t {
 #define A76XX_OUT_OF_MEMORY                  -3
 #define A76XX_MQTT_ALREADY_STOPPED           -4
 #define A76XX_MQTT_ALREADY_STARTED           -5
+#define A76XX_SIM_PIN_REQUIRED               -6
+#define A76XX_SIM_PIN_MODEM_ERROR            -7
 
 
 // if retcode is an error, return it

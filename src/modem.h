@@ -33,8 +33,7 @@ class A76XX {
         @brief Wait for the serial communication with the SIMCOM module to
             become available and initialise the modem. 
             
-        @detail Currently, only sims with no PIN code are supported.
-
+        @param [IN] pincode The PIN code used to unlock the SIM if required.
         @param [IN] timeout Give up if the module cannot be initialised within
             this time in millisecond. Default is 30000 ms.
 
@@ -43,7 +42,7 @@ class A76XX {
             responsive within `timeout`, if the SIM requires a PIN code or
             if any other commands run during the initialisation are unsuccessful.
     */
-    bool init(uint32_t timeout = 30000);
+    bool init(const char* pincode = NULL, uint32_t timeout = 30000);
 
     /*
         @brief Connect to GPRS network.
