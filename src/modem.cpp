@@ -285,6 +285,21 @@ Response_t A76XX::waitResponse(const char* match_1,
     while (millis() - tstart < timeout) {
         if (streamAvailable() > 0) {
             data += static_cast<char>(streamRead());
+
+            // check if we have an MQTT URCs first, then continue
+            if (_mqtt_enabled == true) {
+                // parse message 
+                if (data.endsWith("+CMQTTRXSTART")) {
+                    _MQTTParseMessage();
+                }
+                // execute callback if connection is lost
+                if (data.endsWith("+CMQTTNONET") || data.endsWith("+CMQTTCONNLOST")) {
+                    if (_mqtt_on_connection_lost) {
+                        _mqtt_on_connection_lost();
+                    };
+                }
+            }
+
             if (match_1 != NULL && data.endsWith(match_1) == true)
                 return Response_t::A76XX_RESPONSE_MATCH_1ST;
 
