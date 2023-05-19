@@ -1,6 +1,19 @@
 #ifndef A76XX_MQTT_CLIENT_H_
 #define A76XX_MQTT_CLIENT_H_
 
+#ifndef MQTT_MESSAGE_BUFF_LEN
+    #define MQTT_MESSAGE_BUFF_LEN 64
+#endif
+
+#ifndef MQTT_TOPIC_BUFF_LEN
+    #define MQTT_TOPIC_BUFF_LEN 32
+#endif
+
+struct MQTTMessage_t {
+    char topic[MQTT_TOPIC_BUFF_LEN];
+    char message[MQTT_MESSAGE_BUFF_LEN];
+}
+
 class A76XXMQTTClient : public A76XXSecureClient {
   private:
     MQTTCommands<A76XX>          _mqtt_cmds;
@@ -9,8 +22,14 @@ class A76XXMQTTClient : public A76XXSecureClient {
 
     // these two are set to zero by default until a use
     // case for allowing these to change comes up
-    uint8_t            _client_index;
-    uint8_t              _session_id;
+    uint8_t                   _client_index;
+    uint8_t                     _session_id;
+
+    // it might be possible to use a queue to avoid
+    // overwriting message if the client code is not
+    // processing them fast enough... TODO
+    char[MQTT_MESSAGE_BUFF_LEN]    _msg_buf;
+    char[MQTT_TOPIC_BUFF_LEN]    _topic_buf;
 
   public:
     /*
@@ -119,6 +138,8 @@ class A76XXMQTTClient : public A76XXSecureClient {
                  uint8_t pub_timeout,
                  bool retained = false,
                  bool dup = false);
+
+    bool subscribe(const char* topic, uint8_t qos = 0);
 
     /*
         @brief Check if the connection with the broker is active or not.
