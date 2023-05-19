@@ -23,6 +23,7 @@ const bool  use_ssl       = false;
 const char* apn           = "simbase";
 
 A76XX modem(SerialAT);
+A76XXMQTTClient mqtt(modem, clientID, use_ssl);
 
 // configuration for serial port to simcom module (check your board!)
 #define PIN_TX   26
@@ -63,29 +64,29 @@ void setup() {
     Serial.println("connected");
 
     Serial.print("Starting client  ... ");
-    if (modem.MQTTBegin(clientID, use_ssl) == false) {
+    if (mqtt.begin() == false) {
         Serial.println("error");
         while (true) {}
     }
     Serial.println("done");
 
     Serial.print("Connecting to mosquitto test server  ... ");
-    if (modem.MQTTConnect(server, port, clean_session, keepalive) == false) {
+    if (mqtt.connect(server, port, clean_session, keepalive) == false) {
         Serial.println("error");
         while (true) {}
     }
     Serial.println("done");
 
     Serial.print("Subscribe to topic  ... ");
-    if (modem.MQTTSubscribe("_this_is_a_test_topic_") == false) {
+    if (mqtt.subscribe("_this_is_a_test_topic_") == false) {
         Serial.println("error");
         while (true) {}
     }
     Serial.println("done");
 
     while (true) {
-        if (modem.MQTTHasMessage()) {
-            MQTTMessage_t msg = modem.MQTTReadMessage();
+        if (mqtt.hasMessage()) {
+            MQTTMessage_t msg = mqtt.getLastMessage();
             Serial.println("Received message ...");
             Serial.print("Topic: "); Serial.println(msg.topic);
             Serial.print("Payload: "); Serial.println(msg.payload);

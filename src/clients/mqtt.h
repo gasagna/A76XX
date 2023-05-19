@@ -1,22 +1,9 @@
 #ifndef A76XX_MQTT_CLIENT_H_
 #define A76XX_MQTT_CLIENT_H_
 
-#ifndef MQTT_MESSAGE_BUFF_LEN
-    #define MQTT_MESSAGE_BUFF_LEN 64
-#endif
-
-#ifndef MQTT_TOPIC_BUFF_LEN
-    #define MQTT_TOPIC_BUFF_LEN 32
-#endif
-
-struct MQTTMessage_t {
-    char topic[MQTT_TOPIC_BUFF_LEN];
-    char message[MQTT_MESSAGE_BUFF_LEN];
-}
-
 class A76XXMQTTClient : public A76XXSecureClient {
   private:
-    MQTTCommands<A76XX>          _mqtt_cmds;
+    MQTTCommands                 _mqtt_cmds;
     const char*                   _clientID;
     bool                           _use_ssl;
 
@@ -24,12 +11,6 @@ class A76XXMQTTClient : public A76XXSecureClient {
     // case for allowing these to change comes up
     uint8_t                   _client_index;
     uint8_t                     _session_id;
-
-    // it might be possible to use a queue to avoid
-    // overwriting message if the client code is not
-    // processing them fast enough... TODO
-    char[MQTT_MESSAGE_BUFF_LEN]    _msg_buf;
-    char[MQTT_TOPIC_BUFF_LEN]    _topic_buf;
 
   public:
     /*
@@ -43,7 +24,7 @@ class A76XXMQTTClient : public A76XXSecureClient {
         @param [IN] clientID The client ID used for connecting to the broker.
         @param [IN] use_ssl Whether SSL/TLS encryption should be used.
     */
-    A76XXMQTTClient(A76XX* modem, const char* clientID, bool use_ssl = false);
+    A76XXMQTTClient(A76XX& modem, const char* clientID, bool use_ssl = false);
 
     /*
         @brief Start the MQTT service.
@@ -140,6 +121,10 @@ class A76XXMQTTClient : public A76XXSecureClient {
                  bool dup = false);
 
     bool subscribe(const char* topic, uint8_t qos = 0);
+
+    bool hasMessage();
+
+    MQTTMessage_t getLastMessage(); 
 
     /*
         @brief Check if the connection with the broker is active or not.

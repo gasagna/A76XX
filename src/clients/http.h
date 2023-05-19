@@ -3,7 +3,7 @@
 
 class A76XXHTTPClient : public A76XXSecureClient {
   private:
-    HTTPCommands<A76XX>       _http_cmds;
+    HTTPCommands              _http_cmds;
     bool                        _use_ssl;
     const char*             _server_name;
     uint16_t                _server_port;
@@ -25,7 +25,7 @@ class A76XXHTTPClient : public A76XXSecureClient {
             false, i.e. use unsecure connections.
         @param [IN] user_agent If provided, it is the value of the "User-Agent" header.
     */
-    A76XXHTTPClient(A76XX* modem,
+    A76XXHTTPClient(A76XX& modem,
                     const char* server_name,
                     uint16_t server_port,
                     bool use_ssl = false,

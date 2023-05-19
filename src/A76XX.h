@@ -4,6 +4,19 @@
 #include "Arduino.h"
 #include "time.h"
 
+#ifndef MQTT_PAYLOAD_BUFF_LEN
+    #define MQTT_PAYLOAD_BUFF_LEN 64
+#endif
+
+#ifndef MQTT_TOPIC_BUFF_LEN
+    #define MQTT_TOPIC_BUFF_LEN 32
+#endif
+
+struct MQTTMessage_t {
+    char topic[MQTT_TOPIC_BUFF_LEN];
+    char payload[MQTT_PAYLOAD_BUFF_LEN];
+};
+
 enum Response_t {
     A76XX_RESPONSE_OK        = 0,
     A76XX_RESPONSE_MATCH_1ST = 1,
@@ -66,6 +79,7 @@ enum Response_t {
     }
 
 #include "utils/base64.h"
+#include "modem_serial.h"
 
 #include "commands/internet_service.h"
 #include "commands/serial_interface.h"

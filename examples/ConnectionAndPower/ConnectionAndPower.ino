@@ -32,7 +32,7 @@ void setup() {
     delay(3000);
 
     Serial.print("Initialising modem within 20 seconds ... ");
-    if (modem.init(20000) == false) {
+    if (modem.init(NULL, 20000) == false) {
         Serial.println("error");
         while (true) {}
     }

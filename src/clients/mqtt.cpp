@@ -1,13 +1,12 @@
 #include "A76XX.h"
 
-A76XXMQTTClient::A76XXMQTTClient(A76XX* modem, const char* clientID, bool use_ssl)
+A76XXMQTTClient::A76XXMQTTClient(A76XX& modem, const char* clientID, bool use_ssl)
     : A76XXSecureClient(modem)
+    , _mqtt_cmds(_serial)
     , _clientID(clientID)
     , _use_ssl(use_ssl)
     , _client_index(0)
-    , _session_id(0) {
-        _mqtt_cmds._modem = modem;
-    }
+    , _session_id(0) {}
 
 bool A76XXMQTTClient::begin() {
     // start
@@ -102,58 +101,13 @@ bool A76XXMQTTClient::subscribe(const char* topic, uint8_t qos) {
     return true;
 }
 
-bool A76XXMQTTClient::mainLoop(int timeout) {
-    Response_t rsp = modem->waitResponse("+CMQTTRXSTART: ", "+CMQTTNONET", "+CMQTTCONNLOST");
-    switch (rsp) {
-        case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-            parseMessage();
-            this->onMessage(_topic_buf, _pload_buf);
-        }
-        case Response_t::A76XX_RESPONSE_MATCH_2ND : {
-
-        }
-    }
+bool A76XXMQTTClient::hasMessage() {
+    return _serial.MQTTHasMessage();
 }
 
-bool A76XXMQTTClient::parseMessage() {
-    // +CMQTTRXSTART: 0,22,7
-    //
-    // +CMQTTRXTOPIC: 0,22
-    // _this_is_a_test_topic_
-    // +CMQTTRXPAYLOAD: 0,7
-    // testone
-    // +CMQTTRXEND: 0
-
-    // we read the data until "+CMQTTRXSTART: "
-    // skip the client index
-    modem->streamFind(','); uin16_t topic_length = modem->streamParseInt();
-    modem->streamFind(','); uin16_t pload_length = modem->streamParseInt();
-
-    modem->waitResponse("+CMQTTRXTOPIC: "); modem->streamFind('\n');
-    if (topic_length < MQTT_TOPIC_BUFF_LEN) {
-        modem->streamReadBytes(_topic_buf, topic_length);
-        _topic_buf[topic_length] = '\0';
-    } else {
-        // read what we can't store, then overwrite
-        modem->streamReadBytes(_topic_buf, topic_length - MQTT_TOPIC_BUFF_LEN + 1);
-        modem->streamReadBytes(_topic_buf, MQTT_TOPIC_BUFF_LEN - 1);
-        _topic_buf[MQTT_TOPIC_BUFF_LEN] = '\0';
-    }
-
-    modem->waitResponse("+CMQTTRXPAYLOAD: "); modem->streamFind('\n');
-    if (pload_length < MQTT_PLOAD_BUFF_LEN) {
-        modem->streamReadBytes(_pload_buf, pload_length);
-        _pload_buf[pload_length] = '\0';
-    } else {
-        // read what we can't store, then overwrite
-        modem->streamReadBytes(_pload_buf, pload_length - MQTT_PLOAD_BUFF_LEN + 1);
-        modem->streamReadBytes(_pload_buf, MQTT_PLOAD_BUFF_LEN - 1);
-        _pload_buf[MQTT_PLOAD_BUFF_LEN] = '\0';
-    }
-
-    modem->waitResponse("+CMQTTRXEND: "); modem->streamFind('\n');
+MQTTMessage_t A76XXMQTTClient::getLastMessage() {
+    return _serial.MQTTGetLastMessage();
 }
-
 
 bool A76XXMQTTClient::isConnected() {
     return _mqtt_cmds.isConnected(_client_index);

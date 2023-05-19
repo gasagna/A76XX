@@ -1,9 +1,9 @@
 #include "A76XX.h"
 
-A76XXSecureClient::A76XXSecureClient(A76XX* modem) 
-    : _ssl_ctx_index(0) {
-        _ssl_cmds._modem = modem;
-    }
+A76XXSecureClient::A76XXSecureClient(A76XX& modem) 
+    : A76XXBaseClient(modem)
+    , _ssl_cmds(_serial)
+    , _ssl_ctx_index(0) {}
 
 bool A76XXSecureClient::setCaCert(const char* cacert) {
     int8_t retcode = _ssl_cmds.certOverwrite(cacert, A76XX_DEFAULT_CACERT_FILENAME);

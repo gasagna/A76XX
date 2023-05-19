@@ -33,26 +33,29 @@ enum PINStatus_t {
     BINDSIM         |             |        |
     DUALSIMURC      |             |        |
 */
-template <typename MODEM>
+
 class SIMCommands {
   public:
-    MODEM* _modem = NULL;
+    ModemSerial& _serial;
+
+    SIMCommands(ModemSerial& serial)
+        : _serial(serial) {}
 
     /*
         @brief Implementation for CPIN - Read Command.
 
         @detail Get PIN status.
-        @param [OUT] status The PIN status. In case of errors, status is set to 
+        @param [OUT] status The PIN status. In case of errors, status is set to
             PINStatus_t::UNKNOWN.
-        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR 
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR
     */
     int8_t getPINStatus(PINStatus_t& status) {
         status = PINStatus_t::UKNOWN;
-        _modem->sendCMD("AT+CPIN?");
-        switch(_modem->waitResponse("+CPIN: ", 9000, false, true)) {
+        _serial.sendCMD("AT+CPIN?");
+        switch(_serial.waitResponse("+CPIN: ", 9000, false, true)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 char buff[11];
-                _modem->streamReadBytesUntil('\r', &buff[0], 11);
+                _serial.readBytesUntil('\r', &buff[0], 11);
 
                 if (strstr(buff, "READY")      != NULL) {status = PINStatus_t::READY;}
                 if (strstr(buff, "SIM PIN")    != NULL) {status = PINStatus_t::SIM_PIN;}
@@ -63,7 +66,7 @@ class SIMCommands {
                 if (strstr(buff, "PH-NET PIN") != NULL) {status = PINStatus_t::PH_NET_PIN;}
 
                 // clear up
-                _modem->streamClear();
+                _serial.clear();
 
                 return A76XX_OPERATION_SUCCEEDED;
             }
@@ -81,11 +84,11 @@ class SIMCommands {
 
         @detail Enter PIN to unlock the mobile equipment.
         @param [IN] pincode The PIN.
-        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR 
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR
     */
     int8_t enterPIN(const char* pincode) {
-        _modem->sendCMD("AT+CPIN=", pincode);
-        A76XX_RESPONSE_PROCESS(_modem->waitResponse())
+        _serial.sendCMD("AT+CPIN=", pincode);
+        A76XX_RESPONSE_PROCESS(_serial.waitResponse())
     }
 };
 

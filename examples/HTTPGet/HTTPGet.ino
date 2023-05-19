@@ -22,7 +22,7 @@ const char* user_agent    = "Arduino!!";
 const char* apn           = "simbase";
 
 A76XX modem(SerialAT);
-A76XXHTTPClient http_client(&modem, server_name, server_port, use_ssl, user_agent);
+A76XXHTTPClient http_client(modem, server_name, server_port, use_ssl, user_agent);
 
 // configuration for serial port to simcom module (check your board!)
 #define PIN_TX   26

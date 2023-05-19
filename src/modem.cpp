@@ -1,16 +1,15 @@
 #include "A76XX.h"
 
 A76XX::A76XX(Stream& stream)
-    : _stream(stream)
-    , _last_error_code(0) {
-        internetService._modem = this;
-        network._modem         = this;
-        packetDomain._modem    = this;
-        serialInterface._modem = this;
-        sim._modem             = this;
-        statusControl._modem   = this;
-        v25ter._modem          = this;
-    }
+    : _serial(stream)
+    , _last_error_code(0)
+    , internetService(_serial)
+    , network(_serial)
+    , packetDomain(_serial)
+    , serialInterface(_serial)
+    , sim(_serial)
+    , statusControl(_serial)
+    , v25ter(_serial) {}
 
 int8_t A76XX::getLastError() {
     return _last_error_code;
@@ -172,8 +171,8 @@ bool A76XX::restart(uint32_t timeout) {
 bool A76XX::waitATUnresponsive(uint32_t timeout) {
     uint32_t tstart = millis();
     while (millis() - tstart < timeout) {
-        sendCMD("AT");
-        if (waitResponse(1000) == Response_t::A76XX_RESPONSE_TIMEOUT) {
+        _serial.sendCMD("AT");
+        if (_serial.waitResponse(1000) == Response_t::A76XX_RESPONSE_TIMEOUT) {
             return true;
         }
         delay(100);
@@ -184,8 +183,8 @@ bool A76XX::waitATUnresponsive(uint32_t timeout) {
 bool A76XX::waitATResponsive(uint32_t timeout) {
     uint32_t tstart = millis();
     while (millis() - tstart < timeout) {
-        sendCMD("AT");
-        if (waitResponse(1000) == Response_t::A76XX_RESPONSE_OK) {
+        _serial.sendCMD("AT");
+        if (_serial.waitResponse(1000) == Response_t::A76XX_RESPONSE_OK) {
             return true;
         }
         delay(100);
@@ -200,8 +199,8 @@ bool A76XX::sleep() {
 }
 
 bool A76XX::wakeUp() {
-    sendCMD("AT");
-    return waitResponse() == Response_t::A76XX_RESPONSE_OK;
+    _serial.sendCMD("AT");
+    return _serial.waitResponse() == Response_t::A76XX_RESPONSE_OK;
 }
 
 String A76XX::modelIdentification() {
@@ -267,86 +266,4 @@ uint32_t A76XX::getUnixTime(bool UTC) {
         time -= static_cast<uint32_t>(timezone*15*60);
     }
     return time;
-}
-
-
-Response_t A76XX::waitResponse(const char* match_1,
-                               const char* match_2,
-                               const char* match_3,
-                               int timeout,
-                               bool match_OK,
-                               bool match_ERROR) {
-    // store data here
-    String data; data.reserve(64);
-
-    // start timer
-    auto tstart = millis();
-
-    while (millis() - tstart < timeout) {
-        if (streamAvailable() > 0) {
-            data += static_cast<char>(streamRead());
-
-            // check if we have an MQTT URCs first, then continue
-            if (_mqtt_enabled == true) {
-                // parse message 
-                if (data.endsWith("+CMQTTRXSTART")) {
-                    _MQTTParseMessage();
-                }
-                // execute callback if connection is lost
-                if (data.endsWith("+CMQTTNONET") || data.endsWith("+CMQTTCONNLOST")) {
-                    if (_mqtt_on_connection_lost) {
-                        _mqtt_on_connection_lost();
-                    };
-                }
-            }
-
-            if (match_1 != NULL && data.endsWith(match_1) == true)
-                return Response_t::A76XX_RESPONSE_MATCH_1ST;
-
-            if (match_2 != NULL && data.endsWith(match_2) == true)
-                return Response_t::A76XX_RESPONSE_MATCH_2ND;
-
-            if (match_3 != NULL && data.endsWith(match_3) == true)
-                return Response_t::A76XX_RESPONSE_MATCH_3RD;
-
-            if (match_ERROR && data.endsWith(RESPONSE_ERROR) == true)
-                return Response_t::A76XX_RESPONSE_ERROR;
-
-            if (match_OK && data.endsWith(RESPONSE_OK) == true)
-                return Response_t::A76XX_RESPONSE_OK;
-        }
-    }
-
-    return Response_t::A76XX_RESPONSE_TIMEOUT;
-}
-
-Response_t A76XX::waitResponse(const char* match_1,
-                               const char* match_2,
-                               int timeout,
-                               bool match_OK,
-                               bool match_ERROR) {
-    return waitResponse(match_1, match_2, NULL, timeout, match_OK, match_ERROR);
-}
-
-Response_t A76XX::waitResponse(const char* match_1, 
-                               int timeout,
-                               bool match_OK,
-                               bool match_ERROR) {
-    return waitResponse(match_1, NULL, NULL, timeout, match_OK, match_ERROR);
-}
-
-Response_t A76XX::waitResponse(int timeout,
-                               bool match_OK,
-                               bool match_ERROR) {
-    return waitResponse(NULL, NULL, NULL, timeout, match_OK, match_ERROR);
-}
-
-int32_t A76XX::streamParseIntClear(uint32_t timeout) {
-    int32_t retcode = streamParseInt();
-    streamClear(timeout);
-    return retcode;
-}
-
-void A76XX::streamClear(uint32_t timeout) {
-    waitResponse(timeout);
 }

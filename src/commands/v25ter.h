@@ -29,20 +29,23 @@
     AT+CSCS  |             |        |
     AT+GCAP  |             |        |
 */
-template <typename MODEM>
+
 class V25TERCommands {
   public:
-    MODEM* _modem = NULL;
+    ModemSerial& _serial;
+
+    V25TERCommands(ModemSerial& serial)
+        : _serial(serial) {}
 
     /*
         @brief Implementation for ATE - WRITE Command.
         @detail Enable/Disable command echo.
         @param [IN] enable whether to enable command echo.
-        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR 
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR
     */
     int8_t commandEcho(bool enable) {
-        _modem->sendCMD("ATE", enable ? "1" : "0");
-        switch(_modem->waitResponse(120000)) {
+        _serial.sendCMD("ATE", enable ? "1" : "0");
+        switch(_serial.waitResponse(120000)) {
             case Response_t::A76XX_RESPONSE_OK : {
                 return A76XX_OPERATION_SUCCEEDED;
             }
@@ -59,19 +62,19 @@ class V25TERCommands {
         @brief Implementation for CGMM - WRITE Command.
         @detail Get model identification string
         @param [IN] model will contain the model string on successful execution.
-        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR 
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR
     */
     int8_t modelIdentification(String& model) {
         // clear stream before sending command, then get rid of the first line
-        _modem->streamClear();
-        _modem->sendCMD("AT+CGMM");
-        _modem->streamFind("\r\n");
+        _serial.clear();
+        _serial.sendCMD("AT+CGMM");
+        _serial.find("\r\n");
         uint32_t tstart = millis();
         while (millis() - tstart < 5000) {
-            if (_modem->streamAvailable() > 0) {
-                char c = static_cast<char>(_modem->streamRead());
+            if (_serial.available() > 0) {
+                char c = static_cast<char>(_serial.read());
                 if (c == '\r') {
-                    _modem->streamClear();
+                    _serial.clear();
                     return A76XX_OPERATION_SUCCEEDED;
                 }
                 model += c;
@@ -84,24 +87,24 @@ class V25TERCommands {
         @brief Implementation for CGMR - WRITE Command.
         @detail Get model revision string
         @param [IN] model will contain the revision string on successful execution.
-        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR 
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR
     */
     int8_t revisionIdentification(String& revision) {
-        _modem->sendCMD("AT+CGMR");
-        switch (_modem->waitResponse("+CGMR: ", 9000, false, false)) {
+        _serial.sendCMD("AT+CGMR");
+        switch (_serial.waitResponse("+CGMR: ", 9000, false, false)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 uint32_t tstart = millis();
                 while (millis() - tstart < 5000) {
-                    if (_modem->streamAvailable() > 0) {
-                        char c = static_cast<char>(_modem->streamRead());
+                    if (_serial.available() > 0) {
+                        char c = static_cast<char>(_serial.read());
                         if (c == '\r') {
-                            _modem->streamClear();
+                            _serial.clear();
                             return A76XX_OPERATION_SUCCEEDED;
                         }
                         revision += c;
                     }
                 }
-                _modem->streamClear();
+                _serial.clear();
                 return A76XX_OPERATION_TIMEDOUT;
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {

@@ -20,19 +20,22 @@
     AT+CURCD |             |        |
 
 */
-template <typename MODEM>
+
 class SerialInterfaceCommands {
   public:
-    MODEM* _modem = NULL;
- 
+    ModemSerial& _serial;
+
+    SerialInterfaceCommands(ModemSerial& serial)
+        : _serial(serial) {}
+
     /*
         @brief Implementation for CSCLK - Write Command.
         @detail Control UART sleep.
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR
     */
     int8_t UARTSleep(uint8_t status) {
-        _modem->sendCMD("AT+CSCLK=", status);
-        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
+        _serial.sendCMD("AT+CSCLK=", status);
+        A76XX_RESPONSE_PROCESS(_serial.waitResponse());
     }
 
     /*
@@ -41,8 +44,8 @@ class SerialInterfaceCommands {
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR
     */
     int8_t enableMUX() {
-        _modem->sendCMD("AT+CMUX=0");
-        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
+        _serial.sendCMD("AT+CMUX=0");
+        A76XX_RESPONSE_PROCESS(_serial.waitResponse());
     }
 
     /*
@@ -51,8 +54,8 @@ class SerialInterfaceCommands {
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR
     */
     int8_t setURCInterface(uint8_t port) {
-        _modem->sendCMD("AT+CATR=", port);
-        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
+        _serial.sendCMD("AT+CATR=", port);
+        A76XX_RESPONSE_PROCESS(_serial.waitResponse());
     }
 
 };

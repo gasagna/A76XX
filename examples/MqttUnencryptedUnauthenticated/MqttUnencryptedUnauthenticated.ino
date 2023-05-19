@@ -26,7 +26,7 @@ const bool  use_ssl       = false;
 const char* apn           = "simbase";
 
 A76XX modem(SerialAT);
-A76XXMQTTClient mqtt_client(&modem, clientID, use_ssl);
+A76XXMQTTClient mqtt(modem, clientID, use_ssl);
 
 // configuration for serial port to simcom module (check your board!)
 #define PIN_TX   26
@@ -64,21 +64,21 @@ void setup() {
     Serial.println("connected");
 
     Serial.print("Starting client  ... ");
-    if (mqtt_client.begin() == false) {
+    if (mqtt.begin() == false) {
         Serial.println("error");
         while (true) {}
     }
     Serial.println("done");
 
     Serial.print("Connecting to mosquitto test server  ... ");
-    if (mqtt_client.connect(server, port, clean_session, keepalive, NULL, NULL, will_topic, will_message, will_qos) == false) {
+    if (mqtt.connect(server, port, clean_session, keepalive, NULL, NULL, will_topic, will_message, will_qos) == false) {
         Serial.println("error");
         while (true) {}
     }
     Serial.println("done");
 
     Serial.print("Publishing a message  ... ");
-    if (mqtt_client.publish("test_topic", "test_message", 0, 60) == false) {
+    if (mqtt.publish("test_topic", "test_message", 0, 60) == false) {
         Serial.println("error");
         while (true) {}
     }

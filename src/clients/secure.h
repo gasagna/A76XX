@@ -5,20 +5,19 @@
     @brief Base SSL/TLS functionality for other protocol clients.
 */
 class A76XXSecureClient : public A76XXBaseClient {
-  protected:
+  public:
     // handle to all SSL commands
-    SSLCommands<A76XX>  _ssl_cmds;
+    SSLCommands         _ssl_cmds;
 
     // context id of the SSL session
     uint8_t        _ssl_ctx_index;
 
-  public:
     /*
         @brief Constructor.
 
         @param [IN] FIXME:
     */
-    A76XXSecureClient(A76XX* modem);
+    A76XXSecureClient(A76XX& modem);
 
     /*
         @brief Write root CA certificate to the module and enable server only
