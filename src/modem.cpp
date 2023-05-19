@@ -4,12 +4,12 @@ A76XX::A76XX(Stream& stream)
     : _stream(stream)
     , _last_error_code(0) {
         internetService._modem = this;
-        network._modem = this;
-        packetDomain._modem = this;
+        network._modem         = this;
+        packetDomain._modem    = this;
         serialInterface._modem = this;
-        sim._modem = this;
-        statusControl._modem = this;
-        v25ter._modem = this;
+        sim._modem             = this;
+        statusControl._modem   = this;
+        v25ter._modem          = this;
     }
 
 int8_t A76XX::getLastError() {
