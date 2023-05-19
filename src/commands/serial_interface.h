@@ -14,8 +14,8 @@
     AT+ICF   |             |        |
     AT+IFC   |             |        |
     AT+CSCLK |      y      | WRITE  | UARTSleep
-    AT+CMUX  |             |        |
-    AT+CATR  |             |        |
+    AT+CMUX  |      y      | WRITE  | enableMUX
+    AT+CATR  |      y      | WRITE  | setURCInterface
     AT+CFGRI |             |        |
     AT+CURCD |             |        |
 
@@ -34,6 +34,27 @@ class SerialInterfaceCommands {
         _modem->sendCMD("AT+CSCLK=", status);
         A76XX_RESPONSE_PROCESS(_modem->waitResponse());
     }
+
+    /*
+        @brief Implementation for CMUX - Write Command.
+        @detail Enable the multiplexer over the UART.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR
+    */
+    int8_t enableMUX() {
+        _modem->sendCMD("AT+CMUX=0");
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
+    }
+
+    /*
+        @brief Implementation for CATR - Write Command.
+        @detail Configure URC destination interface.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR
+    */
+    int8_t setURCInterface(uint8_t port) {
+        _modem->sendCMD("AT+CATR=", port);
+        A76XX_RESPONSE_PROCESS(_modem->waitResponse());
+    }
+
 };
 
 #endif A76XX_SERIALINTERFACE_CMDS_H_
