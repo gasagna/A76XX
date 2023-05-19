@@ -15,11 +15,11 @@
     CMQTTWILLMSG   |      y      |        | setWillMessage
     CMQTTCONNECT   |      y      |        | connect
     CMQTTDISC      |      y      |        | disconnect, isConnected
-    CMQTTTOPIC     |      y      |        | setTopic
-    CMQTTPAYLOAD   |      y      |        | setPayload
+    CMQTTTOPIC     |      y      |        | setPublishTopic
+    CMQTTPAYLOAD   |      y      |        | setPublishPayload
     CMQTTPUB       |      y      |        | publish
-    CMQTTSUBTOPIC  |             |        |
-    CMQTTSUB       |             |        |
+    CMQTTSUBTOPIC  |             |        | 
+    CMQTTSUB       |      y      |        | subscribe
     CMQTTUNSUBTOPIC|             |        |
     CMQTTUNSUB     |             |        |
     CMQTTCFG       |             |        |
@@ -308,6 +308,35 @@ class MQTTCommands {
             }
         }
     }
+
+    // CMQTTSUB
+    int8_t subscribe(uint8_t client_index, const char* topic, uint8_t qos) {
+        _modem->sendCMD("AT+CMQTTSUB=", client_index, ",", strlen(topic), ",", qos);
+        Response_t rsp = _modem->waitResponse(">", "+CMQTTSUB: ", 9000, false, true);
+        switch (rsp) {
+            case Response_t::A76XX_RESPONSE_MATCH_1ST : {
+                _modem->streamWrite(topic);
+                _modem->streamFlush();
+                if (_modem->waitResponse("+CMQTTSUB: ", 9000, false, true) == Response_t::A76XX_RESPONSE_MATCH_1ST) {
+                    _modem->streamFind(',');
+                    return _modem->streamParseIntClear();
+                } else {
+                    return A76XX_GENERIC_ERROR;
+                }
+            }
+            case Response_t::A76XX_RESPONSE_MATCH_2ND : {
+                _modem->streamFind(',');
+                return _modem->streamParseIntClear();
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
+    }
+
 };
 
 #endif A76XX_MQTT_CMDS_H_
