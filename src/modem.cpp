@@ -272,6 +272,7 @@ uint32_t A76XX::getUnixTime(bool UTC) {
 
 Response_t A76XX::waitResponse(const char* match_1,
                                const char* match_2,
+                               const char* match_3,
                                int timeout,
                                bool match_OK,
                                bool match_ERROR) {
@@ -284,12 +285,18 @@ Response_t A76XX::waitResponse(const char* match_1,
     while (millis() - tstart < timeout) {
         if (streamAvailable() > 0) {
             data += static_cast<char>(streamRead());
-            if (data.endsWith(match_1) == true)
+            if (match_1 != NULL && data.endsWith(match_1) == true)
                 return Response_t::A76XX_RESPONSE_MATCH_1ST;
-            if (data.endsWith(match_2) == true)
+
+            if (match_2 != NULL && data.endsWith(match_2) == true)
                 return Response_t::A76XX_RESPONSE_MATCH_2ND;
+
+            if (match_3 != NULL && data.endsWith(match_3) == true)
+                return Response_t::A76XX_RESPONSE_MATCH_3RD;
+
             if (match_ERROR && data.endsWith(RESPONSE_ERROR) == true)
                 return Response_t::A76XX_RESPONSE_ERROR;
+
             if (match_OK && data.endsWith(RESPONSE_OK) == true)
                 return Response_t::A76XX_RESPONSE_OK;
         }
@@ -298,21 +305,25 @@ Response_t A76XX::waitResponse(const char* match_1,
     return Response_t::A76XX_RESPONSE_TIMEOUT;
 }
 
+Response_t A76XX::waitResponse(const char* match_1,
+                               const char* match_2,
+                               int timeout,
+                               bool match_OK,
+                               bool match_ERROR) {
+    return waitResponse(match_1, match_2, NULL, timeout, match_OK, match_ERROR);
+}
+
 Response_t A76XX::waitResponse(const char* match_1, 
                                int timeout,
                                bool match_OK,
                                bool match_ERROR) {
-    return waitResponse(match_1,
-                        "_ThIs_Is_AlMoSt_NeVeR_GoNnA_MaTcH_2_",
-                        timeout, match_OK, match_ERROR);
+    return waitResponse(match_1, NULL, NULL, timeout, match_OK, match_ERROR);
 }
 
 Response_t A76XX::waitResponse(int timeout,
                                bool match_OK,
                                bool match_ERROR) {
-    return waitResponse("_ThIs_Is_AlMoSt_NeVeR_GoNnA_MaTcH_1_",
-                        "_ThIs_Is_AlMoSt_NeVeR_GoNnA_MaTcH_2_",
-                        timeout, match_OK, match_ERROR);
+    return waitResponse(NULL, NULL, NULL, timeout, match_OK, match_ERROR);
 }
 
 int32_t A76XX::streamParseIntClear(uint32_t timeout) {
