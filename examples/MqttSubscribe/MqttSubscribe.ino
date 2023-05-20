@@ -28,7 +28,6 @@ A76XXMQTTClient mqtt(modem, clientID, use_ssl);
 // configuration for serial port to simcom module (check your board!)
 #define PIN_TX   26
 #define PIN_RX   27
-#define PIN_RI   33
 
 void setup() {
     // begin serial port
@@ -39,8 +38,6 @@ void setup() {
 
     // wait a little so we can see the output
     delay(3000);
-
-    pinMode(PIN_RI, INPUT);
 
     Serial.print("Waiting for modem ... ");
     if (modem.init() == false) {
