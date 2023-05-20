@@ -125,10 +125,25 @@ void loop() {
     // running on another core. If messages are received more quickly than the
     // processing task can process them, some messages might get dropped. Creating
     // a larger queue that can store more messages might alleviate such issues.
-    if (mqtt.checkMessage()) {
-        MQTTMessage_t msg = mqtt.getLastMessage();
-        xQueueSend(queue, &msg, 0);
-    }
+    A76XXURC_t urc = modem.listen(1000);
+    
+    switch (urc) {
+        case A76XXURC_t::MQTT_HAS_MESSAGE : {
+            MQTTMessage_t msg = modem.MQTT_GetMessage();
+            xQueueSend(queue, &msg, 0);
+            break;
+        }
 
-    // here we can check the network connection is alive ...
+        case A76XXURC_t::MQTT_CONNECTION_LOST : {
+            break;
+        }
+
+        case A76XXURC_t::PDP_DETACH : {
+            break;
+        }
+
+        case A76XXURC_t::NONE : {
+            // no-op
+        }
+    }
 }
