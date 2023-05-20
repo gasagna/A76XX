@@ -12,6 +12,18 @@ class ModemSerial {
 
   public:
 
+    /*
+        @brief Construct a ModemSerial object.
+
+        @details This is a standard Arduino Serial object on steroids, with 
+            additional functionality to send AT commands and parse the response
+            from the module.
+
+        @param [IN] stream The underlying serial object. It must be initialized 
+            externally by the user with, e.g., a call to begin, with the appropriate 
+            TX and RX pins. The modem cannot be used if the serial connection is 
+            not established.
+    */
     ModemSerial(Stream& stream)
         : _stream(stream) {}
 

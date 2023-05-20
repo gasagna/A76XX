@@ -88,8 +88,9 @@ void setup() {
         if (mqtt.checkMessage()) {
             MQTTMessage_t msg = mqtt.getLastMessage();
             Serial.println("Received message ...");
-            Serial.print("Topic: "); Serial.println(msg.topic);
-            Serial.print("Payload: "); Serial.println(msg.payload);
+            Serial.print("  topic: "); Serial.println(msg.topic);
+            Serial.print("  payload: "); Serial.println(msg.payload);
+            delay(100);
         }
     }
 

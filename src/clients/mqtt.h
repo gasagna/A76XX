@@ -120,10 +120,38 @@ class A76XXMQTTClient : public A76XXSecureClient {
                  bool retained = false,
                  bool dup = false);
 
+    /*
+        @brief Subscribe to a topic.
+
+        @param [IN] topic The topic to subscribe to.
+        @param [IN] qos The quality of service of the subscription. Default is 0.
+        @return True on successful subscription, false otherwise.
+    */
     bool subscribe(const char* topic, uint8_t qos = 0);
 
+    /*
+        @brief Check if a message has been received.
+
+        @details This is a blocking function that waits for data available from 
+            the module serial connection and parses MQTT messages, if any. You
+            should call this function as often as possible to avoid missing 
+            any messages.
+
+        @param [IN] timeout Return if no message is received within this time in 
+            milliseconds. Default is 100 ms.
+        @return True if a message is available.
+    */
     bool checkMessage(uint32_t timeout = 100);
 
+    /*
+        @brief Get last message received.
+
+        @details Calling this function repeatedly returns the same message. To avoid 
+            duplicate messages call this function only once after `checkMessage` has
+            returned true.
+
+        @return A MQTTMessage_t object, with fields `topic` and `payload`.
+    */
     MQTTMessage_t getLastMessage(); 
 
     /*
