@@ -2,7 +2,7 @@
 #include <A76XX.h>
 
 // dump all communication with the module to the standard serial port
-#define DEBUG_AT true
+#define DEBUG_AT false
 
 // Use the correct `Serial` object to connect to the simcom module
 #if DEBUG_AT
@@ -85,12 +85,12 @@ void setup() {
     Serial.println("done");
 
     while (true) {
-        if (mqtt.hasMessage()) {
+        if (mqtt.checkMessage()) {
             MQTTMessage_t msg = mqtt.getLastMessage();
             Serial.println("Received message ...");
             Serial.print("Topic: "); Serial.println(msg.topic);
             Serial.print("Payload: "); Serial.println(msg.payload);
-        }   
+        }
     }
 
     Serial.print("Powering off ... ");

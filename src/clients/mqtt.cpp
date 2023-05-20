@@ -6,7 +6,10 @@ A76XXMQTTClient::A76XXMQTTClient(A76XX& modem, const char* clientID, bool use_ss
     , _clientID(clientID)
     , _use_ssl(use_ssl)
     , _client_index(0)
-    , _session_id(0) {}
+    , _session_id(0) {
+        // enable parsing MQTT URCs
+        _serial.MQTTEnableURCParsing();
+    }
 
 bool A76XXMQTTClient::begin() {
     // start
@@ -101,8 +104,8 @@ bool A76XXMQTTClient::subscribe(const char* topic, uint8_t qos) {
     return true;
 }
 
-bool A76XXMQTTClient::hasMessage() {
-    return _serial.MQTTHasMessage();
+bool A76XXMQTTClient::checkMessage(uint32_t timeout) {
+    return _serial.MQTTCheckMessage(timeout);
 }
 
 MQTTMessage_t A76XXMQTTClient::getLastMessage() {

@@ -122,7 +122,7 @@ class A76XXMQTTClient : public A76XXSecureClient {
 
     bool subscribe(const char* topic, uint8_t qos = 0);
 
-    bool hasMessage();
+    bool checkMessage(uint32_t timeout = 100);
 
     MQTTMessage_t getLastMessage(); 
 

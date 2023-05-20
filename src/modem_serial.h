@@ -11,6 +11,7 @@ class ModemSerial {
     bool                    _mqtt_has_message;
 
   public:
+
     ModemSerial(Stream& stream)
         : _stream(stream) {}
 
@@ -53,6 +54,8 @@ class ModemSerial {
                     // parse message 
                     if (data.endsWith("+CMQTTRXSTART: ")) {
                         MQTTParseMessage();
+                        _mqtt_has_message = true;
+                        return Response_t::A76XX_HAS_MQTT_MESSAGE;
                     }
                     // execute callback if connection is lost
                     // if (data.endsWith("+CMQTTNONET") || data.endsWith("+CMQTTCONNLOST")) {
@@ -247,11 +250,21 @@ class ModemSerial {
         return _stream.readBytes(args...); 
     }
 
-    bool MQTTHasMessage() {
+    void MQTTEnableURCParsing() {
+        _mqtt_enabled = true;
+    }
+
+    void MQTTDisableURCParsing() {
+        _mqtt_enabled = false;
+    }
+
+    bool MQTTCheckMessage(uint32_t timeout) {
+        waitResponse(timeout);
         return _mqtt_has_message;
     }
 
     MQTTMessage_t MQTTGetLastMessage() {
+        _mqtt_has_message = false;
         return _mqtt_msg;
     }
 
@@ -292,9 +305,6 @@ class ModemSerial {
         }
 
         waitResponse("+CMQTTRXEND: "); find('\n');
-
-        // set flag
-        _mqtt_has_message = true;
     }
 
 };
