@@ -30,7 +30,7 @@ class StaticQueue {
         @param [in] element The element to append to the queue.
         @return True on successful push, false if the queue is full.
     */
-    bool pushEnd(T element) {
+    bool pushEnd(T& element) {
         // attempt to make space
         if (rear == N && front > 0) {
             _shiftLeft();
