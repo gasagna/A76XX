@@ -21,7 +21,7 @@ class StaticQueue {
     StaticQueue()
         : front(0)
         , rear(0) {}
-    
+
     /*
         @brief Add an element to the queue. When the queue is full
             new elements are dropped. A copy of the input element
@@ -69,30 +69,30 @@ class StaticQueue {
 
     /*
         @brief Get a copy of element at location i.
-        @details No error checking is done. Mostly used for testing.
+        @details No error checking is done.
     */
-    T peek(uint32_t i) { 
-        return data[i]; 
+    T peek(uint32_t i) {
+        return data[i];
     }
 
     /*
         @brief Index of first available element.
     */
-    int32_t begin() { 
-        return front; 
+    int32_t begin() {
+        return front;
     }
 
     /*
         @brief Index of first slot available.
     */
-    int32_t end() { 
-        return rear; 
+    int32_t end() {
+        return rear;
     }
 
   private:
     /*
         @brief Shift data left so that the first used slot is again at index 0.
-    */ 
+    */
     void _shiftLeft() {
         for (int32_t i = front; i < rear; i++) {
             memcpy(&data[i - front], &data[i], sizeof(T));
