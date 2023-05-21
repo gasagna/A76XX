@@ -18,9 +18,9 @@ class StaticQueue {
     /*
         @brief Constructor.
     */
-    StaticQueue()
-        : front(0)
-        , rear(0) {}
+    StaticQueue() {
+        empty();
+    }
 
     /*
         @brief Add an element to the queue. When the queue is full
@@ -65,6 +65,13 @@ class StaticQueue {
     */
     int32_t available() {
         return rear - front;
+    }
+
+    /*
+        @brief Return the number of elements available in the queue.
+    */
+    void empty() {
+        rear  = 0; front = 0;
     }
 
     /*
