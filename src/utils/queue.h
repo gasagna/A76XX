@@ -8,7 +8,7 @@ template <typename T, size_t N>
 class StaticQueue {
   private:
     // store data in a standard array
-    std::array<T, N>   data;
+    T               data[N];
     // index of the first used slot (can be zero with no elements)
     int32_t           front;
     // index of the first available slot (can be N)
