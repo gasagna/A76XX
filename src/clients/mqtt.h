@@ -1,11 +1,41 @@
 #ifndef A76XX_MQTT_CLIENT_H_
 #define A76XX_MQTT_CLIENT_H_
 
+class MQTTOnMessageRx : public EventHandler_t {
+  public:
+    StaticQueue<MQTTMessage_t, MQTT_MESSAGE_SIZE>  messageQueue;
+    
+    MQTTOnMessageRx()
+        : EventHandler_t(A76XXURC_t::MQTT_MESSAGE_RX, "+CMQTTRXSTART: ") {}
+    
+    void process(ModemSerial* serial);
+};
+
+class MQTTOnConnectionLost : public EventHandler_t {
+  public:
+    MQTTOnConnectionLost()
+        : EventHandler_t(A76XXURC_t::MQTT_CONNECTION_LOST, "+CMQTTCONNLOST: ") {}
+    
+    void process(ModemSerial* serial) {}
+};
+
+class MQTTOnNoNet : public EventHandler_t {
+  public:
+    MQTTOnNoNet()
+        : EventHandler_t(A76XXURC_t::MQTT_NO_NET, "+CMQTTNONET: ") {}
+    
+    void process(ModemSerial* serial) {}
+};
+
+
 class A76XXMQTTClient : public A76XXSecureClient {
   private:
-    MQTTCommands                 _mqtt_cmds;
-    const char*                   _clientID;
-    bool                           _use_ssl;
+    MQTTCommands                                     _mqtt_cmds;
+    const char*                                       _clientID;
+    bool                                               _use_ssl;
+    MQTTOnMessageRx                      _on_message_rx_handler;
+    MQTTOnConnectionLost            _on_connection_lost_handler;
+    MQTTOnNoNet                              _on_no_net_handler;
 
     // these two are set to zero by default until a use
     // case for allowing these to change comes up
@@ -141,7 +171,7 @@ class A76XXMQTTClient : public A76XXSecureClient {
             milliseconds. Default is 100 ms.
         @return True if a message is available.
     */
-    bool checkMessage(uint32_t timeout = 100);
+    uint32_t messageAvailable();
 
     /*
         @brief Get last message received.
@@ -152,7 +182,7 @@ class A76XXMQTTClient : public A76XXSecureClient {
 
         @return A MQTTMessage_t object, with fields `topic` and `payload`.
     */
-    MQTTMessage_t getLastMessage(); 
+    MQTTMessage_t getMessage();
 
     /*
         @brief Check if the connection with the broker is active or not.

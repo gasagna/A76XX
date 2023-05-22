@@ -3,12 +3,10 @@
 
 class ModemSerial {
   private:
-    Stream&                           _stream;
-    
-    // TODO use a queue
-    MQTTMessage_t                   _mqtt_msg;
-    bool                        _mqtt_enabled;
-    bool                    _mqtt_has_message;
+    Stream&                                                        _stream;
+    EventHandler_t*              _event_handlers[A76XX_MAX_EVENT_HANDLERS];
+    uint8_t                                            _num_event_handlers;
+    StaticQueue<A76XXURC_t, A76XX_URC_QUEUE_SIZE>        _events_urc_queue;
 
   public:
 
@@ -25,7 +23,8 @@ class ModemSerial {
             not established.
     */
     ModemSerial(Stream& stream)
-        : _stream(stream) {}
+        : _stream(stream) 
+        , _num_event_handlers(0) {}
 
     /*
         @brief Wait for modem to respond.
@@ -61,20 +60,12 @@ class ModemSerial {
             if (available() > 0) {
                 data += static_cast<char>(read());
 
-                // check if we have an MQTT URCs first, then continue
-                if (_mqtt_enabled == true) {
-                    // parse message 
-                    if (data.endsWith("+CMQTTRXSTART: ")) {
-                        MQTTParseMessage();
-                        _mqtt_has_message = true;
-                        return Response_t::A76XX_HAS_MQTT_MESSAGE;
+                // parse modem output for any URCs that we need to process
+                for (uint8_t i = 0; i < _num_event_handlers; i++) {
+                    if (data.endsWith(_event_handlers[i]->match_string)) {
+                        _event_handlers[i]->process(this);
+                        _events_urc_queue.pushEnd(_event_handlers[i]->urc);
                     }
-                    // execute callback if connection is lost
-                    // if (data.endsWith("+CMQTTNONET") || data.endsWith("+CMQTTCONNLOST")) {
-                        // if (_mqtt_on_connection_lost) {
-                            // _mqtt_on_connection_lost();
-                        // };
-                    // }
                 }
 
                 if (match_1 != NULL && data.endsWith(match_1) == true)
@@ -163,6 +154,21 @@ class ModemSerial {
         return waitResponse(NULL, NULL, NULL, timeout, match_OK, match_ERROR);
     }
 
+    A76XXURC_t listen(uint32_t timeout = 100) {
+        if (_events_urc_queue.available() == 0) {
+            waitResponse(timeout, false, false);
+        }
+
+        if (_events_urc_queue.available() > 0) {
+            return _events_urc_queue.popFront();
+        }
+
+        return A76XXURC_t::NONE;
+    }
+
+    void registerEventHandler(EventHandler_t* handler) {
+        _event_handlers[_num_event_handlers++] = handler;
+    }
 
     /*
         @brief Send data to the command to the module, with a trailing carriage return,
@@ -261,64 +267,6 @@ class ModemSerial {
     uint16_t readBytes(ARGS... args) { 
         return _stream.readBytes(args...); 
     }
-
-    void MQTTEnableURCParsing() {
-        _mqtt_enabled = true;
-    }
-
-    void MQTTDisableURCParsing() {
-        _mqtt_enabled = false;
-    }
-
-    bool MQTTCheckMessage(uint32_t timeout) {
-        waitResponse(timeout);
-        return _mqtt_has_message;
-    }
-
-    MQTTMessage_t MQTTGetLastMessage() {
-        _mqtt_has_message = false;
-        return _mqtt_msg;
-    }
-
-    void MQTTParseMessage() {
-        // +CMQTTRXSTART: 0,22,7
-        //
-        // +CMQTTRXTOPIC: 0,22
-        // _this_is_a_test_topic_
-        // +CMQTTRXPAYLOAD: 0,7
-        // testone
-        // +CMQTTRXEND: 0
-
-        // we read the data until "+CMQTTRXSTART: "
-        // skip the client index
-        find(','); uint16_t   topic_length = parseInt();
-        find(','); uint16_t payload_length = parseInt();
-
-        waitResponse("+CMQTTRXTOPIC: "); find('\n');
-        if (topic_length < sizeof(_mqtt_msg.topic)) {
-            readBytes(_mqtt_msg.topic, topic_length);
-            _mqtt_msg.topic[topic_length] = '\0';
-        } else {
-            // read what we can't store, then overwrite
-            readBytes(_mqtt_msg.topic, topic_length - sizeof(_mqtt_msg.topic) + 1);
-            readBytes(_mqtt_msg.topic, sizeof(_mqtt_msg.topic) - 1);
-            _mqtt_msg.topic[sizeof(_mqtt_msg.topic)] = '\0';
-        }
-
-        waitResponse("+CMQTTRXPAYLOAD: "); find('\n');
-        if (payload_length < sizeof(_mqtt_msg.payload)) {
-            readBytes(_mqtt_msg.payload, payload_length);
-            _mqtt_msg.payload[payload_length] = '\0';
-        } else {
-            // read what we can't store, then overwrite
-            readBytes(_mqtt_msg.payload, payload_length - sizeof(_mqtt_msg.payload) + 1);
-            readBytes(_mqtt_msg.payload, sizeof(_mqtt_msg.payload) - 1);
-            _mqtt_msg.payload[sizeof(_mqtt_msg.payload)] = '\0';
-        }
-
-        waitResponse("+CMQTTRXEND: "); find('\n');
-    }
-
 };
 
 

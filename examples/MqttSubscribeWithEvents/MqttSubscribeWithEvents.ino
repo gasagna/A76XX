@@ -2,7 +2,7 @@
 #include <A76XX.h>
 
 // dump all communication with the module to the standard serial port
-#define DEBUG_AT false
+#define DEBUG_AT true
 
 // Use the correct `Serial` object to connect to the simcom module
 #if DEBUG_AT
@@ -23,36 +23,11 @@ const bool  use_ssl       = false;
 const char* apn           = "simbase";
 
 A76XX modem(SerialAT);
-A76XXMQTTClient mqtt(modem, clientID, use_ssl);
+A76XXMQTTClient mqtt_client(modem, clientID, use_ssl);
 
 // configuration for serial port to simcom module (check your board!)
 #define PIN_TX   26
 #define PIN_RX   27
-
-// queue for intertask communication
-QueueHandle_t queue;
-
-// This function is an example of what the processing task might do. We simply 
-// wait forever for MQTT messages to appear in the queue and we then simply
-// print them on the serial port. Other logic can be implemented too.
-// The important thing not to forget is to use vTaskDelay as often as possible
-// to avoid triggering the ESP32 watchdog.
-void processMQTTMessage(void* parameter) {
-    MQTTMessage_t msg;
-    while (true) {
-        while (uxQueueMessagesWaiting(queue) > 0) {
-            xQueueReceive(queue, &msg, 0);
-            Serial.println("Received message ...");
-            Serial.print("  topic: "); Serial.println(msg.topic);
-            Serial.print("  payload: "); Serial.println(msg.payload);
-
-            // allow other tasks on CPU0 to run (e.g. petting the watchdog), plus
-            // simulate some delay which might result in some messages being dropped
-            vTaskDelay(500);
-        }
-        vTaskDelay(100);
-    }
-}
 
 void setup() {
     // begin serial port
@@ -86,37 +61,25 @@ void setup() {
     Serial.println("connected");
 
     Serial.print("Starting client  ... ");
-    if (mqtt.begin() == false) {
+    if (mqtt_client.begin() == false) {
         Serial.println("error");
         while (true) {}
     }
     Serial.println("done");
 
     Serial.print("Connecting to mosquitto test server  ... ");
-    if (mqtt.connect(server, port, clean_session, keepalive) == false) {
+    if (mqtt_client.connect(server, port, clean_session, keepalive) == false) {
         Serial.println("error");
         while (true) {}
     }
     Serial.println("done");
 
     Serial.print("Subscribe to topic  ... ");
-    if (mqtt.subscribe("_this_is_a_test_topic_") == false) {
+    if (mqtt_client.subscribe("_this_is_a_test_topic_") == false) {
         Serial.println("error");
         while (true) {}
     }
     Serial.println("done");
-
-    // Create a queue that can store up to 20 messages
-    queue = xQueueCreate(20, sizeof(MQTTMessage_t));
-
-    // Create task on another CPU to processes packets in the queue
-    xTaskCreatePinnedToCore(processMQTTMessage,   /* Task function. */
-                            "processMQTTMessage", /* String with name of task. */
-                            10000,                /* Stack size in words. */
-                            NULL,                 /* Parameter passed as input of the task */
-                            1,                    /* Priority of the task. */
-                            NULL,                 /* Task handle. */
-                            0);                   /* CPU Core. */
 }
 
 void loop() {
@@ -125,25 +88,38 @@ void loop() {
     // running on another core. If messages are received more quickly than the
     // processing task can process them, some messages might get dropped. Creating
     // a larger queue that can store more messages might alleviate such issues.
-    A76XXURC_t urc = modem.listen(1000);
     
+    A76XXURC_t urc = modem.listen(1000);
+    Serial.print(".");
+
     switch (urc) {
-        case A76XXURC_t::MQTT_HAS_MESSAGE : {
-            MQTTMessage_t msg = modem.MQTT_GetMessage();
-            xQueueSend(queue, &msg, 0);
+        case A76XXURC_t::MQTT_MESSAGE_RX : {
+            MQTTMessage_t msg = mqtt_client.getMessage();
+            Serial.println("Received message ...");
+            Serial.print("  topic: ");   Serial.println(msg.topic);
+            Serial.print("  payload: "); Serial.println(msg.payload);
+
+            // shut down the module remotely
+            if (strcmp(msg.payload, "power-off") == 0) {
+                modem.powerOff();
+            }
             break;
         }
 
         case A76XXURC_t::MQTT_CONNECTION_LOST : {
-            break;
+            // esp_restart();
         }
 
-        case A76XXURC_t::PDP_DETACH : {
-            break;
+        case A76XXURC_t::MQTT_NO_NET : {
+            // esp_restart();
         }
 
-        case A76XXURC_t::NONE : {
-            // no-op
+        case A76XXURC_t::CGEV_PDP_DETACH : {
+            // esp_restart();
+        }
+
+        default : {
+            // esp_restart();
         }
     }
 }

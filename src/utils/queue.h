@@ -51,19 +51,14 @@ class StaticQueue {
         @param [OUT] element Copy the first element at this memory location.
         @return True on successful pop, false if the queue is empty.
     */
-    bool popFront(T& element) {
-        if (available() == 0) {
-            return false;
-        }
-        memcpy(&element, &data[front], sizeof(T));
-        front++;
-        return true;
+    T popFront() {
+        return data[front++];
     }
 
     /*
         @brief Return the number of elements available in the queue.
     */
-    int32_t available() {
+    uint32_t available() {
         return rear - front;
     }
 

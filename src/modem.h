@@ -255,6 +255,11 @@ class A76XX {
         @return An unsigned 32 bit integer with the number of seconds since the Epoch.
     */
     uint32_t getUnixTime(bool UTC = true);
+
+    /*
+    
+    */
+    A76XXURC_t listen(uint32_t timeout = 100);
 };
 
 #endif A76XXMODEM_H_

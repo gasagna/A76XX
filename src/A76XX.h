@@ -4,17 +4,29 @@
 #include "Arduino.h"
 #include "time.h"
 
-#ifndef MQTT_PAYLOAD_BUFF_LEN
-    #define MQTT_PAYLOAD_BUFF_LEN 64
+#ifndef A76XX_URC_QUEUE_SIZE
+    #define A76XX_URC_QUEUE_SIZE 10
 #endif
 
-#ifndef MQTT_TOPIC_BUFF_LEN
-    #define MQTT_TOPIC_BUFF_LEN 32
+#ifndef A76XX_MAX_EVENT_HANDLERS
+    #define A76XX_MAX_EVENT_HANDLERS 10
+#endif
+
+#ifndef MQTT_PAYLOAD_BUFFER_LEN
+    #define MQTT_PAYLOAD_BUFFER_LEN 64
+#endif
+
+#ifndef MQTT_TOPIC_BUFFER_LEN
+    #define MQTT_TOPIC_BUFFER_LEN 32
+#endif
+
+#ifndef MQTT_MESSAGE_SIZE
+    #define MQTT_MESSAGE_SIZE 10
 #endif
 
 struct MQTTMessage_t {
-    char topic[MQTT_TOPIC_BUFF_LEN];
-    char payload[MQTT_PAYLOAD_BUFF_LEN];
+    char topic[MQTT_TOPIC_BUFFER_LEN];
+    char payload[MQTT_PAYLOAD_BUFFER_LEN];
 };
 
 enum Response_t {
@@ -80,6 +92,9 @@ enum Response_t {
     }
 
 #include "utils/base64.h"
+#include "utils/queue.h"
+
+#include "event_handlers.h"
 #include "modem_serial.h"
 
 #include "commands/internet_service.h"
