@@ -1,9 +1,24 @@
 #ifndef A76XX_MQTT_CLIENT_H_
 #define A76XX_MQTT_CLIENT_H_
 
+/*
+    @brief Handler of the URC "+CMQTTRXSTART".
+
+    @details This object is responsible of detecting, parsing and storing 
+        incoming MQTT messages sent to the device. It has one important 
+        member, "messageQueue", i.e. a StaticQueue object used to store 
+        incoming messages if they arrive at a high rate. The size of this
+        queue is define by the variable MQTT_MESSAGE_QUEUE_SIZE. The maximum 
+        length of the topic and payload of MQTT messages shored in this queue
+        if defined by the variables MQTT_TOPIC_BUFFER_LEN and 
+        MQTT_PAYLOAD_BUFFER_LEN, respectively.
+
+        It produces the URC A76XXURC_t::MQTT_MESSAGE_RX when A76XX::listen
+        is called.
+*/
 class MQTTOnMessageRx : public EventHandler_t {
   public:
-    StaticQueue<MQTTMessage_t, MQTT_MESSAGE_SIZE>  messageQueue;
+    StaticQueue<MQTTMessage_t, MQTT_MESSAGE_QUEUE_SIZE>  messageQueue;
     
     MQTTOnMessageRx()
         : EventHandler_t(A76XXURC_t::MQTT_MESSAGE_RX, "+CMQTTRXSTART: ") {}
@@ -11,6 +26,12 @@ class MQTTOnMessageRx : public EventHandler_t {
     void process(ModemSerial* serial);
 };
 
+/*
+    @brief Handler of the URC "+CMQTTCONNLOST".
+
+    @details This is a stateless URC handler. It produces the 
+        URC A76XXURC_t::MQTT_CONNECTION_LOST when A76XX::listen is called.
+*/
 class MQTTOnConnectionLost : public EventHandler_t {
   public:
     MQTTOnConnectionLost()
@@ -19,6 +40,12 @@ class MQTTOnConnectionLost : public EventHandler_t {
     void process(ModemSerial* serial) {}
 };
 
+/*
+    @brief Handler of the URC "+CMQTTNONET".
+
+    @details This is a stateless URC handler. It produces the 
+        URC A76XXURC_t::MQTT_NO_NET when A76XX::listen is called.
+*/
 class MQTTOnNoNet : public EventHandler_t {
   public:
     MQTTOnNoNet()
@@ -160,25 +187,18 @@ class A76XXMQTTClient : public A76XXSecureClient {
     bool subscribe(const char* topic, uint8_t qos = 0);
 
     /*
-        @brief Check if a message has been received.
+        @brief Check if messages have been received.
 
-        @details This is a blocking function that waits for data available from 
-            the module serial connection and parses MQTT messages, if any. You
-            should call this function as often as possible to avoid missing 
-            any messages.
-
-        @param [IN] timeout Return if no message is received within this time in 
-            milliseconds. Default is 100 ms.
-        @return True if a message is available.
+        @return The number of messages available.
     */
     uint32_t messageAvailable();
 
     /*
         @brief Get last message received.
 
-        @details Calling this function repeatedly returns the same message. To avoid 
-            duplicate messages call this function only once after `checkMessage` has
-            returned true.
+        @details You should only call this function if the result of calling
+            A76XXMQTTClient::messageAvailable is greater than zero. The result of 
+            calling this function when no messages are available is undetermined.
 
         @return A MQTTMessage_t object, with fields `topic` and `payload`.
     */

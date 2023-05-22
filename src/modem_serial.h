@@ -154,6 +154,17 @@ class ModemSerial {
         return waitResponse(NULL, NULL, NULL, timeout, match_OK, match_ERROR);
     }
 
+    /*
+        @brief Listen for new data from the serial connection with the module
+            and return any unsolicited result codes found or A76XXURC_t::NONE.
+
+        @details URC are stored internally in a queue. If no URC have been emitted
+            previously, block execution and wait for a new URC.
+
+        @param [IN] timeout Return if no URCs are found within this timeframe in 
+            milliseconds. If an URC code was previouly emitted by the module, 
+            return its code immediately.
+    */
     A76XXURC_t listen(uint32_t timeout = 100) {
         if (_events_urc_queue.available() == 0) {
             waitResponse(timeout, false, false);
@@ -166,6 +177,11 @@ class ModemSerial {
         return A76XXURC_t::NONE;
     }
 
+    /* 
+        @brief Register a new event handler.
+
+        @param [IN] Pointer to a subclass of EventHandler_t.
+    */
     void registerEventHandler(EventHandler_t* handler) {
         _event_handlers[_num_event_handlers++] = handler;
     }

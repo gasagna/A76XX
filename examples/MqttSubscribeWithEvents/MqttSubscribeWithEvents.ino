@@ -83,12 +83,9 @@ void setup() {
 }
 
 void loop() {
-    // main loop – we parse messages as fast as we can from the serial interface
-    // with the SIMCOM module, and put them in a queue for the processing task
-    // running on another core. If messages are received more quickly than the
-    // processing task can process them, some messages might get dropped. Creating
-    // a larger queue that can store more messages might alleviate such issues.
-    
+    // main loop – we parse the serial connection with the module and wait 
+    // for URCs to be emitted.
+
     A76XXURC_t urc = modem.listen(1000);
     Serial.print(".");
 
@@ -107,19 +104,14 @@ void loop() {
         }
 
         case A76XXURC_t::MQTT_CONNECTION_LOST : {
-            // esp_restart();
+            // implement some logic here to handle lost connections
         }
 
         case A76XXURC_t::MQTT_NO_NET : {
-            // esp_restart();
-        }
-
-        case A76XXURC_t::CGEV_PDP_DETACH : {
-            // esp_restart();
+            // implement some logic here to handle no network
         }
 
         default : {
-            // esp_restart();
         }
     }
 }

@@ -20,8 +20,8 @@
     #define MQTT_TOPIC_BUFFER_LEN 32
 #endif
 
-#ifndef MQTT_MESSAGE_SIZE
-    #define MQTT_MESSAGE_SIZE 10
+#ifndef MQTT_MESSAGE_QUEUE_SIZE
+    #define MQTT_MESSAGE_QUEUE_SIZE 10
 #endif
 
 struct MQTTMessage_t {
