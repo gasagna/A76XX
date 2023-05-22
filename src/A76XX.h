@@ -5,29 +5,29 @@
 #include "time.h"
 
 #ifndef A76XX_URC_QUEUE_SIZE
+    /* Controls the size of the queue where URCs are stored */
     #define A76XX_URC_QUEUE_SIZE 10
 #endif
 
 #ifndef A76XX_MAX_EVENT_HANDLERS
+    /* Controls the maximum number of event handlers that are stored in A76XX::ModemSerial  */
     #define A76XX_MAX_EVENT_HANDLERS 10
 #endif
 
 #ifndef MQTT_PAYLOAD_BUFFER_LEN
+    /* Controls the maximum payload size in bytes of an MQTT message */
     #define MQTT_PAYLOAD_BUFFER_LEN 64
 #endif
 
 #ifndef MQTT_TOPIC_BUFFER_LEN
+    /* Controls the maximum topic size of an MQTT message */
     #define MQTT_TOPIC_BUFFER_LEN 32
 #endif
 
 #ifndef MQTT_MESSAGE_QUEUE_SIZE
+    /* Controls the size of the queue to store MQTT message */
     #define MQTT_MESSAGE_QUEUE_SIZE 10
 #endif
-
-struct MQTTMessage_t {
-    char topic[MQTT_TOPIC_BUFFER_LEN];
-    char payload[MQTT_PAYLOAD_BUFFER_LEN];
-};
 
 enum Response_t {
     A76XX_RESPONSE_OK        = 0,
@@ -35,8 +35,7 @@ enum Response_t {
     A76XX_RESPONSE_MATCH_2ND = 2,
     A76XX_RESPONSE_MATCH_3RD = 3,
     A76XX_RESPONSE_ERROR     = 4,
-    A76XX_RESPONSE_TIMEOUT   = 5,
-    A76XX_HAS_MQTT_MESSAGE   = 6
+    A76XX_RESPONSE_TIMEOUT   = 5
 };
 
 #define RESPONSE_OK "OK\r\n"

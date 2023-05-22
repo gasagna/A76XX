@@ -2,6 +2,14 @@
 #define A76XX_MQTT_CLIENT_H_
 
 /*
+    @brief The type of MQTT messages
+*/
+struct MQTTMessage_t {
+    char topic[MQTT_TOPIC_BUFFER_LEN];
+    char payload[MQTT_PAYLOAD_BUFFER_LEN];
+};
+
+/*
     @brief Handler of the URC "+CMQTTRXSTART".
 
     @details This object is responsible of detecting, parsing and storing 
