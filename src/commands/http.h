@@ -39,7 +39,7 @@ class HTTPCommands {
     // HTTPPARA URL
     int8_t configHttpURL(const char* server, uint16_t port, const char* path, bool use_ssl) {
         // add the protocol if not present
-        if (strstr(server, "https://") == NULL || strstr(server, "http://") == NULL) {
+        if (strstr(server, "https://") == NULL && strstr(server, "http://") == NULL) {
             if (use_ssl == true) {
                 _serial.sendCMD("AT+HTTPPARA=\"URL\",", "\"https://", server, ":", port, "/", path, "\"");
             } else {
