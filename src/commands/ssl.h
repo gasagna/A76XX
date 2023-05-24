@@ -1,18 +1,12 @@
 #ifndef A76XX_SSL_CMDS_H_
 #define A76XX_SSL_CMDS_H_
 
-//default certificate names
-#define A76XX_DEFAULT_CACERT_FILENAME      "_A76XX_CACART_DEFAULT_FILENAME_.pem"
-#define A76XX_DEFAULT_CLIENTCERT_FILENAME  "_A76XX_CLIENTCERT_DEFAULT_FILENAME_.pem"
-#define A76XX_DEFAULT_CLIENTKEY_FILENAME   "_A76XX_CLIENTKEY_DEFAULT_FILENAME_.pem"
-#define A76XX_DEFAULT_PASSWORD_FILENAME    "_A76XX_PASSWORD_DEFAULT_FILENAME_.pem"
-
 /*
     @brief Commands in section 19 of the AT command manual version 1.09
 
     Command   | Implemented | Method | Function(s)
     --------- | ----------- | ------ |-----------------
-    CSSLCFG   |      y      |        | cconfigSSLSSL
+    CSSLCFG   |      y      |        | cconfigSSL*
     CCERTDOWN |      y      |        | certDownload
     CCERTLIST |      y      |        | certExists
     CCERTDELE |      y      |        | certDelete

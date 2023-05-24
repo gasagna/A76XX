@@ -1,15 +1,12 @@
 #include "A76XX.h"
 
-A76XXSecureClient::A76XXSecureClient(A76XX& modem) 
+A76XXSecureClient::A76XXSecureClient(A76XX& modem)
     : A76XXBaseClient(modem)
     , _ssl_cmds(_serial)
     , _ssl_ctx_index(0) {}
 
-bool A76XXSecureClient::setCaCert(const char* cacert) {
-    int8_t retcode = _ssl_cmds.certOverwrite(cacert, A76XX_DEFAULT_CACERT_FILENAME);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-    retcode = _ssl_cmds.configSSLCacert(_ssl_ctx_index, A76XX_DEFAULT_CACERT_FILENAME);
+bool A76XXSecureClient::setCaCert(const char* cacertname) {
+    int8_t retcode = _ssl_cmds.configSSLCacert(_ssl_ctx_index, cacertname);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 
     // only server authentication
@@ -19,23 +16,23 @@ bool A76XXSecureClient::setCaCert(const char* cacert) {
     return true;
 }
 
-bool A76XXSecureClient::setClientCertAndKey(const char* clientcert, const char* clientkey, const char* password) {
-    int8_t retcode = _ssl_cmds.certOverwrite(clientcert, A76XX_DEFAULT_CLIENTCERT_FILENAME);
+bool A76XXSecureClient::writeCaCert(const char* cacert, const char* cacertname) {
+    int8_t retcode = _ssl_cmds.certOverwrite(cacert, cacertname);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 
-    retcode = _ssl_cmds.configSSLClientcert(_ssl_ctx_index, A76XX_DEFAULT_CLIENTCERT_FILENAME);
+    return setCaCert(cacertname);
+}
+
+bool A76XXSecureClient::setClientCertAndKey(const char* clientcertname,
+                                            const char* clientkeyname,
+                                            const char* passwordname) {
+    int8_t retcode = _ssl_cmds.configSSLClientcert(_ssl_ctx_index, clientcertname);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 
-    retcode = _ssl_cmds.certOverwrite(clientkey, A76XX_DEFAULT_CLIENTKEY_FILENAME);
+    retcode = _ssl_cmds.configSSLClientkey(_ssl_ctx_index, clientkeyname);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 
-    retcode = _ssl_cmds.configSSLClientkey(_ssl_ctx_index, A76XX_DEFAULT_CLIENTKEY_FILENAME);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-    retcode = _ssl_cmds.certOverwrite(password, A76XX_DEFAULT_PASSWORD_FILENAME);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
-
-    retcode = _ssl_cmds.configSSLPassword(_ssl_ctx_index, A76XX_DEFAULT_PASSWORD_FILENAME);
+    retcode = _ssl_cmds.configSSLPassword(_ssl_ctx_index, passwordname);
     A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
 
     // only client authentication
@@ -45,8 +42,30 @@ bool A76XXSecureClient::setClientCertAndKey(const char* clientcert, const char* 
     return true;
 }
 
-bool A76XXSecureClient::setCerts(const char* cacert, const char* clientcert, const char* clientkey, const char* password) {
-    if (setCaCert(cacert) == false || setClientCertAndKey(clientcert, clientkey, password) == false) {
+bool A76XXSecureClient::writeClientCertAndKey(const char* clientcert,
+                                              const char* clientkey,
+                                              const char* password,
+                                              const char* clientcertname,
+                                              const char* clientkeyname,
+                                              const char* passwordname) {
+    int8_t retcode = _ssl_cmds.certOverwrite(clientcert, clientcertname);
+    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+
+    retcode = _ssl_cmds.certOverwrite(clientkey, clientkeyname);
+    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+
+    retcode = _ssl_cmds.certOverwrite(password, passwordname);
+    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode);
+
+    return setClientCertAndKey(clientcertname, clientkeyname, passwordname);
+}
+
+bool A76XXSecureClient::setCerts(const char* cacertname,
+                                 const char* clientcertname,
+                                 const char* clientkeyname,
+                                 const char* passwordname) {
+    if (setCaCert(cacertname) == false || 
+        setClientCertAndKey(clientcertname, clientkeyname, passwordname) == false) {
         return false;
     }
     // repeat server and client authentication
