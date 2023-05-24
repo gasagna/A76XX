@@ -21,7 +21,7 @@ class A76XXSecureClient : public A76XXBaseClient {
     /*
         @brief Constructor.
 
-        @param [IN] FIXME:
+        @param [IN] An A76XX modem instance.
     */
     A76XXSecureClient(A76XX& modem);
 

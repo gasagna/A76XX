@@ -44,6 +44,7 @@ class A76XXHTTPClient : public A76XXSecureClient {
     /*
         @brief Construct an HTTP client.
 
+        @param [IN] An A76XX modem instance.
         @param [IN] server_name The domain name of the HTTP server to connect to. For instance,
             "https://www.bbc.co.uk" or "www.google.com". When the domain name does not
             start with either "http://" or "https://" the flag `use_ssl` determines whether
