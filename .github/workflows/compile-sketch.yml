@@ -17,5 +17,6 @@ jobs:
           fqbn: "arduino:avr:uno"
           libraries: |
             - name: StreamDebugger
+            - source-path: ./
           sketch-paths: |
             - examples
