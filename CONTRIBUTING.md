@@ -1,0 +1,6 @@
+# How to contribute to this library
+If you are reading this, you might want to add a new feature or fix a bug, so reading these few lines might be of help.
+
+If you want to add new features that would be used at high level, e.g. in a custom sketch,  my suggestion is to start by first implementing wrappers for the required AT commands. Have a look at the header files in the folder `src/commands` for some examples. We follow the structure of SIMCOM's AT command manual and roughly each chapter corresponds to a header file. Add any commands you need in the existing header files, or make a new one. Commands functions should return an `int8_t` code signalling if the operation has been successful or not. If an ouput is expected from an AT command, it is best to pass a pointer argument which will be used to store the result.
+
+When the low-level AT commands have been implemented, high-level functionality can be added either to the `A76XX` modem class (if conceptually the new functionality is a property of the modem, e.g. `GPRSConnect), or in dedicated client classes.
