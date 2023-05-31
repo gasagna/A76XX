@@ -1,15 +1,15 @@
 #include "A76XX.h"
 
 A76XX::A76XX(Stream& stream)
-    : _serial(stream)
+    : serial(stream)
     , _last_error_code(0)
-    , internetService(_serial)
-    , network(_serial)
-    , packetDomain(_serial)
-    , serialInterface(_serial)
-    , sim(_serial)
-    , statusControl(_serial)
-    , v25ter(_serial) {}
+    , internetService(serial)
+    , network(serial)
+    , packetDomain(serial)
+    , serialInterface(serial)
+    , sim(serial)
+    , statusControl(serial)
+    , v25ter(serial) {}
 
 int8_t A76XX::getLastError() {
     return _last_error_code;
@@ -171,8 +171,8 @@ bool A76XX::restart(uint32_t timeout) {
 bool A76XX::waitATUnresponsive(uint32_t timeout) {
     uint32_t tstart = millis();
     while (millis() - tstart < timeout) {
-        _serial.sendCMD("AT");
-        if (_serial.waitResponse(1000) == Response_t::A76XX_RESPONSE_TIMEOUT) {
+        serial.sendCMD("AT");
+        if (serial.waitResponse(1000) == Response_t::A76XX_RESPONSE_TIMEOUT) {
             return true;
         }
         delay(100);
@@ -183,8 +183,8 @@ bool A76XX::waitATUnresponsive(uint32_t timeout) {
 bool A76XX::waitATResponsive(uint32_t timeout) {
     uint32_t tstart = millis();
     while (millis() - tstart < timeout) {
-        _serial.sendCMD("AT");
-        if (_serial.waitResponse(1000) == Response_t::A76XX_RESPONSE_OK) {
+        serial.sendCMD("AT");
+        if (serial.waitResponse(1000) == Response_t::A76XX_RESPONSE_OK) {
             return true;
         }
         delay(100);
@@ -199,8 +199,8 @@ bool A76XX::sleep() {
 }
 
 bool A76XX::wakeUp() {
-    _serial.sendCMD("AT");
-    return _serial.waitResponse() == Response_t::A76XX_RESPONSE_OK;
+    serial.sendCMD("AT");
+    return serial.waitResponse() == Response_t::A76XX_RESPONSE_OK;
 }
 
 String A76XX::modelIdentification() {
@@ -269,5 +269,5 @@ uint32_t A76XX::getUnixTime(bool UTC) {
 }
 
 A76XXURC_t A76XX::listen(uint32_t timeout) {
-    return _serial.listen(timeout);
+    return serial.listen(timeout);
 }

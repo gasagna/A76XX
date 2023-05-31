@@ -1,7 +1,7 @@
 #include "A76XX.h"
 
 A76XXBaseClient::A76XXBaseClient(A76XX& modem)
-    : _serial(modem._serial)
+    : _serial(modem.serial)
     , _last_error_code(0) {}
 
 int8_t A76XXBaseClient::getLastError() {
