@@ -7,13 +7,7 @@ on:
 jobs:
   compile-sketch:
     runs-on: ubuntu-latest
-    include:
-        - board:
-            platform-name: esp32:esp32
-          platforms: |
-            # Install ESP32 platform via Boards Manager
-            - name: esp32:esp32
-              source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+          
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -25,7 +19,10 @@ jobs:
         uses: arduino/compile-sketches@v1
         with:
           fqbn: "esp32:esp32:esp32"
-          platform-name: esp32:esp32
+          platforms: |
+            # Install ESP32 platform via Boards Manager
+            - name: esp32:esp32
+              source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
           libraries: |
             - name: StreamDebugger
             - source-path: ./
