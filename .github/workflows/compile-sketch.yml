@@ -20,8 +20,8 @@ jobs:
         with:
           cli-compile-flags: |
             - -v
-            - --build-property 
-            - compiler.cpp.extra_flags=-Wno-error
+            - --warnings
+            - none
           fqbn: "esp32:esp32:esp32"
           platforms: |
             - name: esp32:esp32
