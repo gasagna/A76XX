@@ -26,8 +26,7 @@ void setup() {
     queue.pushEnd(3);
     print(queue);
 
-    uint8_t out;
-    queue.popFront(out);
+    queue.popFront();
     print(queue);
 
     queue.pushEnd(4);
@@ -39,22 +38,22 @@ void setup() {
     queue.pushEnd(6);
     print(queue);
 
-    queue.popFront(out);
+    queue.popFront();
     print(queue);
 
     queue.pushEnd(7);
     print(queue);
 
-    queue.popFront(out);
+    queue.popFront();
     print(queue);
 
-    queue.popFront(out);
+    queue.popFront();
     print(queue);
 
-    queue.popFront(out);
+    queue.popFront();
     print(queue);
 
-    queue.popFront(out);
+    queue.popFront();
     print(queue);
     
     queue.pushEnd(8);

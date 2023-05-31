@@ -19,7 +19,6 @@ jobs:
         uses: arduino/compile-sketches@v1
         with:
           cli-compile-flags: |
-            - -v
             - --warnings
             - none
           fqbn: "esp32:esp32:esp32"
