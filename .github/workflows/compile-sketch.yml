@@ -19,7 +19,7 @@ jobs:
         uses: arduino/compile-sketches@v1
         with:
           cli-compile-flags: |
-            - "-Wno-error"
+            - "--build-property 'compiler.cpp.extra_flags=-Wno-error'
           fqbn: "esp32:esp32:esp32"
           platforms: |
             - name: esp32:esp32
