@@ -1,0 +1,10 @@
+TODO
+- implement GNSS commands
+- add hardware commands
+- implement WEBSOCKETS commands and client
+- make doxygen docs
+- add to github pages
+- expose serial to modem
+
+DONE
+24/05/2023 - do not always overwrite the certificate
