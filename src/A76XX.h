@@ -104,6 +104,7 @@ enum Response_t {
 #include "commands/v25ter.h"
 #include "commands/http.h"
 #include "commands/mqtt.h"
+#include "commands/coap.h"
 #include "commands/ssl.h"
 #include "commands/sim.h"
 
@@ -113,5 +114,6 @@ enum Response_t {
 #include "clients/secure.h"
 #include "clients/mqtt.h"
 #include "clients/http.h"
+#include "clients/coap.h"
 
 #endif A76XX_H_
