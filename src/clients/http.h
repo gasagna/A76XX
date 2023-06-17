@@ -116,8 +116,9 @@ class A76XXHTTPClient : public A76XXSecureClient {
 
         @param [IN] path The path to the resource, EXCLUDING the leading "/".
         @param [IN] accept The value of the "Accept" header. If NULL, it defaults to "*\/*".
-        @return True on a successful operation. If false, use getLastError() to get
-            details on the error.
+        @return True if the AT commands required for the operation have been successful. 
+            If false, use getLastError() to get details on the error. Also, use
+            getResponseStatusCode to get the response status code.
     */
     bool get(const char* path, const char* accept = NULL) {
         return request(0, path, NULL, NULL, accept);
@@ -131,8 +132,9 @@ class A76XXHTTPClient : public A76XXSecureClient {
         @param [IN] content_type The value of the "Content-Type" header. If NULL, it
             defaults to "text/plain".
         @param [IN] accept The value of the "Accept" header. If NULL, it defaults to "*\/*".
-        @return True on a successful operation. If false, use getLastError() to get
-            details on the error.
+        @return True if the AT commands required for the operation have been successful. 
+            If false, use getLastError() to get details on the error. Also, use
+            getResponseStatusCode to get the response status code.
     */
     bool post(const char* path,
               const char* content_body,
@@ -186,6 +188,9 @@ class A76XXHTTPClient : public A76XXSecureClient {
         @param [IN] content_type The value of the "Content-Type" header. If NULL, it
             defaults to "text/plain".
         @param [IN] accept The value of the "Accept" header. If NULL, it defaults to "*\/*".
+
+        @return True if the AT commands required to send the request have been successful.
+            Use getResponseStatusCode to check the request has actually been successful.
     */
     bool request(uint8_t method,
                  const char* path,
