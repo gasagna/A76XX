@@ -8,8 +8,8 @@
     Command       | Implemented | Method     | Function(s)
     ------------- | ----------- | ---------- | -----------
     AT+CHTPSERV   |             |            |
-    AT+CHTPUPDATE |             | WRITE/EXEC | setNTPParams,
-    AT+CNTP       |     y       |            |
+    AT+CHTPUPDATE |             |            |
+    AT+CNTP       |     y       | WRITE/EXEC | setNTPParams, updateSystemTime
 */
 
 class InternetServiceCommands {
