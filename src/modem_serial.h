@@ -256,6 +256,10 @@ class ModemSerial {
         return _stream.parseInt(); 
     }
 
+    float parseFloat() { 
+        return _stream.parseFloat(); 
+    }
+
     void flush() { 
         _stream.flush(); 
     }

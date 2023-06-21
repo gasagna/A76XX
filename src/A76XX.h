@@ -50,6 +50,8 @@ enum Response_t {
 #define A76XX_MQTT_ALREADY_STARTED           -5
 #define A76XX_SIM_PIN_REQUIRED               -6
 #define A76XX_SIM_PIN_MODEM_ERROR            -7
+#define A76XX_GNSS_NOT_READY                 -8
+#define A76XX_GNSS_NO_FIX                    -9
 
 
 // if retcode is an error, return it
@@ -104,6 +106,7 @@ enum Response_t {
 #include "commands/v25ter.h"
 #include "commands/http.h"
 #include "commands/mqtt.h"
+#include "commands/gnss.h"
 #include "commands/ssl.h"
 #include "commands/sim.h"
 
