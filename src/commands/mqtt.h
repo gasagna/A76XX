@@ -147,6 +147,7 @@ class MQTTCommands {
                 _serial.write(will_message);
                 _serial.flush();
                 if (_serial.waitResponse() == Response_t::A76XX_RESPONSE_OK) {
+                    return A76XX_OPERATION_SUCCEEDED;
                 } else {
                     return A76XX_GENERIC_ERROR;
                 }
