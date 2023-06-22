@@ -50,8 +50,15 @@ class GNSSCommands {
     GNSSCommands(ModemSerial& serial)
         : _serial(serial) {}
 
-    int8_t powerControl(bool enableGNSS) {
-        _serial.sendCMD("AT+CGNSSPWR=", enableGNSS == true ? 1 : 0);
+    /*
+        @brief Implementation for CGNSSPWR - Write Command.
+        @detail GNSS power control.
+        @param [IN] enable_GNSS Set to true to power on the GNSS module.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT, A76XX_GENERIC_ERROR 
+            or A76XX_GNSS_NOT_READY.
+    */
+    int8_t powerControl(bool enable_GNSS) {
+        _serial.sendCMD("AT+CGNSSPWR=", enable_GNSS == true ? 1 : 0);
         switch (_serial.waitResponse("+CGNSSPWR: READY!", 9000)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 return A76XX_OPERATION_SUCCEEDED;
@@ -68,10 +75,54 @@ class GNSSCommands {
         }
     }
 
+    /*
+        @brief Implementation for CGPSCOLD - Write Command.
+        @detail Cold start GPS.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
     int8_t coldStart() { return start("COLD"); }
-    int8_t warmStart() { return start("WARM"); }
-    int8_t hotStart()  { return start("HOT");  }
 
+    /*
+        @brief Implementation for CGPSWARM - Write Command.
+        @detail Warm start GPS.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
+    int8_t warmStart() { return start("WARM"); }
+
+    /*
+        @brief Implementation for CGPSHOT - Write Command.
+        @detail Hot start GPS.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
+    int8_t hotStart() { return start("HOT"); }
+
+    /*
+        @brief Implementation for CGNSSIPR - Write Command.
+        @detail Configure the baud rate of UART3 and GPS module.
+        @param [IN] baud_rate The baud rate to set.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
+    int8_t setUART3BaudRate(uint32_t baud_rate) {
+        _serial.sendCMD("AT+CGNSSIPR=", baud_rate);
+        switch (_serial.waitResponse(9000)) {
+            case Response_t::A76XX_RESPONSE_OK : {
+                return A76XX_OPERATION_SUCCEEDED;
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
+    }
+
+    /*
+        @brief Implementation for CGNSSMODE - Write Command.
+        @detail Configure GNSS support mode.
+        @param [IN] mode The suport mode, from 1 to 7.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
     int8_t setSupportMode(uint8_t mode) {
         _serial.sendCMD("AT+CGNSSMODE=", mode);
         switch (_serial.waitResponse(9000)) {
@@ -87,6 +138,44 @@ class GNSSCommands {
         }
     }
 
+    /*
+        @brief Implementation for CGNSSNMEA - Write Command.
+        @detail Configure NMEA sentence type.
+        @param [IN] nGGA The GGA output rate - at every period if true, never if false 
+        @param [IN] nGLL The GLL output rate - at every period if true, never if false 
+        @param [IN] nGSA The GSA output rate - at every period if true, never if false 
+        @param [IN] nGSV The GSV output rate - at every period if true, never if false 
+        @param [IN] nRMC The RMC output rate - at every period if true, never if false 
+        @param [IN] nVTG The VTG output rate - at every period if true, never if false 
+        @param [IN] nZDA The ZDA output rate - at every period if true, never if false 
+        @param [IN] nGST The GST output rate - at every period if true, never if false 
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
+    int8_t setNMEASentence(bool nGGA = true,  bool nGLL = true,
+                           bool nGSA = true,  bool nGSV = true,
+                           bool nRMC = true,  bool nVTG = true,
+                           bool nZDA = false, bool nGST = false) {
+        _serial.sendCMD("AT+CGNSSNMEA=", nGGA, ",", nGLL, ",", nGSA, ",", nGSV, ",",
+                                         nRMC, ",", nVTG, ",", nZDA, ",", nGST);
+        switch (_serial.waitResponse(9000)) {
+            case Response_t::A76XX_RESPONSE_OK : {
+                return A76XX_OPERATION_SUCCEEDED;
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
+    }
+
+    /*
+        @brief Implementation for CGNSSNMEA - Write Command.
+        @detail Set NMEA output rate.
+        @param [IN] rate Rate in outputs per second - 1, 2, 4, 5 or 10
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
     int8_t setNMEARate(uint8_t rate) {
         _serial.sendCMD("AT+CGPSNMEARATE=", rate);
         switch (_serial.waitResponse(9000)) {
@@ -102,14 +191,18 @@ class GNSSCommands {
         }
     }
 
+    /*
+        @brief Implementation for CGNSSINFO - Write Command.
+        @detail Get GNSS fixed position information.
+        @param [OUT] info A GNSSInfo_t structure.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
     int8_t getGNSSInfo(GNSSInfo_t& info) {
         _serial.sendCMD("AT+CGNSSINFO");
         switch (_serial.waitResponse("+CGNSSINFO:", 9000, false, true)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 // when we do not have a fix
                 if (_serial.peek() == ',') { return A76XX_GNSS_NO_FIX; }
-
-                // parse all
                 info.mode        = _serial.parseInt();   _serial.find(',');
                 info.GPS_SVs     = _serial.parseInt();   _serial.find(',');
                 info.GLONASS_SVs = _serial.parseInt();   _serial.find(',');
@@ -132,6 +225,54 @@ class GNSSCommands {
                 } else {
                     return A76XX_GENERIC_ERROR;
                 }
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
+    }
+
+    /*
+        @brief Implementation for CAGPS - EXEC Command.
+        @detail Get AGPS data from the AGNSS server for assisted positioning.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
+    int8_t getAGPSData() {
+        _serial.sendCMD("AT+CAGPS");
+        switch (_serial.waitResponse("+AGPS: ", 9000, false, true)) {
+            case Response_t::A76XX_RESPONSE_MATCH_1ST : {
+                // when the output is "+AGPS: success"
+                if (_serial.peek() == 's') {
+                    _serial.clear();
+                    return A76XX_OPERATION_SUCCEEDED;
+                }
+                // error case
+                return _serial.parseIntClear();
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
+    }
+
+    /*
+        @brief Implementation for CGNSSPROD - EXEC Command.
+        @detail Get GNSS receiver product information.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
+    int8_t getGPSProductInfo(const char* info) {
+        _serial.sendCMD("AT+CGNSSPROD");
+        switch (_serial.waitResponse("PRODUCT: ", 9000, false, true)) {
+            case Response_t::A76XX_RESPONSE_MATCH_1ST : {
+                _serial.readBytesUntil(info, '\r');
+                _serial.clear();
+                return A76XX_OPERATION_SUCCEEDED;
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
