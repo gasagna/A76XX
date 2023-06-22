@@ -10,18 +10,18 @@
     CGPSCOLD        |      y      |     E      | coldStart
     CGPSWARM        |      y      |     E      | warmStart
     CGPSHOT         |      y      |     E      | hotStart
-    CGNSSIPR        |             |            |
-    CGNSSMODE       |      y      |            | setSupportMode
-    CGNSSNMEA       |             |            |
-    CGPSNMEARATE    |      y      |            | setNMEARate
+    CGNSSIPR        |      y      |     W      | setUART3BaudRate
+    CGNSSMODE       |      y      |     W      | setSupportMode
+    CGNSSNMEA       |      y      |     W      | setNMEASentence
+    CGPSNMEARATE    |      y      |     W      | setNMEARate
     CGPSFTM         |             |            |
     CGPSINFO        |             |            |
-    CGNSSINFO       |      y      |            | getGNSSInfo
+    CGNSSINFO       |      y      |     W      | getGNSSInfo
     CGNSSCMD        |             |            |
-    CGNSSTST        |             |            |
+    CGNSSTST        |      y      |     W      | enableNMEAOutput
     CGNSSPORTSWITCH |             |            |
-    CAGPS           |             |            |
-    CGNSSPROD       |             |            |
+    CAGPS           |      y      |     E      | getAGPSData
+    CGNSSPROD       |      y      |     E      | getGPSProductInfo
 */
 
 struct GNSSInfo_t {
@@ -225,6 +225,27 @@ class GNSSCommands {
                 } else {
                     return A76XX_GENERIC_ERROR;
                 }
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
+    }
+
+    /*
+        @brief Implementation for CGNSSTST - Write Command.
+        @detail Send data received from GNSS module to the serial port.
+        @param [IN] enabled Whether to send NMEA data to the serial port.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
+    int8_t enableNMEAOutput(bool enabled) {
+        _serial.sendCMD("AT+CGNSSTST=", enabled == true ? "1" : "0");
+        switch (_serial.waitResponse(9000)) {
+            case Response_t::A76XX_RESPONSE_OK : {
+                return A76XX_OPERATION_SUCCEEDED;
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
