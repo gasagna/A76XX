@@ -1,6 +1,8 @@
 #ifndef A76XX_MODEMUART_H_
 #define A76XX_MODEMUART_H_
 
+#include "CircularBuffer.h"
+
 class ModemSerial {
   private:
     Stream&                                                        _stream;
@@ -51,36 +53,36 @@ class ModemSerial {
                             bool match_OK = true,
                             bool match_ERROR = true) {
         // store data here
-        String data; data.reserve(64);
+        CircularBuffer<char, 64> data;
 
         // start timer
         auto tstart = millis();
 
         while (millis() - tstart < timeout) {
             if (available() > 0) {
-                data += static_cast<char>(read());
+                data.push(static_cast<char>(read()));
 
                 // parse modem output for any URCs that we need to process
                 for (uint8_t i = 0; i < _num_event_handlers; i++) {
-                    if (data.endsWith(_event_handlers[i]->match_string)) {
+                    if (endsWith(data, _event_handlers[i]->match_string)) {
                         _event_handlers[i]->process(this);
                         _events_urc_queue.pushEnd(_event_handlers[i]->urc);
                     }
                 }
 
-                if (match_1 != NULL && data.endsWith(match_1) == true)
+                if (match_1 != NULL && endsWith(data, match_1) == true)
                     return Response_t::A76XX_RESPONSE_MATCH_1ST;
 
-                if (match_2 != NULL && data.endsWith(match_2) == true)
+                if (match_2 != NULL && endsWith(data, match_2) == true)
                     return Response_t::A76XX_RESPONSE_MATCH_2ND;
 
-                if (match_3 != NULL && data.endsWith(match_3) == true)
+                if (match_3 != NULL && endsWith(data, match_3) == true)
                     return Response_t::A76XX_RESPONSE_MATCH_3RD;
 
-                if (match_ERROR && data.endsWith(RESPONSE_ERROR) == true)
+                if (match_ERROR && endsWith(data, RESPONSE_ERROR) == true)
                     return Response_t::A76XX_RESPONSE_ERROR;
 
-                if (match_OK && data.endsWith(RESPONSE_OK) == true)
+                if (match_OK && endsWith(data, RESPONSE_OK) == true)
                     return Response_t::A76XX_RESPONSE_OK;
             }
         }
@@ -288,6 +290,28 @@ class ModemSerial {
         return _stream.readBytes(args...); 
     }
 };
+
+/*
+    @brief Check if the last characters in the character buffer match with a given string.
+
+    @param [IN] buf The character buffer.
+    @param [IN] str The string to be matched.
+    @return True in case of a match.
+*/
+template<size_t N>
+bool endsWith(CircularBuffer<char, N>& buf, const char* str) {
+    if (strlen(str) > buf.size()) { return false; }
+    char* m = str + strlen(str) - 1; // pointer to last character in str
+    int i = 1;
+    while (i <= buf.size() && i <= strlen(str) ) {
+        if (buf[buf.size() - i] != *m) {
+            return false;
+        }
+        m--;
+        i++;
+    }
+    return true;
+}
 
 
 #endif A76XX_MODEMUART_H_
