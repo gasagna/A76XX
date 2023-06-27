@@ -14,11 +14,12 @@ struct MQTTMessage_t {
 
     @details This object is responsible of detecting, parsing and storing 
         incoming MQTT messages sent to the device. It has one important 
-        member, "messageQueue", i.e. a StaticQueue object used to store 
+        member, "messageQueue", i.e. a CircularBuffer object used to store 
         incoming messages if they arrive at a high rate. The size of this
-        queue is define by the variable MQTT_MESSAGE_QUEUE_SIZE. The maximum 
-        length of the topic and payload of MQTT messages shored in this queue
-        if defined by the variables MQTT_TOPIC_BUFFER_LEN and 
+        buffer is define by the variable MQTT_MESSAGE_QUEUE_SIZE. If messages
+        arrive at a faster rate than they are read, older messages are dropped.
+        The maximum length of the topic and payload of MQTT messages shored in 
+        this queue if defined by the variables MQTT_TOPIC_BUFFER_LEN and 
         MQTT_PAYLOAD_BUFFER_LEN, respectively.
 
         It produces the URC A76XXURC_t::MQTT_MESSAGE_RX when A76XX::listen
@@ -26,7 +27,7 @@ struct MQTTMessage_t {
 */
 class MQTTOnMessageRx : public EventHandler_t {
   public:
-    StaticQueue<MQTTMessage_t, MQTT_MESSAGE_QUEUE_SIZE>  messageQueue;
+    CircularBuffer<MQTTMessage_t, MQTT_MESSAGE_QUEUE_SIZE>  messageQueue;
     
     MQTTOnMessageRx()
         : EventHandler_t(A76XXURC_t::MQTT_MESSAGE_RX, "+CMQTTRXSTART: ") {}

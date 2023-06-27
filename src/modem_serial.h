@@ -8,7 +8,7 @@ class ModemSerial {
     Stream&                                                        _stream;
     EventHandler_t*              _event_handlers[A76XX_MAX_EVENT_HANDLERS];
     uint8_t                                            _num_event_handlers;
-    StaticQueue<A76XXURC_t, A76XX_URC_QUEUE_SIZE>        _events_urc_queue;
+    CircularBuffer<A76XXURC_t, A76XX_URC_QUEUE_SIZE>     _events_urc_queue;
 
   public:
 
@@ -66,7 +66,7 @@ class ModemSerial {
                 for (uint8_t i = 0; i < _num_event_handlers; i++) {
                     if (endsWith(data, _event_handlers[i]->match_string)) {
                         _event_handlers[i]->process(this);
-                        _events_urc_queue.pushEnd(_event_handlers[i]->urc);
+                        _events_urc_queue.push(_event_handlers[i]->urc);
                     }
                 }
 
@@ -168,12 +168,12 @@ class ModemSerial {
             return its code immediately.
     */
     A76XXURC_t listen(uint32_t timeout = 100) {
-        if (_events_urc_queue.available() == 0) {
+        if (_events_urc_queue.size() == 0) {
             waitResponse(timeout, false, false);
         }
 
-        if (_events_urc_queue.available() > 0) {
-            return _events_urc_queue.popFront();
+        if (_events_urc_queue.size() > 0) {
+            return _events_urc_queue.shift();
         }
 
         return A76XXURC_t::NONE;
