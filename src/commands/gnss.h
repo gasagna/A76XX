@@ -15,8 +15,8 @@
     CGNSSNMEA       |      y      |     W      | setNMEASentence
     CGPSNMEARATE    |      y      |     W      | setNMEARate
     CGPSFTM         |      y      |     W      | startTestMode, stopTestMode
-    CGPSINFO        |             |            |
-    CGNSSINFO       |      y      |     W      | getGNSSInfo
+    CGPSINFO        |      y      |     E      | getGPSInfo
+    CGNSSINFO       |      y      |     E      | getGNSSInfo
     CGNSSCMD        |             |            |
     CGNSSTST        |      y      |     W      | enableNMEAOutput
     CGNSSPORTSWITCH |      y      |     W      | selectOutputPort
@@ -41,6 +41,18 @@ struct GNSSInfo_t {
     float PDOP,        // Position Dilution Of Precision.
     float HDOP,        // Horizontal Dilution Of Precision.
     float VDOP         // Vertical Dilution Of Precision.
+};
+
+struct GPSInfo_t {
+    float lat          // Latitude of current position. Output format is dd.ddddd
+    char  NS           // N/S Indicator, N=north or S=south.
+    float lon          // Longitude of current position. Output format is ddd.ddddd 
+    char  EW           // E/W Indicator, E=east or W=west.
+    char  date[7],     // Date. Output format is ddmmyy.
+    char  UTC_TIME[10],// UTC Time. Output format is hhmmss.ss.
+    float alt,         // MSL Altitude. Unit is meters.
+    float speed,       // Speed Over Ground. Unit is knots.
+    float course,      // Course. Degrees.
 };
 
 class GNSSCommands {
@@ -259,6 +271,43 @@ class GNSSCommands {
                 info.PDOP        = _serial.parseFloat(); _serial.find(',');
                 info.HDOP        = _serial.parseFloat(); _serial.find(',');
                 info.VDOP        = _serial.parseFloat();
+                // get last OK
+                if (serial.waitResponse(9000) == Response_t::A76XX_RESPONSE_OK) {
+                    return A76XX_OPERATION_SUCCEEDED;
+                } else {
+                    return A76XX_GENERIC_ERROR;
+                }
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
+    }
+
+    /*
+        @brief Implementation for CGPSSINFO - Write Command.
+        @detail Get GPS fixed position information.
+        @param [OUT] info A GPSInfo_t structure.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
+    int8_t getGPSInfo(GPSInfo_t& info) {
+        _serial.sendCMD("AT+CGPSINFO");
+        switch (_serial.waitResponse("+CGPSINFO:", 9000, false, true)) {
+            case Response_t::A76XX_RESPONSE_MATCH_1ST : {
+                // when we do not have a fix
+                if (_serial.peek() == ',') { return A76XX_GNSS_NO_FIX; }
+                info.lat         = _serial.parseFloat(); _serial.find(',');
+                info.NS          = _serial.read();       _serial.find(',');
+                info.lon         = _serial.parseFloat(); _serial.find(',');
+                info.EW          = _serial.read();       _serial.find(',');
+                _serial.readBytes(info.date, 6);         _serial.find(',');
+                _serial.readBytes(info.UTC_TIME, 9);     _serial.find(',');
+                info.alt         = _serial.parseFloat(); _serial.find(',');
+                info.speed       = _serial.parseFloat(); _serial.find(',');
+                info.course      = _serial.parseFloat();
                 // get last OK
                 if (serial.waitResponse(9000) == Response_t::A76XX_RESPONSE_OK) {
                     return A76XX_OPERATION_SUCCEEDED;
