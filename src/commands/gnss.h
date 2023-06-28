@@ -19,7 +19,7 @@
     CGNSSINFO       |      y      |     W      | getGNSSInfo
     CGNSSCMD        |             |            |
     CGNSSTST        |      y      |     W      | enableNMEAOutput
-    CGNSSPORTSWITCH |             |            |
+    CGNSSPORTSWITCH |      y      |     W      | selectOutputPort
     CAGPS           |      y      |     E      | getAGPSData
     CGNSSPROD       |      y      |     E      | getGPSProductInfo
 */
@@ -283,6 +283,30 @@ class GNSSCommands {
     */
     int8_t enableNMEAOutput(bool enabled) {
         _serial.sendCMD("AT+CGNSSTST=", enabled == true ? "1" : "0");
+        switch (_serial.waitResponse(9000)) {
+            case Response_t::A76XX_RESPONSE_OK : {
+                return A76XX_OPERATION_SUCCEEDED;
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
+    }
+
+    /*
+        @brief Implementation for CGNSSPORTSWITCH - Write Command.
+        @detail Select the output port for NMEA sentence.
+        @param [IN] output_parsed_data If true, output parsed data to the serial port.
+        @param [IN] output_nmea_data If true, output raw nmea data to the serial port.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
+    int8_t selectOutputPort(bool output_parsed_data, bool output_nmea_data) {
+        _serial.sendCMD("AT+CGNSSPORTSWITCH=", 
+                        output_parsed_data == true ? "1" : "0", ",",
+                        output_nmea_data   == true ? "1" : "0");
         switch (_serial.waitResponse(9000)) {
             case Response_t::A76XX_RESPONSE_OK : {
                 return A76XX_OPERATION_SUCCEEDED;
