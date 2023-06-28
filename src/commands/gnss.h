@@ -140,21 +140,21 @@ class GNSSCommands {
 
     /*
         @brief Implementation for CGNSSNMEA - Write Command.
-        @detail Configure NMEA sentence type.
-        @param [IN] nGGA The GGA output rate - at every period if true, never if false 
-        @param [IN] nGLL The GLL output rate - at every period if true, never if false 
-        @param [IN] nGSA The GSA output rate - at every period if true, never if false 
-        @param [IN] nGSV The GSV output rate - at every period if true, never if false 
-        @param [IN] nRMC The RMC output rate - at every period if true, never if false 
-        @param [IN] nVTG The VTG output rate - at every period if true, never if false 
-        @param [IN] nZDA The ZDA output rate - at every period if true, never if false 
-        @param [IN] nGST The GST output rate - at every period if true, never if false 
+        @detail Configure NMEA sentence type. A mask can be constructed by `|`-ing
+            several of the A76XX_GNSS_nXXX flags. For instance, to only output GGA 
+            and RMC NMEA sentences set nmea_mask to A76XX_GNSS_nGGA | A76XX_GNSS_nRMC.
+        @param [IN] nmea_mask An 8 bit mask to select the sentences to output.
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
-    int8_t setNMEASentence(bool nGGA = true,  bool nGLL = true,
-                           bool nGSA = true,  bool nGSV = true,
-                           bool nRMC = true,  bool nVTG = true,
-                           bool nZDA = false, bool nGST = false) {
+    int8_t setNMEASentence(uint8_t nmea_mask) {
+        uint8_t nGGA = (nmea_mask & A76XX_GNSS_nGGA) >> 0;
+        uint8_t nGLL = (nmea_mask & A76XX_GNSS_nGLL) >> 1;
+        uint8_t nGSA = (nmea_mask & A76XX_GNSS_nGSA) >> 2; 
+        uint8_t nGSV = (nmea_mask & A76XX_GNSS_nGSV) >> 3;
+        uint8_t nRMC = (nmea_mask & A76XX_GNSS_nRMC) >> 4; 
+        uint8_t nVTG = (nmea_mask & A76XX_GNSS_nVTG) >> 5;
+        uint8_t nZDA = (nmea_mask & A76XX_GNSS_nZDA) >> 6; 
+        uint8_t nGST = (nmea_mask & A76XX_GNSS_nGST) >> 7;
         _serial.sendCMD("AT+CGNSSNMEA=", nGGA, ",", nGLL, ",", nGSA, ",", nGSV, ",",
                                          nRMC, ",", nVTG, ",", nZDA, ",", nGST);
         switch (_serial.waitResponse(9000)) {
@@ -176,8 +176,20 @@ class GNSSCommands {
         @param [IN] rate Rate in outputs per second - 1, 2, 4, 5 or 10
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
-    int8_t setNMEARate(uint8_t rate) {
-        _serial.sendCMD("AT+CGPSNMEARATE=", rate);
+    int8_t setNMEARate(uint8_t nmea_rate) {
+        _serial.sendCMD("AT+CGPSNMEARATE=", nmea_rate);
+        switch (_serial.waitResponse(9000)) {
+            case Response_t::A76XX_RESPONSE_OK : {
+                return A76XX_OPERATION_SUCCEEDED;
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
+    }
 
     /*
         @brief Implementation for CGPSFTM - Write Command.
