@@ -188,6 +188,29 @@ class ModemSerial {
         _event_handlers[_num_event_handlers++] = handler;
     }
 
+    /* 
+        @brief Deregister an exisiting event handler.
+
+        @param [IN] Pointer to a subclass of EventHandler_t.
+    */
+    void deRegisterEventHandler(EventHandler_t* handler) {
+        // Search for the element of _event_handlers that points to the
+        // same address of the input, and then shift the elements left
+        // by one to `delete` the handler that needs to be de-registered.
+        // This can be replaced by a linked list for efficient removal, 
+        // but registration/deregistration is only done occasionally and 
+        // _num_event_handlers will typically be small
+        for (uint8_t i = 0; i < _num_event_handlers; i++) {
+            if (_event_handlers[i] == handler) {
+                for (uint8_t j = i; j < _num_event_handlers; j++) {
+                    _event_handlers[j] = _event_handlers[j+1];
+                }
+                _num_event_handlers--;
+                return;
+            }
+        }
+    }
+
     /*
         @brief Send data to the command to the module, with a trailing carriage return,
             line feed characters.
