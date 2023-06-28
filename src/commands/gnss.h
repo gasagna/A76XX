@@ -14,7 +14,7 @@
     CGNSSMODE       |      y      |     W      | setSupportMode
     CGNSSNMEA       |      y      |     W      | setNMEASentence
     CGPSNMEARATE    |      y      |     W      | setNMEARate
-    CGPSFTM         |             |            |
+    CGPSFTM         |      y      |     W      | startTestMode, stopTestMode
     CGPSINFO        |             |            |
     CGNSSINFO       |      y      |     W      | getGNSSInfo
     CGNSSCMD        |             |            |
@@ -178,6 +178,34 @@ class GNSSCommands {
     */
     int8_t setNMEARate(uint8_t rate) {
         _serial.sendCMD("AT+CGPSNMEARATE=", rate);
+
+    /*
+        @brief Implementation for CGPSFTM - Write Command.
+        @detail Start GPS test mode.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
+    int8_t startTestMode() {
+        _serial.sendCMD("AT+CGPSFTM=1");
+        switch (_serial.waitResponse(9000)) {
+            case Response_t::A76XX_RESPONSE_OK : {
+                return A76XX_OPERATION_SUCCEEDED;
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
+    }
+
+    /*
+        @brief Implementation for CGPSFTM - Write Command.
+        @detail Stop GPS test mode.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
+    int8_t stopTestMode() {
+        _serial.sendCMD("AT+CGPSFTM=0");
         switch (_serial.waitResponse(9000)) {
             case Response_t::A76XX_RESPONSE_OK : {
                 return A76XX_OPERATION_SUCCEEDED;
