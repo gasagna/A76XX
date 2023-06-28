@@ -173,7 +173,7 @@ class GNSSCommands {
     /*
         @brief Implementation for CGNSSNMEA - Write Command.
         @detail Set NMEA output rate.
-        @param [IN] rate Rate in outputs per second - 1, 2, 4, 5 or 10
+        @param [IN] nmea_rate Rate in outputs per second - 1, 2, 4, 5 or 10
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
     int8_t setNMEARate(uint8_t nmea_rate) {
