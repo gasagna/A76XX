@@ -93,7 +93,6 @@ enum Response_t {
     }
 
 #include "utils/base64.h"
-#include "utils/queue.h"
 
 #include "event_handlers.h"
 #include "modem_serial.h"
