@@ -25,34 +25,34 @@
 */
 
 struct GNSSInfo_t {
-    int   mode,        // Fix mode 2=2D fix 3=3D fix
-    int   GPS_SVs,     // GPS satellite visible numbers
-    int   GLONASS_SVs, // GLONASS satellite visible numbers
-    int   BEIDOU_SVs,  // BEIDOU satellite visible numbers
-    float lat          // Latitude of current position. Output format is dd.ddddd
-    char  NS           // N/S Indicator, N=north or S=south.
-    float lon          // Longitude of current position. Output format is ddd.ddddd 
-    char  EW           // E/W Indicator, E=east or W=west.
-    char  date[7],     // Date. Output format is ddmmyy.
-    char  UTC_TIME[10],// UTC Time. Output format is hhmmss.ss.
-    float alt,         // MSL Altitude. Unit is meters.
-    float speed,       // Speed Over Ground. Unit is knots.
-    float course,      // Course. Degrees.
-    float PDOP,        // Position Dilution Of Precision.
-    float HDOP,        // Horizontal Dilution Of Precision.
-    float VDOP         // Vertical Dilution Of Precision.
+    int   mode;         // Fix mode 2=2D fix 3=3D fix
+    int   GPS_SVs;      // GPS satellite visible numbers
+    int   GLONASS_SVs;  // GLONASS satellite visible numbers
+    int   BEIDOU_SVs;   // BEIDOU satellite visible numbers
+    float lat;          // Latitude of current position. Output format is dd.ddddd
+    char  NS;           // N/S Indicator, N=north or S=south.
+    float lon;          // Longitude of current position. Output format is ddd.ddddd 
+    char  EW;           // E/W Indicator, E=east or W=west.
+    char  date[7];      // Date. Output format is ddmmyy.
+    char  UTC_TIME[10]; // UTC Time. Output format is hhmmss.ss.
+    float alt;          // MSL Altitude. Unit is meters.
+    float speed;        // Speed Over Ground. Unit is knots.
+    float course;       // Course. Degrees.
+    float PDOP;         // Position Dilution Of Precision.
+    float HDOP;         // Horizontal Dilution Of Precision.
+    float VDOP;         // Vertical Dilution Of Precision.
 };
 
 struct GPSInfo_t {
-    float lat          // Latitude of current position. Output format is dd.ddddd
-    char  NS           // N/S Indicator, N=north or S=south.
-    float lon          // Longitude of current position. Output format is ddd.ddddd 
-    char  EW           // E/W Indicator, E=east or W=west.
-    char  date[7],     // Date. Output format is ddmmyy.
-    char  UTC_TIME[10],// UTC Time. Output format is hhmmss.ss.
-    float alt,         // MSL Altitude. Unit is meters.
-    float speed,       // Speed Over Ground. Unit is knots.
-    float course,      // Course. Degrees.
+    float lat;          // Latitude of current position. Output format is dd.ddddd
+    char  NS;           // N/S Indicator, N=north or S=south.
+    float lon;          // Longitude of current position. Output format is ddd.ddddd 
+    char  EW;           // E/W Indicator, E=east or W=west.
+    char  date[7];      // Date. Output format is ddmmyy.
+    char  UTC_TIME[10]; // UTC Time. Output format is hhmmss.ss.
+    float alt;          // MSL Altitude. Unit is meters.
+    float speed;        // Speed Over Ground. Unit is knots.
+    float course;       // Course. Degrees.
 };
 
 class GNSSCommands {
