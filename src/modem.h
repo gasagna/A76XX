@@ -3,7 +3,7 @@
 
 class A76XX {
   public:
-    ModemSerial                           serial;
+    ModemSerial                            serial;
     int8_t                       _last_error_code;
     InternetServiceCommands       internetService;
     NetworkCommands                       network;
