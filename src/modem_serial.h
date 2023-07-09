@@ -3,6 +3,28 @@
 
 #include "CircularBuffer.h"
 
+/*
+    @brief Check if the last characters in the character buffer match with a given string.
+
+    @param [IN] buf The character buffer.
+    @param [IN] str The string to be matched.
+    @return True in case of a match.
+*/
+template<size_t N>
+bool endsWith(CircularBuffer<char, N>& buf, const char* str) {
+    if (strlen(str) > buf.size()) { return false; }
+    char* m = str + strlen(str) - 1; // pointer to last character in str
+    int i = 1;
+    while (i <= buf.size() && i <= strlen(str) ) {
+        if (buf[buf.size() - i] != *m) {
+            return false;
+        }
+        m--;
+        i++;
+    }
+    return true;
+}
+
 class ModemSerial {
   private:
     Stream&                                                        _stream;
@@ -313,28 +335,5 @@ class ModemSerial {
         return _stream.readBytes(args...); 
     }
 };
-
-/*
-    @brief Check if the last characters in the character buffer match with a given string.
-
-    @param [IN] buf The character buffer.
-    @param [IN] str The string to be matched.
-    @return True in case of a match.
-*/
-template<size_t N>
-bool endsWith(CircularBuffer<char, N>& buf, const char* str) {
-    if (strlen(str) > buf.size()) { return false; }
-    char* m = str + strlen(str) - 1; // pointer to last character in str
-    int i = 1;
-    while (i <= buf.size() && i <= strlen(str) ) {
-        if (buf[buf.size() - i] != *m) {
-            return false;
-        }
-        m--;
-        i++;
-    }
-    return true;
-}
-
 
 #endif A76XX_MODEMUART_H_
