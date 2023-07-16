@@ -1,35 +1,6 @@
 #ifndef A76XX_HTTP_CLIENT_H_
 #define A76XX_HTTP_CLIENT_H_
 
-/*
-    @brief Handler of the URC "+HTTP_PEER_CLOSED".
-
-    @details This is a stateless URC handler. It produces the 
-        URC A76XXURC_t::HTTP_PEER_CLOSED when A76XX::listen is called.
-*/
-class HTTPOnPeerClosed : public EventHandler_t {
-  public:
-    HTTPOnPeerClosed()
-        : EventHandler_t(A76XXURC_t::HTTP_PEER_CLOSED, "+HTTP_PEER_CLOSED: ") {}
-    
-    void process(ModemSerial* serial) {}
-};
-
-/*
-    @brief Handler of the URC "+HTTP_NONET_EVENT".
-
-    @details This is a stateless URC handler. It produces the 
-        URC A76XXURC_t::HTTP_NO_NET when A76XX::listen is called.
-*/
-class HTTPOnNoNet : public EventHandler_t {
-  public:
-    HTTPOnNoNet()
-        : EventHandler_t(A76XXURC_t::HTTP_NO_NET, "+HTTP_NONET_EVENT: ") {}
-    
-    void process(ModemSerial* serial) {}
-};
- 
-
 class A76XXHTTPClient : public A76XXSecureClient {
   private:
     HTTPCommands              _http_cmds;
@@ -60,8 +31,6 @@ class A76XXHTTPClient : public A76XXSecureClient {
                     uint16_t server_port,
                     bool use_ssl = false,
                     const char* user_agent = NULL);
-
-  public:
 
     /*
         @brief Start the HTTP service
