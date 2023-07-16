@@ -30,7 +30,6 @@ class ModemSerial {
     Stream&                                                        _stream;
     EventHandler_t*              _event_handlers[A76XX_MAX_EVENT_HANDLERS];
     uint8_t                                            _num_event_handlers;
-    CircularBuffer<A76XXURC_t, A76XX_URC_QUEUE_SIZE>     _events_urc_queue;
 
   public:
 
@@ -88,7 +87,6 @@ class ModemSerial {
                 for (uint8_t i = 0; i < _num_event_handlers; i++) {
                     if (endsWith(data, _event_handlers[i]->match_string)) {
                         _event_handlers[i]->process(this);
-                        _events_urc_queue.push(_event_handlers[i]->urc);
                     }
                 }
 
@@ -179,26 +177,12 @@ class ModemSerial {
     }
 
     /*
-        @brief Listen for new data from the serial connection with the module
-            and return any unsolicited result codes found or A76XXURC_t::NONE.
+        @brief Listen for URCs from the serial connection with the module.
 
-        @details URC are stored internally in a queue. If no URC have been emitted
-            previously, block execution and wait for a new URC.
-
-        @param [IN] timeout Return if no URCs are found within this timeframe in 
-            milliseconds. If an URC code was previouly emitted by the module, 
-            return its code immediately.
+        @param [IN] timeout Wait up to this time in ms before returning.
     */
-    A76XXURC_t listen(uint32_t timeout = 100) {
-        if (_events_urc_queue.size() == 0) {
-            waitResponse(timeout, false, false);
-        }
-
-        if (_events_urc_queue.size() > 0) {
-            return _events_urc_queue.shift();
-        }
-
-        return A76XXURC_t::NONE;
+    void listen(uint32_t timeout = 100) {
+        waitResponse(timeout, false, false);
     }
 
     /* 

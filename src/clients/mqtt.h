@@ -22,7 +22,7 @@ struct MQTTMessage_t {
         this queue if defined by the variables MQTT_TOPIC_BUFFER_LEN and 
         MQTT_PAYLOAD_BUFFER_LEN, respectively.
 
-        It produces the URC A76XXURC_t::MQTT_MESSAGE_RX when A76XX::listen
+        This event does not produces a A76XXURC_t URC code when A76XX::listen
         is called.
 */
 class MQTTOnMessageRx : public EventHandler_t {
@@ -30,37 +30,9 @@ class MQTTOnMessageRx : public EventHandler_t {
     CircularBuffer<MQTTMessage_t, MQTT_MESSAGE_QUEUE_SIZE>  messageQueue;
     
     MQTTOnMessageRx()
-        : EventHandler_t(A76XXURC_t::MQTT_MESSAGE_RX, "+CMQTTRXSTART: ") {}
+        : EventHandler_t("+CMQTTRXSTART: ") {}
     
     void process(ModemSerial* serial);
-};
-
-/*
-    @brief Handler of the URC "+CMQTTCONNLOST".
-
-    @details This is a stateless URC handler. It produces the 
-        URC A76XXURC_t::MQTT_CONNECTION_LOST when A76XX::listen is called.
-*/
-class MQTTOnConnectionLost : public EventHandler_t {
-  public:
-    MQTTOnConnectionLost()
-        : EventHandler_t(A76XXURC_t::MQTT_CONNECTION_LOST, "+CMQTTCONNLOST: ") {}
-    
-    void process(ModemSerial* serial) {}
-};
-
-/*
-    @brief Handler of the URC "+CMQTTNONET".
-
-    @details This is a stateless URC handler. It produces the 
-        URC A76XXURC_t::MQTT_NO_NET when A76XX::listen is called.
-*/
-class MQTTOnNoNet : public EventHandler_t {
-  public:
-    MQTTOnNoNet()
-        : EventHandler_t(A76XXURC_t::MQTT_NO_NET, "+CMQTTNONET: ") {}
-    
-    void process(ModemSerial* serial) {}
 };
 
 
@@ -70,13 +42,11 @@ class A76XXMQTTClient : public A76XXSecureClient {
     const char*                                       _clientID;
     bool                                               _use_ssl;
     MQTTOnMessageRx                      _on_message_rx_handler;
-    MQTTOnConnectionLost            _on_connection_lost_handler;
-    MQTTOnNoNet                              _on_no_net_handler;
 
     // these two are set to zero by default until a use
     // case for allowing these to change comes up
-    uint8_t                   _client_index;
-    uint8_t                     _session_id;
+    uint8_t                                       _client_index;
+    uint8_t                                         _session_id;
 
   public:
     /*

@@ -1,4 +1,5 @@
 TODO
+- only register the MQQT onRXMessage handler if we want to subscribe
 - implement GNSS commands
 - add hardware commands
 - implement WEBSOCKETS commands and client

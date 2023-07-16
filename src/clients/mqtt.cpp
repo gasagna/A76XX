@@ -44,8 +44,6 @@ A76XXMQTTClient::A76XXMQTTClient(A76XX& modem, const char* clientID, bool use_ss
     , _session_id(0) {
         // enable parsing MQTT URCs
         _serial.registerEventHandler(&_on_message_rx_handler);
-        _serial.registerEventHandler(&_on_connection_lost_handler);
-        _serial.registerEventHandler(&_on_no_net_handler);
     }
 
 bool A76XXMQTTClient::begin() {

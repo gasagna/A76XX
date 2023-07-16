@@ -257,9 +257,11 @@ class A76XX {
     uint32_t getUnixTime(bool UTC = true);
 
     /*
-    
+        @brief Listen for URCs from the serial connection with the module.
+
+        @param [IN] timeout Wait up to this time in ms before returning.
     */
-    A76XXURC_t listen(uint32_t timeout = 100);
+    void listen(uint32_t timeout = 100);
 };
 
 #endif A76XXMODEM_H_

@@ -82,36 +82,23 @@ void setup() {
     Serial.println("done");
 }
 
+// main loop
 void loop() {
-    // main loop – we parse the serial connection with the module and wait 
-    // for URCs to be emitted.
+    
+    // listen to the serial connection with the SIMCOM 
+    // module for 100 ms and wait for a message
+    modem.listen(100);
 
-    A76XXURC_t urc = modem.listen(1000);
-    Serial.print(".");
+    while (mqtt_client.messageAvailable() > 0) {
+        MQTTMessage_t msg = mqtt_client.getMessage();
+        Serial.println("Received message ...");
+        Serial.print("  topic: ");   Serial.println(msg.topic);
+        Serial.print("  payload: "); Serial.println(msg.payload);
 
-    switch (urc) {
-        case A76XXURC_t::MQTT_MESSAGE_RX : {
-            MQTTMessage_t msg = mqtt_client.getMessage();
-            Serial.println("Received message ...");
-            Serial.print("  topic: ");   Serial.println(msg.topic);
-            Serial.print("  payload: "); Serial.println(msg.payload);
-
-            // shut down the module remotely
-            if (strcmp(msg.payload, "power-off") == 0) {
-                modem.powerOff();
-            }
-            break;
-        }
-
-        case A76XXURC_t::MQTT_CONNECTION_LOST : {
-            // implement some logic here to handle lost connections
-        }
-
-        case A76XXURC_t::MQTT_NO_NET : {
-            // implement some logic here to handle no network
-        }
-
-        default : {
+        // shut down the module remotely
+        if (strcmp(msg.payload, "power-off") == 0) {
+            modem.powerOff();
         }
     }
+    
 }

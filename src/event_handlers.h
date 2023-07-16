@@ -5,18 +5,6 @@
 class ModemSerial;
 
 /*
-    URC codes.
-*/
-enum A76XXURC_t {
-    MQTT_MESSAGE_RX,      /* URC emitted when a MQTT message is received. */
-    MQTT_CONNECTION_LOST, /* URC emitted when connection with the MQTT broker is lost. */
-    MQTT_NO_NET,          /* URC emitted when connection with the MQTT broker is lost. */
-    HTTP_PEER_CLOSED,     /* URC emitted when connection has been closed by the server. */
-    HTTP_NO_NET,          /* URC emitted when the network is unavailable. */
-    NONE                  /* special code used to indicate no URCs where emitted. */
-};
-
-/*
     @brief Base class for URC event handlers.
 
     @details SIMCOM modules produce certain unsolicited result codes (URC)
@@ -41,21 +29,15 @@ enum A76XXURC_t {
 class EventHandler_t {
   public:
     /*
-        The URC emitted when A76XX::listen is called.
-    */
-    A76XXURC_t                                urc;
-
-    /*
         The URC string produces by the module that we attempt to match.
     */
-    const char*                      match_string;
+    const char* match_string;
     
     /*
         Construct from the URC code and a match string.
     */
-    EventHandler_t(A76XXURC_t _urc, const char* _match_string)
-        : urc(_urc)
-        , match_string(_match_string) {}
+    EventHandler_t(const char* _match_string)
+        : match_string(_match_string) {}
     
     /*
         Function to be executed as soon as the match string is found in the 
