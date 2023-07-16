@@ -29,7 +29,7 @@ class ModemSerial;
 class EventHandler_t {
   public:
     /*
-        The URC string produces by the module that we attempt to match.
+        The URC string produced by the module that we attempt to match.
     */
     const char* match_string;
     
