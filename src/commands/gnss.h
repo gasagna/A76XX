@@ -17,7 +17,7 @@
     CGPSFTM         |      y      |     W      | startTestMode, stopTestMode
     CGPSINFO        |      y      |     E      | getGPSInfo
     CGNSSINFO       |      y      |     E      | getGNSSInfo
-    CGNSSCMD        |             |            |
+    CGNSSCMD        |      y      |     W      | sendGNSSCommand
     CGNSSTST        |      y      |     W      | enableNMEAOutput
     CGNSSPORTSWITCH |      y      |     W      | selectOutputPort
     CAGPS           |      y      |     E      | getAGPSData
@@ -321,6 +321,27 @@ class GNSSCommands {
                 } else {
                     return A76XX_GENERIC_ERROR;
                 }
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
+    }
+
+    /*
+        @brief Implementation for CGNSSCMD - Write Command.
+        @detail Send command to GNSS module.
+        @param [in] cmd The command to send.
+        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
+    */
+    int8_t sendGNSSCommand(const char* cmd) {
+        _serial.sendCMD("AT+CGNSSCMD=0,", "\"", cmd, "\"");
+        switch (_serial.waitResponse(9000, true, true)) {
+            case Response_t::A76XX_RESPONSE_OK : {
+                return A76XX_OPERATION_SUCCEEDED;
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
                 return A76XX_OPERATION_TIMEDOUT;
