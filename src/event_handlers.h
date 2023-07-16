@@ -34,7 +34,7 @@ class EventHandler_t {
     const char* match_string;
     
     /*
-        Construct from the URC code and a match string.
+        Construct from a match string.
     */
     EventHandler_t(const char* _match_string)
         : match_string(_match_string) {}
