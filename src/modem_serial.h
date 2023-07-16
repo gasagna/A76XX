@@ -13,7 +13,7 @@
 template<size_t N>
 bool endsWith(CircularBuffer<char, N>& buf, const char* str) {
     if (strlen(str) > buf.size()) { return false; }
-    char* m = str + strlen(str) - 1; // pointer to last character in str
+    const char* m = str + strlen(str) - 1; // pointer to last character in str
     int i = 1;
     while (i <= buf.size() && i <= strlen(str) ) {
         if (buf[buf.size() - i] != *m) {
@@ -309,6 +309,10 @@ class ModemSerial {
 
     void flush() { 
         _stream.flush(); 
+    }
+
+    char peek() { 
+        return _stream.peek(); 
     }
 
     uint16_t read() { 
