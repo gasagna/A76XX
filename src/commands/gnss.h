@@ -75,7 +75,7 @@ class GNSSCommands {
     */
     int8_t powerControl(bool enable_GNSS) {
         _serial.sendCMD("AT+CGNSSPWR=", enable_GNSS == true ? 1 : 0);
-        switch (_serial.waitResponse("+CGNSSPWR: READY!", 9000)) {
+        switch (_serial.waitResponse("+CGNSSPWR: READY!", 9000, false, true)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
                 return A76XX_OPERATION_SUCCEEDED;
             }
