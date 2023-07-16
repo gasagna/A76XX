@@ -7,9 +7,9 @@
     Command         | Implemented | Method     | Function(s)
     --------------- | ----------- | ---------- | -----------
     CGNSSPWR        |      y      |     W      | powerControl
-    CGPSCOLD        |      y      |     E      | coldStart
-    CGPSWARM        |      y      |     E      | warmStart
-    CGPSHOT         |      y      |     E      | hotStart
+    CGPSCOLD        |      y      |     E      | start
+    CGPSWARM        |      y      |     E      | start
+    CGPSHOT         |      y      |     E      | start
     CGNSSIPR        |      y      |     W      | setUART3BaudRate
     CGNSSMODE       |      y      |     W      | setSupportMode
     CGNSSNMEA       |      y      |     W      | setNMEASentence
@@ -55,6 +55,10 @@ struct GPSInfo_t {
     float course;       // Course. Degrees.
 };
 
+enum GPSStart_t {
+    COLD, WARM, HOT;
+};
+
 class GNSSCommands {
   public:
     ModemSerial& _serial;
@@ -88,25 +92,28 @@ class GNSSCommands {
     }
 
     /*
-        @brief Implementation for CGPSCOLD - Write Command.
-        @detail Cold start GPS.
+        @brief Implementation for CGPSCOLD/WARM/HOT - Write Command.
+        @detail Cold/Warm/Hot start GPS.
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
-    int8_t coldStart() { return start("COLD"); }
-
-    /*
-        @brief Implementation for CGPSWARM - Write Command.
-        @detail Warm start GPS.
-        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
-    */
-    int8_t warmStart() { return start("WARM"); }
-
-    /*
-        @brief Implementation for CGPSHOT - Write Command.
-        @detail Hot start GPS.
-        @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
-    */
-    int8_t hotStart() { return start("HOT"); }
+    int8_t start(GPSStart_t _start) {
+        switch (_start) {
+            case COLD: { _serial.sendCMD("AT+CGPSCOLD"); break }
+            case WARM: { _serial.sendCMD("AT+CGPSWARM"); break }
+            case HOT:  { _serial.sendCMD("AT+CGPSHOT");  break }
+        }
+        switch (_serial.waitResponse(9000)) {
+            case Response_t::A76XX_RESPONSE_OK : {
+                return A76XX_OPERATION_SUCCEEDED;
+            }
+            case Response_t::A76XX_RESPONSE_TIMEOUT : {
+                return A76XX_OPERATION_TIMEDOUT;
+            }
+            default : {
+                return A76XX_GENERIC_ERROR;
+            }
+        }
+    }
 
     /*
         @brief Implementation for CGNSSIPR - Write Command.
@@ -416,24 +423,6 @@ class GNSSCommands {
             }
         }
     }
-
-  private:
-    int8_t start(const char* start_type) {
-        _serial.sendCMD("AT+CGPS", start_type);
-        switch (_serial.waitResponse(9000)) {
-            case Response_t::A76XX_RESPONSE_OK : {
-                return A76XX_OPERATION_SUCCEEDED;
-            }
-            case Response_t::A76XX_RESPONSE_TIMEOUT : {
-                return A76XX_OPERATION_TIMEDOUT;
-            }
-            default : {
-                return A76XX_GENERIC_ERROR;
-            }
-        }
-    }
-
-
 };
 
 #endif A76XX_GNSS_CMDS_H_
