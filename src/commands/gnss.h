@@ -405,13 +405,15 @@ class GNSSCommands {
     /*
         @brief Implementation for CGNSSPROD - EXEC Command.
         @detail Get GNSS receiver product information.
+        @param [OUT] info Buffer to store the the GPS device information.
+        @param [IN] len Length of the buffer.
         @return A76XX_OPERATION_SUCCEEDED, A76XX_OPERATION_TIMEDOUT or A76XX_GENERIC_ERROR.
     */
-    int8_t getGPSProductInfo(const char* info) {
+    int8_t getGPSProductInfo(char* info, size_t len) {
         _serial.sendCMD("AT+CGNSSPROD");
         switch (_serial.waitResponse("PRODUCT: ", 9000, false, true)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                _serial.readBytesUntil(info, '\r');
+                _serial.readBytesUntil('\r', info, len);
                 _serial.clear();
                 return A76XX_OPERATION_SUCCEEDED;
             }
