@@ -279,7 +279,7 @@ class GNSSCommands {
                 info.HDOP        = _serial.parseFloat(); _serial.find(',');
                 info.VDOP        = _serial.parseFloat();
                 // get last OK
-                if (serial.waitResponse(9000) == Response_t::A76XX_RESPONSE_OK) {
+                if (_serial.waitResponse(9000) == Response_t::A76XX_RESPONSE_OK) {
                     return A76XX_OPERATION_SUCCEEDED;
                 } else {
                     return A76XX_GENERIC_ERROR;
@@ -316,7 +316,7 @@ class GNSSCommands {
                 info.speed       = _serial.parseFloat(); _serial.find(',');
                 info.course      = _serial.parseFloat();
                 // get last OK
-                if (serial.waitResponse(9000) == Response_t::A76XX_RESPONSE_OK) {
+                if (_serial.waitResponse(9000) == Response_t::A76XX_RESPONSE_OK) {
                     return A76XX_OPERATION_SUCCEEDED;
                 } else {
                     return A76XX_GENERIC_ERROR;
