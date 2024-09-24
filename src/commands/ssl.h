@@ -57,7 +57,7 @@ class SSLCommands {
 
     // CSSLCFG cacert
     int8_t configSSLCacert(uint8_t ssl_ctx_index, const char* ca_file) {
-        _serial.sendCMD("AT+CSSLCFG=\"cacert\",", ssl_ctx_index, ",", ca_file);
+        _serial.sendCMD("AT+CSSLCFG=\"cacert\",", ssl_ctx_index, ",\"", ca_file, "\"");
         A76XX_RESPONSE_PROCESS(_serial.waitResponse());
     }
 
