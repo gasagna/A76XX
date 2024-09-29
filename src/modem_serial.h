@@ -1,7 +1,7 @@
 #ifndef A76XX_MODEMUART_H_
 #define A76XX_MODEMUART_H_
 
-#include "CircularBuffer.h"
+#include "CircularBuffer.hpp"
 
 /*
     @brief Check if the last characters in the character buffer match with a given string.
