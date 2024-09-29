@@ -268,6 +268,6 @@ uint32_t A76XX::getUnixTime(bool UTC) {
     return time;
 }
 
-A76XXURC_t A76XX::listen(uint32_t timeout) {
+void A76XX::listen(uint32_t timeout) {
     return serial.listen(timeout);
 }
