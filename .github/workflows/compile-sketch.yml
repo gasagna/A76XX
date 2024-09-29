@@ -28,5 +28,7 @@ jobs:
           libraries: |
             - name: StreamDebugger
             - source-path: ./
+            - name: CircularBuffer
+            - source-path: ./
           sketch-paths: |
             - examples
