@@ -24,39 +24,62 @@
     CGNSSPROD       |      y      |     E      | getGPSProductInfo
 */
 
+// flags for filtering NMEA messages
+#define A76XX_GNSS_nGGA B00000001
+#define A76XX_GNSS_nGLL B00000010
+#define A76XX_GNSS_nGSA B00000100
+#define A76XX_GNSS_nGSV B00001000
+#define A76XX_GNSS_nRMC B00010000
+#define A76XX_GNSS_nVTG B00100000
+#define A76XX_GNSS_nZDA B01000000
+#define A76XX_GNSS_nGST B10000000
+
+/*
+    @brief Data structure of GNSS info returned by the command AT+CGNSSINFO.
+*/ 
 struct GNSSInfo_t {
-    int   mode;         // Fix mode 2=2D fix 3=3D fix
-    int   GPS_SVs;      // GPS satellite visible numbers
-    int   GLONASS_SVs;  // GLONASS satellite visible numbers
-    int   BEIDOU_SVs;   // BEIDOU satellite visible numbers
-    float lat;          // Latitude of current position. Output format is dd.ddddd
-    char  NS;           // N/S Indicator, N=north or S=south.
-    float lon;          // Longitude of current position. Output format is ddd.ddddd 
-    char  EW;           // E/W Indicator, E=east or W=west.
-    char  date[7];      // Date. Output format is ddmmyy.
-    char  UTC_TIME[10]; // UTC Time. Output format is hhmmss.ss.
-    float alt;          // MSL Altitude. Unit is meters.
-    float speed;        // Speed Over Ground. Unit is knots.
-    float course;       // Course. Degrees.
-    float PDOP;         // Position Dilution Of Precision.
-    float HDOP;         // Horizontal Dilution Of Precision.
-    float VDOP;         // Vertical Dilution Of Precision.
+    bool  hasfix = false;             // whether a fix is available or not
+    int   mode = 0;                   // Fix mode 2=2D fix 3=3D fix
+    int   GPS_SVs = 0;                // GPS satellite visible numbers
+    int   GLONASS_SVs = 0;            // GLONASS satellite visible numbers
+    int   BEIDOU_SVs = 0;             // BEIDOU satellite visible numbers
+    float lat = 0.0;                  // Latitude of current position. Output format is dd.ddddd
+    char  NS = '0';                   // N/S Indicator, N=north or S=south.
+    float lon = 0.0;                  // Longitude of current position. Output format is ddd.ddddd 
+    char  EW = '0';                   // E/W Indicator, E=east or W=west.
+    char  date[7] = "000000";         // Date. Output format is ddmmyy.
+    char  UTC_TIME[10] = "000000.00"; // UTC Time. Output format is hhmmss.ss.
+    float alt = 0.0;                  // MSL Altitude. Unit is meters.
+    float speed = 0.0;                // Speed Over Ground. Unit is knots.
+    float course = 0.0;               // Course. Degrees.
+    float PDOP = 0.0;                 // Position Dilution Of Precision.
+    float HDOP = 0.0;                 // Horizontal Dilution Of Precision.
+    float VDOP = 0.0;                 // Vertical Dilution Of Precision.
 };
 
+/*
+    @brief Data structure of GPS info returned by the command AT+CGPSINFO.
+*/ 
 struct GPSInfo_t {
-    float lat;          // Latitude of current position. Output format is dd.ddddd
-    char  NS;           // N/S Indicator, N=north or S=south.
-    float lon;          // Longitude of current position. Output format is ddd.ddddd 
-    char  EW;           // E/W Indicator, E=east or W=west.
-    char  date[7];      // Date. Output format is ddmmyy.
-    char  UTC_TIME[10]; // UTC Time. Output format is hhmmss.ss.
-    float alt;          // MSL Altitude. Unit is meters.
-    float speed;        // Speed Over Ground. Unit is knots.
-    float course;       // Course. Degrees.
+    bool  hasfix       = false;       // whether a fix is available or not
+    float lat          = 0.0;         // Latitude of current position. Output format is dd.ddddd
+    char  NS           = '0';         // N/S Indicator, N=north or S=south.
+    float lon          = 0.0;         // Longitude of current position. Output format is ddd.ddddd 
+    char  EW           = '0';         // E/W Indicator, E=east or W=west.
+    char  date[7]      = "000000";    // Date. Output format is ddmmyy.
+    char  UTC_TIME[10] = "000000.00"; // UTC Time. Output format is hhmmss.ss.
+    float alt          = 0.0;         // MSL Altitude. Unit is meters.
+    float speed        = 0.0;         // Speed Over Ground. Unit is knots.
+    float course       = 0.0;         // Course. Degrees.
 };
 
+/*
+    @brief Flag to start the GPS module in different modes. 
+*/
 enum GPSStart_t {
-    COLD, WARM, HOT;
+    COLD,
+    WARM,
+    HOT
 };
 
 class GNSSCommands {
@@ -98,9 +121,9 @@ class GNSSCommands {
     */
     int8_t start(GPSStart_t _start) {
         switch (_start) {
-            case COLD: { _serial.sendCMD("AT+CGPSCOLD"); break }
-            case WARM: { _serial.sendCMD("AT+CGPSWARM"); break }
-            case HOT:  { _serial.sendCMD("AT+CGPSHOT");  break }
+            case COLD: { _serial.sendCMD("AT+CGPSCOLD"); break; }
+            case WARM: { _serial.sendCMD("AT+CGPSWARM"); break; }
+            case HOT:  { _serial.sendCMD("AT+CGPSHOT");  break; }
         }
         switch (_serial.waitResponse(9000)) {
             case Response_t::A76XX_RESPONSE_OK : {
@@ -260,25 +283,29 @@ class GNSSCommands {
         _serial.sendCMD("AT+CGNSSINFO");
         switch (_serial.waitResponse("+CGNSSINFO:", 9000, false, true)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                // when we do not have a fix
-                if (_serial.peek() == ',') { return A76XX_GNSS_NO_FIX; }
-                info.mode        = _serial.parseInt();   _serial.find(',');
-                info.GPS_SVs     = _serial.parseInt();   _serial.find(',');
-                info.GLONASS_SVs = _serial.parseInt();   _serial.find(',');
-                info.BEIDOU_SVs  = _serial.parseInt();   _serial.find(',');
-                info.lat         = _serial.parseFloat(); _serial.find(',');
-                info.NS          = _serial.read();       _serial.find(',');
-                info.lon         = _serial.parseFloat(); _serial.find(',');
-                info.EW          = _serial.read();       _serial.find(',');
-                _serial.readBytes(info.date, 6);         _serial.find(',');
-                _serial.readBytes(info.UTC_TIME, 9);     _serial.find(',');
-                info.alt         = _serial.parseFloat(); _serial.find(',');
-                info.speed       = _serial.parseFloat(); _serial.find(',');
-                info.course      = _serial.parseFloat(); _serial.find(',');
-                info.PDOP        = _serial.parseFloat(); _serial.find(',');
-                info.HDOP        = _serial.parseFloat(); _serial.find(',');
-                info.VDOP        = _serial.parseFloat();
-                // get last OK
+                // when we do not have a fix there is a space
+                if (_serial.peek() == ' ') { 
+                    info.hasfix = false;
+                } else {
+                    info.hasfix = true;
+                    info.mode        = _serial.parseInt();   _serial.find(',');
+                    info.GPS_SVs     = _serial.parseInt();   _serial.find(',');
+                    info.GLONASS_SVs = _serial.parseInt();   _serial.find(',');
+                    info.BEIDOU_SVs  = _serial.parseInt();   _serial.find(',');
+                    info.lat         = _serial.parseFloat(); _serial.find(',');
+                    info.NS          = _serial.read();       _serial.find(',');
+                    info.lon         = _serial.parseFloat(); _serial.find(',');
+                    info.EW          = _serial.read();       _serial.find(',');
+                    _serial.readBytes(info.date, 6);         _serial.find(',');
+                    _serial.readBytes(info.UTC_TIME, 9);     _serial.find(',');
+                    info.alt         = _serial.parseFloat(); _serial.find(',');
+                    info.speed       = _serial.parseFloat(); _serial.find(',');
+                    info.course      = _serial.parseFloat(); _serial.find(',');
+                    info.PDOP        = _serial.parseFloat(); _serial.find(',');
+                    info.HDOP        = _serial.parseFloat(); _serial.find(',');
+                    info.VDOP        = _serial.parseFloat();
+                }
+                // get last OK in any case
                 if (_serial.waitResponse(9000) == Response_t::A76XX_RESPONSE_OK) {
                     return A76XX_OPERATION_SUCCEEDED;
                 } else {
@@ -304,22 +331,26 @@ class GNSSCommands {
         _serial.sendCMD("AT+CGPSINFO");
         switch (_serial.waitResponse("+CGPSINFO:", 9000, false, true)) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
-                // when we do not have a fix
-                if (_serial.peek() == ',') { return A76XX_GNSS_NO_FIX; }
-                info.lat         = _serial.parseFloat(); _serial.find(',');
-                info.NS          = _serial.read();       _serial.find(',');
-                info.lon         = _serial.parseFloat(); _serial.find(',');
-                info.EW          = _serial.read();       _serial.find(',');
-                _serial.readBytes(info.date, 6);         _serial.find(',');
-                _serial.readBytes(info.UTC_TIME, 9);     _serial.find(',');
-                info.alt         = _serial.parseFloat(); _serial.find(',');
-                info.speed       = _serial.parseFloat(); _serial.find(',');
-                info.course      = _serial.parseFloat();
-                // get last OK
+                // when we do not have a fix there should be an empty space after the :
+                if (_serial.peek() == ' ') { 
+                    info.hasfix = false;
+                } else {
+                    info.hasfix = true;
+                    info.lat         = _serial.parseFloat(); _serial.find(',');
+                    info.NS          = _serial.read();       _serial.find(',');
+                    info.lon         = _serial.parseFloat(); _serial.find(',');
+                    info.EW          = _serial.read();       _serial.find(',');
+                    _serial.readBytes(info.date, 6);         _serial.find(',');
+                    _serial.readBytes(info.UTC_TIME, 9);     _serial.find(',');
+                    info.alt         = _serial.parseFloat(); _serial.find(',');
+                    info.speed       = _serial.parseFloat(); _serial.find(',');
+                    info.course      = _serial.parseFloat();
+                }
+                // get last OK in any case
                 if (_serial.waitResponse(9000) == Response_t::A76XX_RESPONSE_OK) {
                     return A76XX_OPERATION_SUCCEEDED;
                 } else {
-                    return A76XX_GENERIC_ERROR;
+                    return A76XX_GNSS_GENERIC_ERROR;
                 }
             }
             case Response_t::A76XX_RESPONSE_TIMEOUT : {
