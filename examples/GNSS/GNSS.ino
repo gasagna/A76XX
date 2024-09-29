@@ -39,7 +39,7 @@ void setup() {
 
     // enable gps
     Serial.print("Enabling GNSS ...");
-    if (gnss.enableGNSS(GPSStart_t::HOT) == false) {
+    if (gnss.enableGNSS(GPSStart_t::COLD) == false) {
         Serial.println("error");
         while (true) {}
     }
