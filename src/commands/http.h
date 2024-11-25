@@ -222,7 +222,7 @@ class HTTPCommands {
         _serial.sendCMD("AT+HTTPDATA=", length, ",", 30);
 
         // timeout after 10 seconds
-        Response_t rsp = _serial.waitResponse("DOWNLOAD", 10, false, true);
+        Response_t rsp = _serial.waitResponse("DOWNLOAD", 10000, false, true);
 
         switch (rsp) {
             case Response_t::A76XX_RESPONSE_MATCH_1ST : {
