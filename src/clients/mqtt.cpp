@@ -32,7 +32,7 @@ void MQTTOnMessageRx::process(ModemSerial* serial) {
 
     serial->waitResponse("+CMQTTRXEND: "); serial->find('\n');
 
-    messageQueue.pushEnd(msg);
+    messageQueue.push(msg);
 }
 
 A76XXMQTTClient::A76XXMQTTClient(A76XX& modem, const char* clientID, bool use_ssl)
@@ -44,8 +44,6 @@ A76XXMQTTClient::A76XXMQTTClient(A76XX& modem, const char* clientID, bool use_ss
     , _session_id(0) {
         // enable parsing MQTT URCs
         _serial.registerEventHandler(&_on_message_rx_handler);
-        _serial.registerEventHandler(&_on_connection_lost_handler);
-        _serial.registerEventHandler(&_on_no_net_handler);
     }
 
 bool A76XXMQTTClient::begin() {
@@ -142,11 +140,11 @@ bool A76XXMQTTClient::subscribe(const char* topic, uint8_t qos) {
 }
 
 uint32_t A76XXMQTTClient::messageAvailable() {
-    return _on_message_rx_handler.messageQueue.available();
+    return _on_message_rx_handler.messageQueue.size();
 }
 
 MQTTMessage_t A76XXMQTTClient::getMessage() {
-    return _on_message_rx_handler.messageQueue.popFront();
+    return _on_message_rx_handler.messageQueue.shift();
 }
 
 bool A76XXMQTTClient::isConnected() {

@@ -23,6 +23,22 @@ bool A76XX::init(const char* pincode, uint32_t timeout) {
         return false;
     }
 
+    // turn off echoing commands
+    retcode = v25ter.commandEcho(false);
+    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
+
+    // disable reporting mobile equipment errors with numeric values
+    retcode = statusControl.setErrorResultCodes(0);
+    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
+
+    // disable unsolicited codes for time zone change
+    retcode = network.setTimeZoneURC(false);
+    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
+
+    // enable automatic time and time zone updates via NITZ
+    retcode = network.setTimeZoneAutoUpdate(true);
+    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
+
     PINStatus_t status;
     retcode = sim.getPINStatus(status);
     // catch errors with the command
@@ -47,22 +63,6 @@ bool A76XX::init(const char* pincode, uint32_t timeout) {
             A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
         }
     }
-
-    // turn off echoing commands
-    retcode = v25ter.commandEcho(false);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
-
-    // disable reporting mobile equipment errors with numeric values
-    retcode = statusControl.setErrorResultCodes(0);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
-
-    // disable unsolicited codes for time zone change
-    retcode = network.setTimeZoneURC(false);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
-
-    // enable automatic time and time zone updates via NITZ
-    retcode = network.setTimeZoneAutoUpdate(true);
-    A76XX_CLIENT_RETCODE_ASSERT_BOOL(retcode)
 
     return true;
 }
@@ -268,6 +268,6 @@ uint32_t A76XX::getUnixTime(bool UTC) {
     return time;
 }
 
-A76XXURC_t A76XX::listen(uint32_t timeout) {
+void A76XX::listen(uint32_t timeout) {
     return serial.listen(timeout);
 }

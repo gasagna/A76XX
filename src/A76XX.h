@@ -29,6 +29,20 @@
     #define MQTT_MESSAGE_QUEUE_SIZE 10
 #endif
 
+#ifndef NMEA_MESSAGE_SIZE
+    /* Length size of NMEA message */
+    #define NMEA_MESSAGE_SIZE 100
+#endif
+
+#ifndef GNSS_NMEA_QUEUE_SIZE
+    /* 
+        Controls the size of the queue to store NMEA messages.
+        Old messages get overwritten if they do not get processed 
+        sufficiently quickly by the user's code.
+    */
+    #define GNSS_NMEA_QUEUE_SIZE 32
+#endif
+
 enum Response_t {
     A76XX_RESPONSE_OK        = 0,
     A76XX_RESPONSE_MATCH_1ST = 1,
@@ -50,7 +64,8 @@ enum Response_t {
 #define A76XX_MQTT_ALREADY_STARTED           -5
 #define A76XX_SIM_PIN_REQUIRED               -6
 #define A76XX_SIM_PIN_MODEM_ERROR            -7
-
+#define A76XX_GNSS_NOT_READY                 -8
+#define A76XX_GNSS_GENERIC_ERROR             -9
 
 // if retcode is an error, return it
 #define A76XX_RETCODE_ASSERT_RETURN(retcode) {        \
@@ -91,7 +106,6 @@ enum Response_t {
     }
 
 #include "utils/base64.h"
-#include "utils/queue.h"
 
 #include "event_handlers.h"
 #include "modem_serial.h"
@@ -104,6 +118,7 @@ enum Response_t {
 #include "commands/v25ter.h"
 #include "commands/http.h"
 #include "commands/mqtt.h"
+#include "commands/gnss.h"
 #include "commands/ssl.h"
 #include "commands/sim.h"
 
@@ -113,5 +128,6 @@ enum Response_t {
 #include "clients/secure.h"
 #include "clients/mqtt.h"
 #include "clients/http.h"
+#include "clients/gnss.h"
 
 #endif A76XX_H_

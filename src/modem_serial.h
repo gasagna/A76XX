@@ -1,12 +1,35 @@
 #ifndef A76XX_MODEMUART_H_
 #define A76XX_MODEMUART_H_
 
+#include "CircularBuffer.hpp"
+
+/*
+    @brief Check if the last characters in the character buffer match with a given string.
+
+    @param [IN] buf The character buffer.
+    @param [IN] str The string to be matched.
+    @return True in case of a match.
+*/
+template<size_t N>
+bool endsWith(CircularBuffer<char, N>& buf, const char* str) {
+    if (strlen(str) > buf.size()) { return false; }
+    const char* m = str + strlen(str) - 1; // pointer to last character in str
+    int i = 1;
+    while (i <= buf.size() && i <= strlen(str) ) {
+        if (buf[buf.size() - i] != *m) {
+            return false;
+        }
+        m--;
+        i++;
+    }
+    return true;
+}
+
 class ModemSerial {
   private:
     Stream&                                                        _stream;
     EventHandler_t*              _event_handlers[A76XX_MAX_EVENT_HANDLERS];
     uint8_t                                            _num_event_handlers;
-    StaticQueue<A76XXURC_t, A76XX_URC_QUEUE_SIZE>        _events_urc_queue;
 
   public:
 
@@ -51,36 +74,35 @@ class ModemSerial {
                             bool match_OK = true,
                             bool match_ERROR = true) {
         // store data here
-        String data; data.reserve(64);
+        CircularBuffer<char, 64> data;
 
         // start timer
         auto tstart = millis();
 
         while (millis() - tstart < timeout) {
             if (available() > 0) {
-                data += static_cast<char>(read());
+                data.push(static_cast<char>(read()));
 
                 // parse modem output for any URCs that we need to process
                 for (uint8_t i = 0; i < _num_event_handlers; i++) {
-                    if (data.endsWith(_event_handlers[i]->match_string)) {
+                    if (endsWith(data, _event_handlers[i]->match_string)) {
                         _event_handlers[i]->process(this);
-                        _events_urc_queue.pushEnd(_event_handlers[i]->urc);
                     }
                 }
 
-                if (match_1 != NULL && data.endsWith(match_1) == true)
+                if (match_1 != NULL && endsWith(data, match_1) == true)
                     return Response_t::A76XX_RESPONSE_MATCH_1ST;
 
-                if (match_2 != NULL && data.endsWith(match_2) == true)
+                if (match_2 != NULL && endsWith(data, match_2) == true)
                     return Response_t::A76XX_RESPONSE_MATCH_2ND;
 
-                if (match_3 != NULL && data.endsWith(match_3) == true)
+                if (match_3 != NULL && endsWith(data, match_3) == true)
                     return Response_t::A76XX_RESPONSE_MATCH_3RD;
 
-                if (match_ERROR && data.endsWith(RESPONSE_ERROR) == true)
+                if (match_ERROR && endsWith(data, RESPONSE_ERROR) == true)
                     return Response_t::A76XX_RESPONSE_ERROR;
 
-                if (match_OK && data.endsWith(RESPONSE_OK) == true)
+                if (match_OK && endsWith(data, RESPONSE_OK) == true)
                     return Response_t::A76XX_RESPONSE_OK;
             }
         }
@@ -155,26 +177,12 @@ class ModemSerial {
     }
 
     /*
-        @brief Listen for new data from the serial connection with the module
-            and return any unsolicited result codes found or A76XXURC_t::NONE.
+        @brief Listen for URCs from the serial connection with the module.
 
-        @details URC are stored internally in a queue. If no URC have been emitted
-            previously, block execution and wait for a new URC.
-
-        @param [IN] timeout Return if no URCs are found within this timeframe in 
-            milliseconds. If an URC code was previouly emitted by the module, 
-            return its code immediately.
+        @param [IN] timeout Wait up to this time in ms before returning.
     */
-    A76XXURC_t listen(uint32_t timeout = 100) {
-        if (_events_urc_queue.available() == 0) {
-            waitResponse(timeout, false, false);
-        }
-
-        if (_events_urc_queue.available() > 0) {
-            return _events_urc_queue.popFront();
-        }
-
-        return A76XXURC_t::NONE;
+    void listen(uint32_t timeout = 100) {
+        waitResponse(timeout, false, false);
     }
 
     /* 
@@ -184,6 +192,29 @@ class ModemSerial {
     */
     void registerEventHandler(EventHandler_t* handler) {
         _event_handlers[_num_event_handlers++] = handler;
+    }
+
+    /* 
+        @brief Deregister an exisiting event handler.
+
+        @param [IN] Pointer to a subclass of EventHandler_t.
+    */
+    void deRegisterEventHandler(EventHandler_t* handler) {
+        // Search for the element of _event_handlers that points to the
+        // same address of the input, and then shift the elements left
+        // by one to `delete` the handler that needs to be de-registered.
+        // This can be replaced by a linked list for efficient removal, 
+        // but registration/deregistration is only done occasionally and 
+        // _num_event_handlers will typically be small
+        for (uint8_t i = 0; i < _num_event_handlers; i++) {
+            if (_event_handlers[i] == handler) {
+                for (uint8_t j = i; j < _num_event_handlers; j++) {
+                    _event_handlers[j] = _event_handlers[j+1];
+                }
+                _num_event_handlers--;
+                return;
+            }
+        }
     }
 
     /*
@@ -256,8 +287,16 @@ class ModemSerial {
         return _stream.parseInt(); 
     }
 
+    float parseFloat() { 
+        return _stream.parseFloat(); 
+    }
+
     void flush() { 
         _stream.flush(); 
+    }
+
+    char peek() { 
+        return _stream.peek(); 
     }
 
     uint16_t read() { 
@@ -284,6 +323,5 @@ class ModemSerial {
         return _stream.readBytes(args...); 
     }
 };
-
 
 #endif A76XX_MODEMUART_H_
